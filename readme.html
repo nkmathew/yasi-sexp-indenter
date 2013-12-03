@@ -1,0 +1,256 @@
+<h2>yasi- yet another s-expression indenter</h2>
+<p>yasi is a dialect aware s-expression indenter that tries to improve<br />
+on
+<a href="http://www.ccs.neu.edu/home/dorai/scmindent/">Dorai's indenter</a>
+and <em>Vim's</em> built in indenter. It can handle<br />
+<em>Common Lisp</em>, <em>Clojure</em>, <em>Scheme</em> and <em>newLISP</em> code and their<br />
+unique syntaxes.</p>
+<p>It's a batch mode indenter inspired by Dorai's <a href="http://www.ccs.neu.edu/home/dorai/scmindent/lispindent.lisp">lispindent.lisp</a>
+that was<br />
+written first in <em>Python</em> and later translated to <em>newLISP</em>.<br />
+</p>
+<p>It's style of indentation is  very close to that of <em>Dorai's</em> <em>lispindent.lisp</em><br />
+and tries to follow <em>Dorai's</em> <a href="http://www.ccs.neu.edu/home/dorai/scmindent/">style guidelines</a>
+where reasonable.(refer to file dorai-test.lisp)</p>
+<h3>Features</h3>
+<p><em>yasi's</em> indentation relies heavily on regular expressions that<br />
+give it an edge over it's counterpart <em>lispindent.lisp</em>. It's<br />
+features include:<br />
+</p>
+<ul>
+<li>
+<p>Ability to compact code that has extra whitespace between forms.<br />
+  e.g. Code like <code>(if  (= lisp Clojure ) 'Yes 'No )</code> is compacted<br />
+  to <code>(if (= lisp Clojure) 'Yes 'No)</code><br />
+</p>
+</li>
+<li>
+<p>Supports 4 dialects of the <em>Lisp</em> family giving you the correct indentation<br />
+  of a form according to the dialect's syntax. e.g the <code>do</code> keyword that<br />
+  is used for looping in <em>Lisp</em> and sequential execution in <em>Clojure</em>.<br />
+  The keyword should look like this in the two dialects:<br />
+</p>
+<pre><code>;; In Common Lisp
+(do ((j 0 (+ j 1)))
+    (nil)                       ;Do forever.
+  (format t "~%Input ~D:" j)
+  (let ((item (read)))
+    (if (null item) (return)   ;Process items until NIL seen.
+      (format t "~&amp;Output ~D: ~S" j item))))
+
+;; In Clojure
+(do
+ (println "LOG: Computing...")
+ (+ 1 1))
+</code></pre>
+</li>
+<li>
+<p><em>yasi</em> also issues warnings that would become syntax errors if you<br />
+  ran the code. e.g. If you forgot to close a string or a comment.<br />
+</p>
+</li>
+<li>
+<p>Correct indentation of user defined macros. If <em>yasi</em> finds a <code>defmacro</code><br />
+  keyword, it adds the macro name to the list of keywords with indentation level<br />
+  of 2.</p>
+<pre><code>;; from quicklisp.lisp
+(defmacro with-connection ((connection host port) &amp;body body)
+  `(call-with-connection ,host ,port (lambda (,connection) ,@body)))
+
+(with-connection (connection (hostname connect-url) (port connect-url))
+  (let ((cbuf (make-instance 'cbuf :connection connection))
+        (request (request-buffer "GET" url)))
+    (format stream "; ~$KB~%" (/ size 1024))
+    (format stream "; Unknown size~%")))
+</code></pre>
+</li>
+<li>
+<p>It indents <code>flets</code> and <code>labels</code> the right way, using a hack here and there.<br />
+</p>
+</li>
+<li>
+<p>It doesn't mess with <code>newLISP</code>'s multiline strings({})</p>
+</li>
+<li>
+<p>Overkill feature: You get to know the last time you indented the
+  file.</p>
+</li>
+</ul>
+<h3>Command Line Arguments</h3>
+<pre><code> _________________________________________________________________________________________________________________
+|    Usage: newlisp yasi.lsp [[&lt;file&gt;] [--backup-dir&lt;directory&gt;] [--no-compact] [--no-backup] [--no-warning]      |
+|                   [--clojure] [--lisp] [--scheme] [--default-indent &lt;num&gt;]]                                     |
+|            -nb,    --no-backup     # Don't create a backup file even if --backup-dir is specified               |
+|            -nc,    --no-compact    # Try to preserve the structure of the file.                                 |
+|            -nw,    --no-warning    # Don't issue warnings                                                       |
+|            -ne,    --no-exit       # Instructs the program not to exit when a warning is raised. True by default|
+|            -uni,   --uniform       # Dicatates whether the if-clause and else-clause of an if-like block should |
+|                                       have the same indent level. False by default                              |
+|            -no,    --no-output     # Suppress output of the indented code                                       |
+|            -nm,    --no-modify     # Don't modify the file                                                      |
+|            --backup-dir            # The directory where the backup file is to be written                       |
+|            --clojure               # Use Clojure keywords                                                       |
+|            --lisp                  # Use Lisp keywords                                                          |
+|            --newlisp               # Use newLISP keywords                                                       |
+|            --scheme                # Use Scheme keywords                                                        |
+|            --default-indent &lt;num&gt;  # The indent level to be used in case a                                      |
+|                                    function's argument is in the next line. Vim uses 2, the most common being 1.|
+|            --indent-comments, -ic  # False by default. If true, comment lines will be indented possibly         |
+|                                        messing with any deliberate comment layout                               |
++-----------------------------------------------------------------------------------------------------------------+
+</code></pre>
+<h3>What yasi does not handle</h3>
+<p>There are some syntaxes used in some dialects of scheme that I didn't feel like<br />
+including because they are not that common. An example is <em>MzScheme</em> and<br />
+<em>Gauche's</em> use of <code>#//</code> or <code>#[]</code> for regular expressions. I just saw it as too<br />
+much an effort for something I would not use that oftenly.</p>
+<h3>Customization</h3>
+<p><em>yasi</em> takes a different approach to cutomization from that of Dorai's indenter. Instead<br />
+of you storing extra keywords in a <em>.lispwords</em> file in your home directory, you are advised<br />
+to edit the list of keywords in the source file so that you have only one file. For example,<br />
+if you find that <code>multiple-value-bind</code> should have all of its subforms indented uniformly like<br />
+so:<br />
+</p>
+<pre><code>(multiple-value-bind (f r)
+  (floor 130 11)
+  (list f r))
+</code></pre>
+<p>Instead of:<br />
+</p>
+<pre><code>(multiple-value-bind (f r)
+    (floor 130 11)
+  (list f r))
+</code></pre>
+<p>You go to <em>line 424(yasi.py)</em>:<br />
+</p>
+<pre><code>if DIALECT == 'Common Lisp': # Lisp
+    TWO_SPACE_INDENTERS = LISP_KEYWORDS
+    IF_LIKE += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
+</code></pre>
+<p>and simply remove <code>multiple-value-bind</code> from the list.</p>
+<h4>About the default indent</h4>
+<p>The <em>--default-indent</em> comes in in expressions whose subforms usually<br />
+start in the subsequent lines. Like a <code>cond</code> expression:<br />
+</p>
+<pre><code>(cond
+ ((&gt; this that) 'Yes)
+ ((= those these) 'No))
+</code></pre>
+<p>According to Dorai's <a href="http://www.ccs.neu.edu/home/dorai/scmindent/">guidelines</a>
+the above indentation is correct. However,<br />
+some people may prefer the test expressions to be two spaces past the bracket,<br />
+like this:<br />
+</p>
+<pre><code>(cond
+  ((&gt; newLISP CL) 'Yes)
+  ((= Clojure Lisp) 'No))
+</code></pre>
+<p>It makes the body stand out well enough to be easily noticeable; <em>Vim</em> does this.<br />
+That option enables you to specify the amount you want, for example to achieve<br />
+the style above, you pass the parameter like so:</p>
+<pre><code>yasi.py test.lisp --lisp --default-indent 2
+</code></pre>
+<h4>Testing</h4>
+<p>I used a rather unorthodox method of testing the three programs(<em>yasi.py</em>,<br />
+<em>original_yasi.py</em>, <em>yasi.lsp</em>). I figured, since the programs follow the<br />
+same logic, they should give the same result for any file with the same<br />
+parameters passed to them.<br />
+This gurrantees that the programs were translated correctly but doesn't mean<br />
+that the way they are indenting is the right way. You should get similar results<br />
+when you run a command like this:<br />
+</p>
+<pre><code>forfiles /c "cmd /c newlisp ..\yasi.lsp @file --scheme -nb -no -ne"
+forfiles /c "cmd /c python ..\yasi.py @file --scheme -nb -no -ne"
+forfiles /c "cmd /c python ..\original-yasi.py @file --scheme -nb -no -ne"
+</code></pre>
+<hr />
+<h4>Changes made to Dorai's Indenter</h4>
+<p>I made a couple of modifications to <em>lispindent.lisp</em> and renamed it to<br />
+<em>lispindent2.lisp</em>. It contains some of <em>yasi's</em> features. The changes<br />
+include:<br />
+</p>
+<ul>
+<li>
+<p>Added comments for some sections of the program that took me time to grok. <br />
+</p>
+</li>
+<li>
+<p>I turned into a batch-mode indenter, which was quite easy really since <em>Lisp</em><br />
+  uses streams. You simply open a file and pass the file descriptor to most<br />
+  of the i/o functions like <code>terpri</code> and <code>write</code>.</p>
+</li>
+<li>
+<p><em>lispindent2.lisp</em> indents <em>Clojure's</em> <em>vectors</em> and <em>sets</em><br />
+  better, i.e with an indentation level of 1. This doesn't affect<br />
+<em>lisp</em> or <em>scheme indentation</em>. It uses the file's extension to determine<br />
+  if it's looking at <em>Clojure</em> code.
+  e.g</p>
+<pre><code>;; lispindent2.lisp's indentation
+(print {define "The keyword does not affect indentation"
+        })
+
+;; lispindent.lisp's indentation
+(print {define "The keyword does not affect indentation"
+       })
+</code></pre>
+</li>
+<li>
+<p><em>lispindent2.lisp</em> ignores any code in a multiline comment and won't<br />
+  be affected by any unclosed brackets inside the comment like the original<br />
+  version. Unfortunately, its method of detecting multiline comments is rather<br />
+  naive and introduces a bug in the code. Refer to its issues below.<br />
+</p>
+</li>
+<li>
+<p><em>lispindent2.lisp</em> writes files using <em>LF</em> line endings be default. It's less<br />
+  irritating than <em>CRLF</em> endings which usually light up in an annoying way in <em>Vim</em>.<br />
+</p>
+</li>
+</ul>
+<h4>lispindent2.lisp's Issues</h4>
+<p>I inadvertently added a bug in an attempt to prevent it from evaluating<br />
+brackets inside multiline comments and symbols with whitespace. It uses the pipe<br />
+character(|) to switch between <code>multiline-commentp=T</code> and <code>multiline-commentp=nil</code><br />
+which means that if your pipes are unbalanced, you'll get wrong indentation, e.g.:<br />
+</p>
+<pre><code>#|*******************************************************************|
+ |   This is a multiline comment that will trip the indenter         |
+ |   because the odd number of pipes will cause `multiline-commentp` |
+ |   to be true after this comment. It means the rest of the code    |
+ |   won't be indented because it thinks it's still in a comment.    |
+          Total pipes=11(odd)
+ |#
+ (print (cons
+    'Hello ;; This line and the one below won't change
+    'World
+        ))
+</code></pre>
+<p>I don't find this to be a major issue because multiline comments are rare,<br />
+the common use case being to comment out some piece of code when debugging.<br />
+</p>
+<p><em>lispindent2.lisp</em> uses the <em>Lisp</em> reader function <code>read-from-string</code> to get<br />
+lisp forms and atoms from the read string. The downside of this is that<br />
+<code>read-from-string</code> will fail when the code in the string is 'malformed'.<br />
+For example, if it finds that the dot operator used for consing in <em>Common Lisp</em><br />
+comes after the opening bracket, it will stop reading from the string. This<br />
+means that any <em>Clojure</em> code that tries to use the dot operator to access a<br />
+class method will not be indented because of the error. An example is this code:<br />
+</p>
+<pre><code>(defmacro chain
+  ([x form] `(. ~x ~form))
+  ([x form &amp; more] `(chain (. ~x ~form) ~@more)))
+</code></pre>
+<p>It uses the <code>ignore-errors</code> macro as a workaround. Doing that means that it can't<br />
+run in <em>GNU Common Lisp</em> because it doesn't have the macro.</p>
+<h4>lispindent2.lisp's command-line options</h4>
+<pre><code> ___________________________________________________________________________
+|   Usage:  lispindent2.lisp [[&lt;file&gt;] [--no-modify] [--no-output]]         |
+|           --no-output ;; Don't output the indented code, false by default |
+|           --no-modify ;; Don't modify the file, false by default          |
++---------------------------------------------------------------------------+
+</code></pre>
+<h4>About yasi.lsp</h4>
+<p><em>yasi.lsp</em> is the <em>newLISP</em> translation of the python version. I translated<br />
+almost every method with little modification from Python to newLISP. <em>yasi.lsp</em><br />
+should therefore run almost 100% like <em>yasi.py</em><br />
+</p>
