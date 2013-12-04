@@ -1,0 +1,124 @@
+Nov 19-2013 23:00:00
+	* yasi.py (trim_extra_whitespace): All whitespace after opening brackets was
+		being stripped concatenating literal bracket characters with the tokens
+		after them.
+
+Nov 20-2013 03:32:20
+	* yasi.py (main): Fixed a test condition that identified the start of a
+		comment line wrongly.
+
+
+Nov 20-2013 05:02:26
+
+	* yasi.py (is_macro_name): Classifies a token with `def` as a macro and
+		hance a two space indenter so that it handles macros with full namespace 
+		qualification like `yacc:define-parser`
+
+Nov 20-2013 05:55:17
+	* yasi.py (main): Fixed wrong detection of comment and symbol regions.
+					  It needed to be updated at two places.
+Nov 21-2013 12:32:54
+	* yasi.py (main): Major refactoring. Put all the code in functions. 12 
+					  in the toplevel and 11 in the Indenter class. The program 
+					  can now indent strings. 
+
+					  Documented those functions.
+Nov 21-2013 16:29:42
+	* yasi.py (Indenter.trim): Removed functions:
+			remove_btw_brackets [Indenter]
+			remove_leading [Indenter]
+			remove_extra [Indenter]
+			remove_before_closing_bracket [Indenter]
+			remove_after_opening_bracket [Indenter]
+		in favour of regular expressions with back references to 
+		trim whitespace in code.
+
+Nov 22-2013 21:53:45
+	* yasi.py (Indenter.pad_leading_whitespace): It doesn't modify an empty lines.
+			  (Indenter.all_whitespace): New function that determines if a string has
+										 nothing else but whitespace
+			  (Indenter.split_preserve): Doesn't rstrip everything, only the separator. 
+
+Nov 22-2013 22:09:18
+	* yasi.py (Indenter.trim): Fixed regex that separated the splicing comma from the symbol
+							   after it.
+
+Nov 22-2013 23:17:32
+	* yasi.py (indent_file): Backs up the file only if the file contents are different from
+							 the original.
+										  
+Nov 22-2013 23:54:50
+	* yasi.py (indent_code): Wrong detection of string endings in the case of 3 or more backslashes 
+							 preceding a double quote.
+							
+							Renamed variable untouchable_region to in_symbol_region
+
+Nov 23-2013 09:45:31
+	* yasi.py (main): Renamed lists `positions` and `string_positions` to `quote_locations` and
+					  `brackect_locations` respectively. It felt more meaningful that way since 
+					  technically you can't store the position of a string but it's beginning and
+					  and end at best.
+
+Nov 23-2013 11:11:31
+	* yasi.py (after_indentation, indent_code): A list is not necessary to track
+				unclosed strings, simply use a variable e.g `last_quote_location`
+
+Nov 23-2013 12:28:53
+	* yasi.py (handle_warning): A new function called when a warning is issued. The
+							 functions code was previously duplicated in several
+							functions in the code.
+		   (indented_code): Can now handle newLISP's multiline strings.
+Nov 23-2013 12:52:01
+	* yasi.py (after_indentation): Warnings on unclosed multiline strings for
+								   newLISP
+Nov 23-2013 16:11:07
+	* yasi.py (indent_code): Prevent evaluation of escape characters in
+							 newLISP's raw strings that would cause false warnings 
+							of unclosed strings.
+Nov 24-2013 09:38:19
+	* yasi.py (indent_code): False detection of multiline string when a pipe is encountered 
+							 in a newLISP raw string.
+Nov 24-2013 14:48:25
+	* yasi.py (indenter.indent): New function broken off from function
+								 indent_code for length reasons.
+
+Nov 24-2013 15:20:52
+	* yasi.py (indent_code): Wrong calculation of a bracket's real position
+
+Nov 24-2013 15:36:43
+	* yasi.py (indenter.indent): Returns NullObject when zero level is found. 
+
+Nov 24-2013 16:38:01
+	* yasi.py (indent_code): Passes filename without path to `after_indentation`
+							 causing it to fail when absolute and relative paths 
+							are used
+Nov 24-2013 21:45:09
+	* yasi.py (pad_leading_whitespace): Wrong calculation of indent level due to 
+							the zero level being added on every line in nocompact 
+							mode.
+Nov 25-2013 22:09:20
+	* yasi.py (find_first_arg_pos): Multiline comments shouldn't be treated as
+									arguments to functions.
+
+Nov 26-2013 14:52:52
+	* yasi.py (find_first_arg_pos): Regex fails if there's exactly one space between two
+									matching brackets.
+
+Nov 26-2013 15:58:43
+	* yasi.py (indenter.indent): Comments can now be indented with the `--indent-comments` option
+								 One can now specify the default indent level.
+
+Nov 27-2013 20:40:48
+	* yasi.py (issue_warning): All warnings are handled by this function 
+
+Dec 02-2013 00:26:09
+	* yasi.py (indent_code): Square and curly brackets should ignored when the dialect in
+							 use is newLISP or Common Lisp.
+
+Dec 02-2013 17:51:01
+	* yasi.py (indent_code): Vectors indent by one space
+							 Sharp sign before semi colons in Scheme should not
+							be considered as comments in order to avoid errors
+							about unclosed brackets.
+
+
