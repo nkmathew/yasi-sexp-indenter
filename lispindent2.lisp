@@ -190,7 +190,7 @@
 
 (defun string-trim-blanks (s)
   " Remove leading and trailing whitespace even in a string."
-  (string-left-trim '(#\space #\tab #\newline #\return) s))
+  (string-trim '(#\space #\tab #\newline #\return) s))
 
 (with-open-file (file-with-code *file-name*
                   :direction :input)
@@ -213,7 +213,7 @@
                                   (nas (lparen-num-aligned-subforms lp)) ;; num-aligned-subforms is not really necessary since it'll be 2
                                   (nfs (lparen-num-finished-subforms lp)) ;; num-finished-subforms is used to detect whether we have found an if-clause
                                   (extra-w 0)) ;; extra width is used to make the if-clause have more indentation than the else clause
-                             (when (< nfs nas) ;(and (>= nas 0) (< nfs nas))
+                             (when (< nfs nas)
                                (incf (lparen-num-finished-subforms lp))
                                (setq extra-w 2))
                              (+ (lparen-spaces-before lp)
