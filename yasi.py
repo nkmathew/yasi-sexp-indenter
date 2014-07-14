@@ -239,6 +239,9 @@ class Indenter():
             ## if compact mode is on, split the string into two, trim the first
             ## position and merge the two portions.
             trim_limit = self.find_trim_limit(string)
+            comment_line = re.search("^[ \t]*;", string, re.M)
+            if comment_line and INDENT_COMMENTS:
+                trim_limit = -1
             substr1 = string[0:trim_limit]
             substr2 = string[trim_limit:]
             substr1 = self.trim(substr1)

@@ -162,7 +162,7 @@
   (set '*if-like* (append '("with-slots" "do" "do*")  *if-like*)))
  ((= *dialect* "Clojure")
   (set '*two-space-indenters* *clojure-keywords*)
-  (set '*if-like* (append '()  *if-like*)))
+  (set '*if-like* (append '() *if-like*)))
  ((= *dialect* "newLISP")
   (set '*two-space-indenters* *newlisp-keywords*)
   (set '*if-like* (append '() *if-like*)))
@@ -241,7 +241,7 @@
 (define (my-trim! str)
   " Trim the string making sure there's no whitespace where it's not necessary"
   ;; "(print(++ 1))" ==> "(print (++ 1))"
-  (set 'str (replace  [text]([^\\(\[,{@~`'^#])(\(|\[|{)[/text] str (string $1 " " $2) 0))
+  (set 'str (replace [text] ([^\\(\[,{@~`'^#]) (\(|\[| {) [/text] str (string $1 " " $2) 0))
   ;; "(print (++ 1)(-- 1))" ==> "(print (++ 1) (-- 1))"
   (set 'str (replace "(\\)|\]|\})(\\[|\\(|\{)" str (string $1 " " $2) 0))
   ;; "(print 'hello     )" ==> "(print 'hello)"
@@ -284,7 +284,7 @@
   (let ((str-list (parse str sep))
         (map-separator (lambda (separator lst)
                          (map (lambda (_)
-                                (string _ separator)) lst))))  
+                                (string _ separator)) lst)))) 
     (if str-list ;; an empty list will raise an error with function 'last'
       (if (empty? (last str-list))
           (begin
@@ -356,7 +356,9 @@
 indent level and the zero level"
   (let ((str
          (if compact?
-             (letn ((trim-limit (find-trim-limit str))
+             (letn ((trim-limit (if (regex "^[ \t]*;" str 0)
+                                    (length str)
+                                  (find-trim-limit str)))
                     (substr-1 (slice str 0 trim-limit)) ;; split into two portions
                     (substr-2 (slice str trim-limit))
                     (substr-1 (my-trim! substr-1))) ;; strip the first portion
