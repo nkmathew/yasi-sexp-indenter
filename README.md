@@ -29,19 +29,20 @@ features include:
   is used for looping in *Lisp* and sequential execution in *Clojure*.  
   The keyword should look like this in the two dialects:  
 
-        ;; In Common Lisp
-        (do ((j 0 (+ j 1)))
-            (nil)                       ;Do forever.
-          (format t "~%Input ~D:" j)
-          (let ((item (read)))
-            (if (null item) (return)   ;Process items until NIL seen.
-              (format t "~&Output ~D: ~S" j item))))
+```lisp
+;; In Common Lisp
+(do ((j 0 (+ j 1)))
+    (nil)                       ;Do forever.
+  (format t "~%Input ~D:" j)
+  (let ((item (read)))
+    (if (null item) (return)   ;Process items until NIL seen.
+      (format t "~&Output ~D: ~S" j item))))
 
-        ;; In Clojure
-        (do
-         (println "LOG: Computing...")
-         (+ 1 1))
-
+;; In Clojure
+(do
+ (println "LOG: Computing...")
+ (+ 1 1))
+```
 
 + *yasi* also issues warnings that would become syntax errors if you  
   ran the code. e.g. If you forgot to close a string or a comment.  
@@ -50,15 +51,17 @@ features include:
   found, the following macro name is added to the list of keywords with indentation  
   level of 2.  
 
-        ;; from quicklisp.lisp
-        (defmacro with-connection ((connection host port) &body body)
-          `(call-with-connection ,host ,port (lambda (,connection) ,@body)))
+```lisp
+;; from quicklisp.lisp
+(defmacro with-connection ((connection host port) &body body)
+  `(call-with-connection ,host ,port (lambda (,connection) ,@body)))
 
-        (with-connection (connection (hostname connect-url) (port connect-url))
-          (let ((cbuf (make-instance 'cbuf :connection connection))
-                (request (request-buffer "GET" url)))
-            (format stream "; ~$KB~%" (/ size 1024))
-            (format stream "; Unknown size~%")))
+(with-connection (connection (hostname connect-url) (port connect-url))
+  (let ((cbuf (make-instance 'cbuf :connection connection))
+        (request (request-buffer "GET" url)))
+    (format stream "; ~$KB~%" (/ size 1024))
+    (format stream "; Unknown size~%")))
+```
 
 + It indents `flets` and `labels` the right way, using a hack here and there.  
 
@@ -73,7 +76,7 @@ features include:
     |            -nc,    --no-compact    # Try to preserve the structure of the file.                                 |
     |            -nw,    --no-warning    # Don't issue warnings                                                       |
     |            -ne,    --no-exit       # Instructs the program not to exit when a warning is raised. True by default|
-    |            -uni,   --uniform       # Dictates whether the if-clause and else-clause of an if-like block should |
+    |            -uni,   --uniform       # Dictates whether the if-clause and else-clause of an if-like block should  |
     |                                       have the same indent level. False by default                              |
     |            -no,    --no-output     # Suppress output of the indented code                                       |
     |            -nm,    --no-modify     # Don't modify the file                                                      |
@@ -99,24 +102,29 @@ much an effort for something I would not use that often.
 storing extra keywords in a *.lispwords* file in your home directory, you are  
 advised  to edit the list of keywords in the source file so that you have only  
 one file. For example, if you find that `multiple-value-bind` should have all  
-of its subforms indented uniformly like  
-so:  
+of its subforms indented uniformly like so:  
 
-    (multiple-value-bind (f r)
-      (floor 130 11)
-      (list f r))
+```lisp
+(multiple-value-bind (f r)
+  (floor 130 11)
+  (list f r))
+```
 
 Instead of:  
 
-    (multiple-value-bind (f r)
-        (floor 130 11)
-      (list f r))
+```lisp
+(multiple-value-bind (f r)
+    (floor 130 11)
+  (list f r))
+```
 
 You go to *line 424(yasi.py)*:  
 
-    if DIALECT == 'Common Lisp': # Lisp
-        TWO_SPACE_INDENTERS = LISP_KEYWORDS
-        IF_LIKE += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
+```python
+if DIALECT == 'Common Lisp': # Lisp
+    TWO_SPACE_INDENTERS = LISP_KEYWORDS
+    IF_LIKE += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
+```
 and simply remove `multiple-value-bind` from the list.
 
 ####About the default indent
@@ -124,18 +132,22 @@ and simply remove `multiple-value-bind` from the list.
 The *--default-indent* comes in in expressions whose subforms usually  
 start in the subsequent lines. Like a `cond` expression:  
 
-    (cond
-     ((> this that) 'Yes)
-     ((= those these) 'No))
+```lisp
+(cond
+ ((> this that) 'Yes)
+ ((= those these) 'No))
+```
 
 According to Dorai's [guidelines](http://www.ccs.neu.edu/home/dorai/scmindent/)
 the above indentation is correct. However,  
 some people may prefer the test expressions to be two spaces past the bracket,  
 like this:  
 
-    (cond
-      ((> newLISP CL) 'Yes)
-      ((= Clojure Lisp) 'No))
+```lisp
+(cond
+  ((> newLISP CL) 'Yes)
+  ((= Clojure Lisp) 'No))
+```
 
 This is *Vim's* default style of indentation.  
 That option enables you to specify the amount you want, for example to achieve  
@@ -175,13 +187,15 @@ include:
   if it's looking at *Clojure* code.
   e.g.
 
-        ;; lispindent2.lisp's indentation
-        (print {define "The keyword does not affect indentation"
-                })
+```lisp
+;; lispindent2.lisp's indentation
+(print {define "The keyword does not affect indentation"
+    })
 
-        ;; lispindent.lisp's indentation
-        (print {define "The keyword does not affect indentation"
-               })
+;; lispindent.lisp's indentation
+(print {define "The keyword does not affect indentation"
+   })
+```
 
 + *lispindent2.lisp* ignores any code in a multiline comment and won't  
   be affected by any unclosed brackets inside the comment like the original  
@@ -198,17 +212,20 @@ brackets inside multiline comments and symbols with whitespace. It uses the pipe
 character(|) to switch between `multiline-commentp=T` and `multiline-commentp=NIL`  
 which means that if your pipes are unbalanced, you'll get wrong indentation, e.g.:  
 
-    #|*******************************************************************|
-     |   This is a multiline comment that will trip the indenter         |
-     |   because the odd number of pipes will cause `multiline-commentp` |
-     |   to be true after this comment. It means the rest of the code    |
-     |   won't be indented because it thinks it's still in a comment.    |
-              Total pipes=11(odd)
-     |#
-     (print (cons
-        'Hello ;; This line and the one below won't change
-        'World
-            ))
+```lisp
+#|*******************************************************************|
+ |   This is a multiline comment that will trip the indenter         |
+ |   because the odd number of pipes will cause `multiline-commentp` |
+ |   to be true after this comment. It means the rest of the code    |
+ |   won't be indented because it thinks it's still in a comment.    |
+          Total pipes=11(odd)
+ |#
+ (print (cons
+    'Hello ;; This line and the one below won't change
+    'World
+        ))
+```
+
 I don't find this to be a major issue because multiline comments are rare,  
 the common use case being to comment out some piece of code when debugging.  
 
@@ -220,9 +237,11 @@ comes after the opening bracket, it will raise a fatal error. This
 means that any *Clojure* code that tries to use the dot operator to access a  
 class method will not be indented because of the error. An example is this code:  
 
-    (defmacro chain
-      ([x form] `(. ~x ~form))
-      ([x form & more] `(chain (. ~x ~form) ~@more)))
+```lisp
+(defmacro chain
+  ([x form] `(. ~x ~form))
+  ([x form & more] `(chain (. ~x ~form) ~@more)))
+```
 
 *lispindent2.lisp* uses the `ignore-errors` macro as a workaround. Doing that means that it can't  
 run in *GNU Common Lisp* because it doesn't have the macro.
