@@ -120,5 +120,3 @@ Dec 02-2013 17:51:01
 							 Sharp sign before semi colons in Scheme should not
 							be considered as comments in order to avoid errors
 							about unclosed brackets.
-
-
