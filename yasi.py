@@ -868,7 +868,7 @@ def after_indentation(indentation_state):
         issue_warning(message, tpl, True, False, fname)
     else:
         if OUTPUT:
-            print indented_code
+            print(indented_code)
 
         if MODIFY:
             # write in binary mode to preserve the original line ending
@@ -897,10 +897,7 @@ def indent_file(fname):
         # Create a backup file in the directory specified
         backup_source_file(fname, backup_dir)
 
-if __name__ == '__main__':
-    # Print the help menu if no arguments are passed to the file.
-    if sys.argv[1:] == []:
-        print  '''
+USAGE_HELP = '''
  _________________________________________________________________________________________________________________
 |    Usage: newlisp yasi.lsp [[<file>] [--backup-dir<directory>] [--no-compact] [--no-backup] [--no-warning]      |
 |                   [--clojure] [--lisp] [--scheme] [--default-indent <num>]]                                     |
@@ -923,5 +920,10 @@ if __name__ == '__main__':
 |                                        messing with any deliberate comment layout                               |
 +-----------------------------------------------------------------------------------------------------------------+
 '''
+
+if __name__ == '__main__':
+    # Print the help menu if no arguments are passed to the file.
+    if sys.argv[1:] == []:
+        print(USAGE_HELP)
     else:
         indent_file(sys.argv[1])
