@@ -725,4 +725,3 @@ if _MODIFY:
     # write in binary mode to preserve the original line ending
     with open(fpath, "wb") as indented_file:
         indented_file.write(indented_code)
-

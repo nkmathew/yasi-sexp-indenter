@@ -703,5 +703,3 @@ indent level and the zero level"
 (when (= (length $main-args) 2)
   (print *help*)
   (exit))
-
-

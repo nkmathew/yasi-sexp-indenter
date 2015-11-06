@@ -925,6 +925,3 @@ if __name__ == '__main__':
 '''
     else:
         indent_file(sys.argv[1])
-
-
-
