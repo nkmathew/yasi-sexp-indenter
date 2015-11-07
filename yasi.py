@@ -19,7 +19,7 @@ def read_file(fname):
                 ==> r'(print "No, no, there\'s \\r\\nlife in him!. ")\\r\\n\\r\\n'
     The file is read in binary mode in order to preserve original line endings.
         Line ending    Binary mode Text mode
-            CRLF            CRLF    LF 
+            CRLF            CRLF    LF
             CR              CR      LF
     """
     assert os.path.exists(fname), "\n--%s-- Warning: File `%s' does not exist. . ." \
@@ -40,7 +40,7 @@ def issue_warning(warning_message, format_tuple, warn, exit_after_warning, fname
 def current_time():
     ''' current_time() -> str
 
-    example: current_time() 
+    example: current_time()
                 ==> 14:28:04
     Returns the current local time in 24 clock system.
     '''
@@ -121,7 +121,7 @@ def md5sum(content):
 
 
 class Indenter():
-    ''' The class simply serves to group methods that indent 
+    ''' The class simply serves to group methods that indent
     the string.
     example: indenter = Indenter()
              indenter.trim(" ( ( (  ) ) ) ")
@@ -131,7 +131,7 @@ class Indenter():
     def trim(self, string):
         ''' trim(string : str) -> str
 
-        Uses every usefull hack to try and reduce extra whitespace without 
+        Uses every usefull hack to try and reduce extra whitespace without
         messing with character literals
         '''
         ## turn "(print(+ 1 1))" to "(print (+ 1 1))"
@@ -167,7 +167,7 @@ class Indenter():
                     ==> 7
         The function attempts to identify upto which point we are supposed to trim
         so that we don't mess with strings or any aligned comments.
-        It does this by comparing the positions of semicolons and double 
+        It does this by comparing the positions of semicolons and double
         quotes. It doesn't consider the multiline comment marker. If your
         code uses multiline comments, you'll have to use --no-compact mode'''
         ## Find position of the first unescaped semi colon
@@ -202,7 +202,7 @@ class Indenter():
 
         example: is_macro_name("yacc:define-parser")
                     True
-            Tests if a word is a macro using the language's/dialect's convention, 
+            Tests if a word is a macro using the language's/dialect's convention,
             e.g macros in Lisp usually start with 'def' and 'with' in Scheme. Saves
             the effort of finding all the macros in Lisp/Scheme/Clojure/newLISP and storing
             them in a list.
@@ -221,7 +221,7 @@ class Indenter():
     def all_whitespace(self, string):
         ''' all_whitespace(string : str) -> bool
 
-        example: all_whitespace("      ") 
+        example: all_whitespace("      ")
                     ==> True
         Returns True if a string has only whitespace.
         '''
@@ -232,7 +232,7 @@ class Indenter():
 
         example: pad_leading_whitespace("(print 'Yello)")
                     ==> "         (print 'Yello)"
-        Takes a string and indents it using the current indentation level 
+        Takes a string and indents it using the current indentation level
         and the zero level.
         '''
         if compact:
@@ -271,9 +271,9 @@ class Indenter():
         "My dear Holmes, " said I, "this is too much. You would certainly
         have been burned, had you lived a few centuries ago.
                     """, "\\n")
-               ==>  ['\\n', 
-                     '    "My dear Holmes, " said I, "this is too much. You would certainly\\n', 
-                     '    have been burned, had you lived a few centuries ago.\\n', 
+               ==>  ['\\n',
+                     '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
+                     '    have been burned, had you lived a few centuries ago.\\n',
                      '                ']
         Splits the string and sticks the separator back to every string in the
         list.
@@ -314,7 +314,7 @@ class Indenter():
             return LF
 
     def indent(self, zerolevel, bracket_list, line, in_comment, in_symbol_region):
-        ''' indent(zerolevel : int, bracket_list : list, line : str, in_comment : bool, 
+        ''' indent(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
                     in_symbol_region : bool)
 
         Most important function in the indentation process. It uses the bracket
@@ -330,7 +330,7 @@ class Indenter():
             ## is not empty or has a comment
             leading_spaces = re.search("^[ \t]+[^; )\n\r]", line)
             if leading_spaces:
-                ## NOTE: If you don't subtract one here, the zero level will increase 
+                ## NOTE: If you don't subtract one here, the zero level will increase
                 ## every time you indent the file because the character at the end of
                 ## the regex is part of the capture.
                 zerolevel = leading_spaces.end() - 1
@@ -339,10 +339,10 @@ class Indenter():
             # No processing done in strings and comments
             return zerolevel, line, 0
         elif not comment_line and not self.all_whitespace(line):
-            # If this is not a comment line indent the line. 
+            # If this is not a comment line indent the line.
             # If the list is empty, then the current_level defaults
             # to zero
-            curr_line, current_level = self.pad_leading_whitespace(line, 
+            curr_line, current_level = self.pad_leading_whitespace(line,
                             zerolevel, COMPACT, bracket_list)
             return zerolevel, curr_line, current_level
         else:
@@ -352,53 +352,53 @@ class Indenter():
 # GLOBAL CONSTANTS::
 
 # Keywords that indent by two spaces
-SCHEME_KEYWORDS=['define', 'local-odd?', 'when', 'begin', 'case', 
-'local-even?', 'do', 'call-with-bytevector-output-port', 
-'call-with-input-file', 'call-with-port', 
-'call-with-current-continuation', 'open-file-input-port', 
-'call-with-port', 'call-with-values', 'call-with-output-file', 
-'call-with-string-output-port', 'define-syntax', 'if', 'let', 'let*', 
-'library', 'unless', 'lambda', 'syntax-rules', 'syntax-case', 
-'let-syntax', 'letrec*', 'letrec', 'let-values', 'let*-values', 
-'with-exception-handler', 'with-input-from-file', 
-'with-interrupts-disabled', 'with-input-from-string', 
-'with-output-to-file', 'with-input-from-port', 
-'with-output-to-string', 'with-source-path', 'with-syntax', 
-'with-implicit', 
+SCHEME_KEYWORDS=['define', 'local-odd?', 'when', 'begin', 'case',
+'local-even?', 'do', 'call-with-bytevector-output-port',
+'call-with-input-file', 'call-with-port',
+'call-with-current-continuation', 'open-file-input-port',
+'call-with-port', 'call-with-values', 'call-with-output-file',
+'call-with-string-output-port', 'define-syntax', 'if', 'let', 'let*',
+'library', 'unless', 'lambda', 'syntax-rules', 'syntax-case',
+'let-syntax', 'letrec*', 'letrec', 'let-values', 'let*-values',
+'with-exception-handler', 'with-input-from-file',
+'with-interrupts-disabled', 'with-input-from-string',
+'with-output-to-file', 'with-input-from-port',
+'with-output-to-string', 'with-source-path', 'with-syntax',
+'with-implicit',
 'with-error-handler', 'module', 'parameterize']
 
-CLOJURE_KEYWORDS=['defn', 'fn', 'dorun', 'doseq', 'loop', 'when', 
-'let', 'defmacro', 'binding', 'doto', 'ns', ':import', 'defstruct', 
-'condp', 'comment', 'when', 'when-let', '->', '->>', 
-'extend-type', 'reify', 'binding', 'when-not', 'proxy', 'dotimes', 
-'try', 'finally', 'for', 'letfn', 'catch', 'iterate', 'while', 
+CLOJURE_KEYWORDS=['defn', 'fn', 'dorun', 'doseq', 'loop', 'when',
+'let', 'defmacro', 'binding', 'doto', 'ns', ':import', 'defstruct',
+'condp', 'comment', 'when', 'when-let', '->', '->>',
+'extend-type', 'reify', 'binding', 'when-not', 'proxy', 'dotimes',
+'try', 'finally', 'for', 'letfn', 'catch', 'iterate', 'while',
 'with-local-vars', 'locking', 'defmulti', 'defmethod', 'extend'
 ]
 
-LISP_KEYWORDS=[':implementation', ':method', 'case', 'defclass', 
-'defconstant', 'defgeneric', 'defimplementation', 
-'define-condition', 'define-implementation-package', 
-'definterface', 'defmacro', 'defmethod', 'defpackage', 
-'defproject', 'deftype', 'defun', 'defvar', 'do-external-symbols', 
-'dolist', 'dotimes', 'ecase', 'etypecase', 'flet', 'handler-bind', 
-'if', 'lambda', 'let', 'let*', 'print-unreadable-object', 
-'macrolet', 'defparameter', 'with-slots', 'typecase', 'loop', 'when', 'prog1', 
-'unless', 'with-open-file', 'with-output-to-string', 'with-input-from-string', 
-'block', 'handler-case', 'defstruct', 'eval-when', 'tagbody', 'ignore-errors', 
+LISP_KEYWORDS=[':implementation', ':method', 'case', 'defclass',
+'defconstant', 'defgeneric', 'defimplementation',
+'define-condition', 'define-implementation-package',
+'definterface', 'defmacro', 'defmethod', 'defpackage',
+'defproject', 'deftype', 'defun', 'defvar', 'do-external-symbols',
+'dolist', 'dotimes', 'ecase', 'etypecase', 'flet', 'handler-bind',
+'if', 'lambda', 'let', 'let*', 'print-unreadable-object',
+'macrolet', 'defparameter', 'with-slots', 'typecase', 'loop', 'when', 'prog1',
+'unless', 'with-open-file', 'with-output-to-string', 'with-input-from-string',
+'block', 'handler-case', 'defstruct', 'eval-when', 'tagbody', 'ignore-errors',
 'labels', 'multiple-value-bind'
 ]
- 
-NEWLISP_KEYWORDS=['while', 'if', 'case', 'dotimes', 'define', 'dolist', 'catch', 
-'throw', 'lambda', 'lambda-macro', 'when', 'unless', 'letex', 'letn', 'begin', 
-'dostring', 'let', 'letn', 'doargs', "define-macro", 'until', 'do-until', 
-'do-while', 'for-all', 'find-all', 'for' 
+
+NEWLISP_KEYWORDS=['while', 'if', 'case', 'dotimes', 'define', 'dolist', 'catch',
+'throw', 'lambda', 'lambda-macro', 'when', 'unless', 'letex', 'letn', 'begin',
+'dostring', 'let', 'letn', 'doargs', "define-macro", 'until', 'do-until',
+'do-while', 'for-all', 'find-all', 'for'
 ]
 
 ## Keywords that indent by one space
 ONE_SPACE_INDENTERS = ['call-with-port']
 
 
-## Assign default values here depending on the command line arguments 
+## Assign default values here depending on the command line arguments
 BACKUP   =  False if '--no-backup'  in sys.argv or '-nb' in sys.argv else True
 COMPACT  =  False if '--no-compact' in sys.argv or '-nc' in sys.argv else True
 EXIT     =  False if '--no-exit'    in sys.argv or '-ne' in sys.argv else True
@@ -474,7 +474,7 @@ def find_first_arg_pos(curr_pos, string):
                 arg_pos = arg_pos.end() + leading_spaces + 1
             else:
                 arg_pos = leading_spaces + 1
-            if re.match("^[ \t]*(#\||;|$|\r)", 
+            if re.match("^[ \t]*(#\||;|$|\r)",
                 substr[(end - 1 + substr[end - 1:].find(' ')):]):
                 ## But, if a comment if found after the function name, the
                 ## indent level becomes one
@@ -495,10 +495,10 @@ def find_first_arg_pos(curr_pos, string):
 
 
 def pop_from_list(bracket, lst, fname, line, real_pos, offset):
-    ''' pop_from_list(char : str, lst : [str], fname : str, line : str, 
+    ''' pop_from_list(char : str, lst : [str], fname : str, line : str,
                         real_pos : int, offset : int)
 
-        The function is called when a closing bracket is encountered. The function 
+        The function is called when a closing bracket is encountered. The function
         simply pops the last pushed item and issues a warning if an error is
         encountered.
     '''
@@ -533,20 +533,20 @@ def pop_from_list(bracket, lst, fname, line, real_pos, offset):
         issue_warning(message, tpl, WARN, EXIT, fname)
     return lst
 
-def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
+def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item,
         in_list_literal, lead_spaces):
-    ''' push_to_list(lst : [str], func_name : str, char : str, line : int, offset : int, 
+    ''' push_to_list(lst : [str], func_name : str, char : str, line : int, offset : int,
                         first_arg_pos :int , first_item : int, in_list_literal : bool, lead_spaces : int)
 
     Called when an opening bracket is encountered. A hash containing the
     necessary data to pin point errors and the indentation level is stored in
     the list and the list returned.
     '''
-    pos_hash={"character":char, 
-              "line_number":line, 
-              "bracket_pos":offset, 
+    pos_hash={"character":char,
+              "line_number":line,
+              "bracket_pos":offset,
               "indent_level":offset + first_arg_pos, # the default value, e.g in normal function
-              "func_name":func_name, 
+              "func_name":func_name,
               "spaces":0}
 
     two_spacer = func_name in TWO_SPACE_INDENTERS or indenter.is_macro_name(func_name, DIALECT)
@@ -593,7 +593,7 @@ def indent_code(original_code, fpath=None):
     # Safeguards against processing brackets inside strings
     in_string = False
 
-    # newLISP use curly brackets as a syntax for multiline strings 
+    # newLISP use curly brackets as a syntax for multiline strings
     # this variable here tries to keep track of that
     in_newlisp_string = 0
     in_newlisp_tag_string = False
@@ -623,7 +623,7 @@ def indent_code(original_code, fpath=None):
     # any unclosed strings, we can pinpoint them
     last_quote_location = ()
 
-    code_lines = indenter.split_preserve(original_code, 
+    code_lines = indenter.split_preserve(original_code,
                                 indenter.line_ending(original_code))
 
     indented_code=""
@@ -632,9 +632,9 @@ def indent_code(original_code, fpath=None):
     for line in code_lines:
         escaped      = False
         curr_line    = line
-        
+
         ## Get the indent level and the indented line
-        zero_level, curr_line, indent_level = indenter.indent(zero_level, bracket_locations, 
+        zero_level, curr_line, indent_level = indenter.indent(zero_level, bracket_locations,
                                     line, in_comment, in_symbol_region)
         ## Build up the indented string.
         indented_code += curr_line
@@ -654,7 +654,7 @@ def indent_code(original_code, fpath=None):
             if curr_char == "\\" and not in_newlisp_string and not in_newlisp_tag_string:
                 # the next character has been escaped
                 escaped = True
-            
+
             if curr_char == ';' and not in_symbol_region and not ((prev_char == "#"
                     and DIALECT == "Scheme")):
                 # a comment has been found, go to the next line
@@ -722,7 +722,7 @@ def indent_code(original_code, fpath=None):
                 continue
 
             # Finds the real position of a bracket to be used in pinpointing where
-            # the unclosed bracket is. The real position is different from the offset 
+            # the unclosed bracket is. The real position is different from the offset
             # because current offset is the position of the bracket in the
             # trimmed string not the original.
             real_position = (offset - zero_level) + len(re.findall("^[ \t]*", line)[0]) - indent_level
@@ -738,7 +738,7 @@ def indent_code(original_code, fpath=None):
                 in_list_literal = False
                 if re.search("('|`|#)([ \t]*\(|\[)($|\r)", curr_line[0:offset+1]):
                     in_list_literal = True
-            
+
                 if re.search("^[^ \t]+[ \t]*($|\r)", substr):
                     ## The function is the last symbol/form in the line
                     func_name = substr.strip(')]\t\n\r ').lower()
@@ -752,7 +752,7 @@ def indent_code(original_code, fpath=None):
                 if func_name in ["define-macro", "defmacro"]:
                     # Macro names are part of TWO_SPACE_INDENTERS space indenters.
                     # This part tries to find the name so that it is not indented
-                    # like a function the next time it's used. 
+                    # like a function the next time it's used.
                     end_of_space = re.search("^[ \t]*", substr).end()
                     substr = substr[end_of_space:]
                     substr = substr[re.search("[ \t]*", substr).start():].strip()
@@ -761,11 +761,11 @@ def indent_code(original_code, fpath=None):
                         TWO_SPACE_INDENTERS.append(macro_name)
 
                 # first_item stores the position of the first item in the literal list
-                # it's necessary so that we don't assume that the first item is always 
+                # it's necessary so that we don't assume that the first item is always
                 # after the opening bracket.
                 first_item = re.search("[ \t]*", curr_line[offset+1:]).end() + offset + 1
-                bracket_locations = push_to_list(bracket_locations[:], func_name, curr_char, line_number, 
-                        offset, first_arg_pos, first_item, in_list_literal, 
+                bracket_locations = push_to_list(bracket_locations[:], func_name, curr_char, line_number,
+                        offset, first_arg_pos, first_item, in_list_literal,
                         leading_spaces)
 
             elif curr_char in [']', ')', '}']:
@@ -779,7 +779,7 @@ def indent_code(original_code, fpath=None):
 
             if bracket_locations and curr_char in [' ', '\t'] and bracket_locations[-1]['func_name'] in IF_LIKE:
                 ''' This part changes the indentation level of a then clause so that
-                    we can achieve something like: 
+                    we can achieve something like:
                             (if (= this that)
                                 'then-form
                               'else-form)
@@ -803,14 +803,14 @@ def indent_code(original_code, fpath=None):
         line_number += 1
     return [first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations,
             newlisp_brace_locations, in_string, in_comment,
-            in_symbol_with_space, bracket_locations, 
+            in_symbol_with_space, bracket_locations,
             last_quote_location, fpath, original_code, indented_code]
 
 def after_indentation(indentation_state):
-    ''' after_indentation(indentation_state : lst): 
+    ''' after_indentation(indentation_state : lst):
 
-    Called after the string has been indented appropriately. 
-    It takes care of writing the file and checking for unclosed strings 
+    Called after the string has been indented appropriately.
+    It takes care of writing the file and checking for unclosed strings
     or comments.
     '''
     ## Receive all the state variables. *This is the price you for modularity*
@@ -823,7 +823,7 @@ def after_indentation(indentation_state):
 
     if bracket_locations:
         # If the bracket_locations list is not empty it means that there are some
-        # brackets(opening) that haven't been closed. 
+        # brackets(opening) that haven't been closed.
         for bracket in bracket_locations:
             y = bracket["line_number"]
             x = bracket["bracket_pos"]
