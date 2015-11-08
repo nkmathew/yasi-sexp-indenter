@@ -872,7 +872,7 @@ def after_indentation(indentation_state):
         tpl = (current_time(), fname) + first_tag_string
         issue_warning(message, tpl, WARN, EXIT, fname)
 
-    if hashlib.md5(indented_code).hexdigest() == md5sum(original_code):
+    if md5sum(indented_code.encode('utf-8')) == md5sum(original_code.encode('utf-8')):
         message = "\n--%s-- File `%s' has already been formatted. Leaving it unchanged. . .\n"
         tpl = (current_time(), fname)
         issue_warning(message, tpl, True, False, fname)
@@ -882,7 +882,7 @@ def after_indentation(indentation_state):
 
         if MODIFY:
             # write in binary mode to preserve the original line ending
-            with open(fpath, "wb") as indented_file:
+            with open(fpath, "w") as indented_file:
                 indented_file.write(indented_code)
 
 
@@ -895,7 +895,7 @@ def indent_file(fname):
         4. Writes the file or print the indented code(after_indentation())
     """
     fname = os.path.abspath(fname)
-    code = read_file(fname)
+    code = read_file(fname).decode('utf-8')
     indent_result = indent_code(code, fname)
     after_indentation(indent_result)
 
