@@ -30,9 +30,9 @@ def read_file(fname):
 
 
 def issue_warning(warning_message, format_tuple, warn, exit_after_warning, fname):
-    '''
+    """
     Issues all the warning messages.
-    '''
+    """
     if warn:
         sys.stderr.write(warning_message % format_tuple)
     if exit_after_warning:
@@ -40,22 +40,22 @@ def issue_warning(warning_message, format_tuple, warn, exit_after_warning, fname
 
 
 def current_time():
-    ''' current_time() -> str
+    """ current_time() -> str
 
     example: current_time()
                 ==> 14:28:04
     Returns the current local time in 24 clock system.
-    '''
+    """
     return time.strftime("%X", (time.localtime()))
 
 
 def lisp_dialect(lst):
-    ''' lisp_dialect(lst : [list]) -> str
+    """ lisp_dialect(lst : [list]) -> str
 
     example: lisp_dialect(["quicklisp.lisp", "--no-backup", "--clojure"])
     Find the lisp dialect specified in the list(sys.argv). The lisp
     dialect determines the keywords to be used.
-    '''
+    """
     if "--clojure" in lst:
         return "Clojure"
     elif "--scheme" in lst:
@@ -69,11 +69,11 @@ def lisp_dialect(lst):
 
 
 def backup_source_file(fname, backup_dir="."):
-    ''' backup_source_file(fname : str)
+    """ backup_source_file(fname : str)
 
     example: backup_source_file("~/Desktop/lisp/test.lisp")
     Create a backup copy of the source file.
-    '''
+    """
     assert os.path.exists(fname), \
         ("\n--%s-- Warning: File `%s' does not exist. . ." % (current_time(), fname))
     assert os.path.exists(os.path.abspath(backup_dir)), \
@@ -88,14 +88,14 @@ def backup_source_file(fname, backup_dir="."):
 
 
 def get_backup_directory(lst, fname):
-    ''' get_backup_directory(lst : list, fname : str) -> str
+    """ get_backup_directory(lst : list, fname : str) -> str
 
     get_backup_directory(['--no-warning', '--no-output', '--backup-dir', 'desktop'])
             ==> 'desktop'
     Returns the backup directory, assuming it's always after the '--backup-dir'
     parameter. The filename is not really necessary, it's just for issuing the
     error message.
-    '''
+    """
     if '--backup-dir' in lst:
         index = lst.index('--backup-dir') + 1
         if len(lst) <= index:
@@ -115,31 +115,31 @@ def get_backup_directory(lst, fname):
 
 
 def md5sum(content):
-    ''' md5sum(content : str) -> str
+    """ md5sum(content : str) -> str
 
     example: md5sum("Keyboard not found!! Press F1 to continue...")
                 ==> 'ad98cde09016d2e99a726966a4291acf'
     Returns a checksum to be used to determine whether the file has changed.
     A simple textual comparison can still do the work
-    '''
+    """
     return hashlib.md5(content).hexdigest()
 
 
 class Indenter():
 
-    ''' The class simply serves to group methods that indent
+    """ The class simply serves to group methods that indent
     the string.
     example: indenter = Indenter()
              indenter.trim(" ( ( (  ) ) ) ")
              ==> '((()))'
-    '''
+    """
 
     def trim(self, string):
-        ''' trim(string : str) -> str
+        """ trim(string : str) -> str
 
         Uses every usefull hack to try and reduce extra whitespace without
         messing with character literals
-        '''
+        """
         # turn "(print(+ 1 1))" to "(print (+ 1 1))"
         string = re.sub(r'''([^\\(\[, {@~`'#^])(\(|\[|{)''', r'\1 \2', string, re.X)
         # turn  ")(" to ") ("
@@ -163,7 +163,7 @@ class Indenter():
         return string
 
     def find_trim_limit(self, string):
-        ''' find_trim_limit(string : str) -> int
+        """ find_trim_limit(string : str) -> int
 
         examples: find_trim_limit(r'(list #\; #\")')
                     ==> 14
@@ -175,7 +175,8 @@ class Indenter():
         so that we don't mess with strings or any aligned comments.
         It does this by comparing the positions of semicolons and double
         quotes. It doesn't consider the multiline comment marker. If your
-        code uses multiline comments, you'll have to use --no-compact mode'''
+        code uses multiline comments, you'll have to use --no-compact mode
+        """
         # Find position of the first unescaped semi colon
         comment_start = re.search(r'([^\\];)|(^;)', string)
         # Find position of the first unescaped double quote
@@ -204,7 +205,7 @@ class Indenter():
         return limit
 
     def is_macro_name(self, form, dialect):
-        ''' is_macro_name(form : str, dialect : str) -> bool
+        """ is_macro_name(form : str, dialect : str) -> bool
 
         example: is_macro_name("yacc:define-parser")
                     True
@@ -212,7 +213,7 @@ class Indenter():
             e.g macros in Lisp usually start with 'def' and 'with' in Scheme. Saves
             the effort of finding all the macros in Lisp/Scheme/Clojure/newLISP and storing
             them in a list.
-        '''
+        """
         if not form:
             return form
         if dialect == 'Common Lisp':
@@ -225,22 +226,22 @@ class Indenter():
             return re.search('macro|def', form)
 
     def all_whitespace(self, string):
-        ''' all_whitespace(string : str) -> bool
+        """ all_whitespace(string : str) -> bool
 
         example: all_whitespace("      ")
                     ==> True
         Returns True if a string has only whitespace.
-        '''
+        """
         return re.search("^[ \t]*(\r|\n|$)", string)
 
     def pad_leading_whitespace(self, string, zero_level, compact, blist):
-        ''' pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
+        """ pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
 
         example: pad_leading_whitespace("(print 'Yello)")
                     ==> "         (print 'Yello)"
         Takes a string and indents it using the current indentation level
         and the zero level.
-        '''
+        """
         if compact:
             # if compact mode is on, split the string into two, trim the first
             # position and merge the two portions.
@@ -270,19 +271,19 @@ class Indenter():
             return string, 0
 
     def split_preserve(self, string, sep):
-        ''' split_preserve(string : str, sep : str)  -> [str]
+        """ split_preserve(string : str, sep : str)  -> [str]
 
-        example: split_preserve("""
+        example: split_preserve('''
         "My dear Holmes, " said I, "this is too much. You would certainly
         have been burned, had you lived a few centuries ago.
-                    """, "\\n")
+                    ''', "\\n")
                ==>  ['\\n',
                      '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
                      '    have been burned, had you lived a few centuries ago.\\n',
                      '                ']
         Splits the string and sticks the separator back to every string in the
         list.
-        '''
+        """
         # split the whole string into a list so that you can iterate line by line.
         str_list = string.split(sep)
         if str_list[-1] == "":
@@ -301,12 +302,12 @@ class Indenter():
         return str_list
 
     def line_ending(self, string):
-        ''' line_ending(string : str) -> str
+        """ line_ending(string : str) -> str
 
         example: line_ending("Elementary my dear Watson. \\r")
                     ==> '\\r'
         Find the line ending in the file so that we can try to preserve it.
-        '''
+        """
         CR   = "\r"
         LF   = "\n"
         CRLF = CR + LF
@@ -319,12 +320,12 @@ class Indenter():
             return LF
 
     def indent(self, zerolevel, bracket_list, line, in_comment, in_symbol_region):
-        ''' indent(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
+        """ indent(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
                     in_symbol_region : bool)
 
         Most important function in the indentation process. It uses the bracket
         locations stored in the list to indent the line.
-        '''
+        """
         comment_line = re.search("^[ \t]*;", line, re.M)
         if INDENT_COMMENTS:
             # We are allowed to indent comment lines
@@ -454,12 +455,12 @@ elif DIALECT == 'All':
 
 
 def find_first_arg_pos(curr_pos, string):
-    ''' find_first_arg_pos(curr_pos : int, string : str) -> int
+    """ find_first_arg_pos(curr_pos : int, string : str) -> int
 
     example: find_first_arg_pos(0, "(     list 'one-sheep 'two-sheep )")
                 ==> 11
     Returns the position of the first argument to the function.
-    '''
+    """
     leading_spaces = 0
     substr = string[curr_pos + 1:]
     if re.search("^[ \t]*($|\r)", substr):
@@ -504,13 +505,13 @@ def find_first_arg_pos(curr_pos, string):
 
 
 def pop_from_list(bracket, lst, fname, line, real_pos, offset):
-    ''' pop_from_list(char : str, lst : [str], fname : str, line : str,
+    """ pop_from_list(char : str, lst : [str], fname : str, line : str,
                         real_pos : int, offset : int)
 
         The function is called when a closing bracket is encountered. The function
         simply pops the last pushed item and issues a warning if an error is
         encountered.
-    '''
+    """
     # Try to spot a case when a square bracket is used to close a round bracket
     # block
     if bracket == ']':
@@ -544,13 +545,13 @@ def pop_from_list(bracket, lst, fname, line, real_pos, offset):
 
 
 def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, in_list_literal, lead_spaces):
-    ''' push_to_list(lst : [str], func_name : str, char : str, line : int, offset : int,
+    """ push_to_list(lst : [str], func_name : str, char : str, line : int, offset : int,
                         first_arg_pos :int , first_item : int, in_list_literal : bool, lead_spaces : int)
 
     Called when an opening bracket is encountered. A hash containing the
     necessary data to pin point errors and the indentation level is stored in
     the list and the list returned.
-    '''
+    """
     pos_hash = {"character": char,
                 "line_number": line,
                 "bracket_pos": offset,
@@ -590,12 +591,12 @@ indenter = Indenter()
 
 
 def indent_code(original_code, fpath=None):
-    ''' indented_code(string : str, fname : str) -> [...]
+    """ indented_code(string : str, fname : str) -> [...]
 
     example: indented_code("(print\\n'Hello)")
                 ==> [False, False, False, [], [], None, "(print\\n'Hello)", "(print\\n 'Hello)"]
     The last entry in the list is the indented string.
-    '''
+    """
     # get the filename only not its full path
     fname = os.path.split(fpath)[1]
 
@@ -785,7 +786,7 @@ def indent_code(original_code, fpath=None):
                 bracket_locations = pop_from_list(curr_char, bracket_locations[:], fname, line_number, real_position, offset)
 
             if bracket_locations and curr_char in [' ', '\t'] and bracket_locations[-1]['func_name'] in IF_LIKE:
-                ''' This part changes the indentation level of a then clause so that
+                """ This part changes the indentation level of a then clause so that
                     we can achieve something like:
                             (if (= this that)
                                 'then-form
@@ -795,7 +796,7 @@ def indent_code(original_code, fpath=None):
                     passed the then-form and hence should decrease the indentation
                     level by 2.(I shamelessly copied this algorithm from Dorai's
                     indenter)
-                '''
+                """
                 if prev_char not in [' ', '\t', ''] or not \
                         re.search("^[ \t]*(;|#\||$|\r)", curr_line):
                     # The level shouldn't be decreased if the line is a comment
@@ -815,12 +816,12 @@ def indent_code(original_code, fpath=None):
 
 
 def after_indentation(indentation_state):
-    ''' after_indentation(indentation_state : lst):
+    """ after_indentation(indentation_state : lst):
 
     Called after the string has been indented appropriately.
     It takes care of writing the file and checking for unclosed strings
     or comments.
-    '''
+    """
     # Receive all the state variables. *This is the price you for modularity*
     first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations, \
         newlisp_brace_locations, in_string, in_comment, in_symbol_with_space, \
@@ -885,13 +886,13 @@ def after_indentation(indentation_state):
 
 
 def indent_file(fname):
-    ''' indent_file(fname : str)
+    """ indent_file(fname : str)
 
         1. Creates a backup of the source file(backup_source_file())
         2. Reads the files contents(read_file())
         3. Indents the code(indent_code())
         4. Writes the file or print the indented code(after_indentation())
-    '''
+    """
     fname = os.path.abspath(fname)
     code = read_file(fname)
     indent_result = indent_code(code, fname)
@@ -906,7 +907,7 @@ def indent_file(fname):
         # Create a backup file in the directory specified
         backup_source_file(fname, backup_dir)
 
-USAGE_HELP = '''
+USAGE_HELP = """
  _________________________________________________________________________________________________________________
 |    Usage: newlisp yasi.lsp [[<file>] [--backup-dir<directory>] [--no-compact] [--no-backup] [--no-warning]      |
 |                   [--clojure] [--lisp] [--scheme] [--default-indent <num>]]                                     |
@@ -928,7 +929,7 @@ USAGE_HELP = '''
 |            --indent-comments, -ic  # False by default. If true, comment lines will be indented possibly         |
 |                                        messing with any deliberate comment layout                               |
 +-----------------------------------------------------------------------------------------------------------------+
-'''
+"""
 
 if __name__ == '__main__':
     # Print the help menu if no arguments are passed to the file.
