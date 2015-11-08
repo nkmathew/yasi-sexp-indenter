@@ -126,236 +126,232 @@ def md5sum(content):
     return hashlib.md5(content).hexdigest()
 
 
-class Indenter():
+def line_ending(string):
+    """ line_ending(string : str) -> str
 
-    """ The class simply serves to group methods that indent
-    the string.
-    example: indenter = Indenter()
-             indenter.trim(" ( ( (  ) ) ) ")
-             ==> '((()))'
+    example: line_ending("Elementary my dear Watson. \\r")
+                ==> '\\r'
+    Find the line ending in the file so that we can try to preserve it.
     """
+    if CRLF in string:
+        return CRLF
+    elif CR in string:
+        return CR
+    else:
+        return LF
 
-    def trim(self, string):
-        """ trim(string : str) -> str
 
-        Uses every usefull hack to try and reduce extra whitespace without
-        messing with character literals
-        """
-        # turn "(print(+ 1 1))" to "(print (+ 1 1))"
-        string = re.sub(r'''([^\\(\[, {@~`'#^])(\(|\[|{)''', r'\1 \2', string, re.X)
-        # turn  ")(" to ") ("
-        string = re.sub(r'(\)|\]|})(\[|\(|{)', r'\1 \2', string)
-        # Remove any space before closing brackets "(print 12   )" ==> "(print 12)"
-        string = re.sub('[ \t]*(\)|\]|})', r'\1', string)
-        # remove extra whitespace "(print     'this) ==> "(print 'this)"
-        string = re.sub('[ \t]{2, }', ' ', string)
-        # turn ") ) ) " into "))) "
-        string = re.sub(r"(\))[ \t]*(?=(\)))", r"\1", string)
-        string = re.sub(r"(\])[ \t]*(?=(\]))", r"\1", string)
-        string = re.sub(r"(})[ \t]*(?=(}))", r"\1", string)
-        # turn "( ( ( " into "((( "
-        string = re.sub(r"(\()[ \t]*(?=(\())", r"\1", string)
-        string = re.sub(r"(\[)[ \t]*(?=(\[))", r"\1", string)
-        string = re.sub(r"({)[ \t]*(?=({))", r"\1", string)
-        # remove leading whitespace "   print" ==> "print"
-        string = re.sub('^[ \t]*', '', string)
-        # Remove space before list literal, " ' (1 2 3)" ==> " '(1 2 3)"
-        string = re.sub(r" ('|`) (\(|\[|{)", r" \1\2", string)
-        return string
+def trim(string):
+    """ trim(string : str) -> str
 
-    def find_trim_limit(self, string):
-        """ find_trim_limit(string : str) -> int
+    Uses every usefull hack to try and reduce extra whitespace without
+    messing with character literals
+    """
+    # turn "(print(+ 1 1))" to "(print (+ 1 1))"
+    string = re.sub(r'''([^\\(\[, {@~`'#^])(\(|\[|{)''', r'\1 \2', string, re.X)
+    # turn  ")(" to ") ("
+    string = re.sub(r'(\)|\]|})(\[|\(|{)', r'\1 \2', string)
+    # Remove any space before closing brackets "(print 12   )" ==> "(print 12)"
+    string = re.sub('[ \t]*(\)|\]|})', r'\1', string)
+    # remove extra whitespace "(print     'this) ==> "(print 'this)"
+    string = re.sub('[ \t]{2, }', ' ', string)
+    # turn ") ) ) " into "))) "
+    string = re.sub(r"(\))[ \t]*(?=(\)))", r"\1", string)
+    string = re.sub(r"(\])[ \t]*(?=(\]))", r"\1", string)
+    string = re.sub(r"(})[ \t]*(?=(}))", r"\1", string)
+    # turn "( ( ( " into "((( "
+    string = re.sub(r"(\()[ \t]*(?=(\())", r"\1", string)
+    string = re.sub(r"(\[)[ \t]*(?=(\[))", r"\1", string)
+    string = re.sub(r"({)[ \t]*(?=({))", r"\1", string)
+    # remove leading whitespace "   print" ==> "print"
+    string = re.sub('^[ \t]*', '', string)
+    # Remove space before list literal, " ' (1 2 3)" ==> " '(1 2 3)"
+    string = re.sub(r" ('|`) (\(|\[|{)", r" \1\2", string)
+    return string
 
-        examples: find_trim_limit(r'(list #\; #\")')
-                    ==> 14
-                  find_trim_limit(r'(list ; ")')
-                    ==> 6
-                  find_trim_limit(r'(list " ;)')
-                    ==> 7
-        The function attempts to identify upto which point we are supposed to trim
-        so that we don't mess with strings or any aligned comments.
-        It does this by comparing the positions of semicolons and double
-        quotes. It doesn't consider the multiline comment marker. If your
-        code uses multiline comments, you'll have to use --no-compact mode
-        """
-        # Find position of the first unescaped semi colon
-        comment_start = re.search(r'([^\\];)|(^;)', string)
-        # Find position of the first unescaped double quote
-        limit = re.search(r'([^\\]")|(^")', string)
-        # Assign -1 if there's no match
-        limit = limit.end() if limit else -1
-        comment_start = comment_start.end() if comment_start else -1
-        if comment_start != -1:
-            # If semi colon is found, include all the whitespace before it so
-            # just in case someone had 'prettified' and aligned the comments
-            comment_start = re.search("[ \t]*;", string).start() + 1
+def find_trim_limit(string):
+    """ find_trim_limit(string : str) -> int
 
-        if comment_start != -1 and limit != -1:
-            if comment_start < limit:
-                # If the semicolon comes before the comma, it means the string
-                # has been commented out
-                limit = comment_start
-        elif comment_start != -1 and limit == -1:
-            # If there's a semicolon but no quote, use the semicolon position
-            # as the limit
+    examples: find_trim_limit(r'(list #\; #\")')
+                ==> 14
+                find_trim_limit(r'(list ; ")')
+                ==> 6
+                find_trim_limit(r'(list " ;)')
+                ==> 7
+    The function attempts to identify upto which point we are supposed to trim
+    so that we don't mess with strings or any aligned comments.
+    It does this by comparing the positions of semicolons and double
+    quotes. It doesn't consider the multiline comment marker. If your
+    code uses multiline comments, you'll have to use --no-compact mode
+    """
+    # Find position of the first unescaped semi colon
+    comment_start = re.search(r'([^\\];)|(^;)', string)
+    # Find position of the first unescaped double quote
+    limit = re.search(r'([^\\]")|(^")', string)
+    # Assign -1 if there's no match
+    limit = limit.end() if limit else -1
+    comment_start = comment_start.end() if comment_start else -1
+    if comment_start != -1:
+        # If semi colon is found, include all the whitespace before it so
+        # just in case someone had 'prettified' and aligned the comments
+        comment_start = re.search("[ \t]*;", string).start() + 1
+
+    if comment_start != -1 and limit != -1:
+        if comment_start < limit:
+            # If the semicolon comes before the comma, it means the string
+            # has been commented out
             limit = comment_start
-        elif limit == -1:
-            # If neither a semicolon nor a double quote have been found, use
-            # the length of the string as the limit
-            limit = len(string)
-        return limit
+    elif comment_start != -1 and limit == -1:
+        # If there's a semicolon but no quote, use the semicolon position
+        # as the limit
+        limit = comment_start
+    elif limit == -1:
+        # If neither a semicolon nor a double quote have been found, use
+        # the length of the string as the limit
+        limit = len(string)
+    return limit
 
-    def is_macro_name(self, form, dialect):
-        """ is_macro_name(form : str, dialect : str) -> bool
 
-        example: is_macro_name("yacc:define-parser")
-                    True
-            Tests if a word is a macro using the language's/dialect's convention,
-            e.g macros in Lisp usually start with 'def' and 'with' in Scheme. Saves
-            the effort of finding all the macros in Lisp/Scheme/Clojure/newLISP and storing
-            them in a list.
-        """
-        if not form:
-            return form
-        if dialect == 'Common Lisp':
-            return re.search('macro|def|do|with-', form, re.I)
-        if dialect == 'Scheme':
-            return re.search('call-|def|with-', form)
-        if dialect == 'Clojure':
-            return re.search('def|with', form)
-        if dialect == 'newLISP':
-            return re.search('macro|def', form)
+def is_macro_name(form, dialect):
+    """ is_macro_name(form : str, dialect : str) -> bool
 
-    def all_whitespace(self, string):
-        """ all_whitespace(string : str) -> bool
+    example: is_macro_name("yacc:define-parser")
+                True
+        Tests if a word is a macro using the language's/dialect's convention,
+        e.g macros in Lisp usually start with 'def' and 'with' in Scheme. Saves
+        the effort of finding all the macros in Lisp/Scheme/Clojure/newLISP and storing
+        them in a list.
+    """
+    if not form:
+        return form
+    if dialect == 'Common Lisp':
+        return re.search('macro|def|do|with-', form, re.I)
+    if dialect == 'Scheme':
+        return re.search('call-|def|with-', form)
+    if dialect == 'Clojure':
+        return re.search('def|with', form)
+    if dialect == 'newLISP':
+        return re.search('macro|def', form)
 
-        example: all_whitespace("      ")
-                    ==> True
-        Returns True if a string has only whitespace.
-        """
-        return re.search("^[ \t]*(\r|\n|$)", string)
 
-    def pad_leading_whitespace(self, string, zero_level, compact, blist):
-        """ pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
+def split_preserve(string, sep):
+    """ split_preserve(string : str, sep : str)  -> [str]
 
-        example: pad_leading_whitespace("(print 'Yello)")
-                    ==> "         (print 'Yello)"
-        Takes a string and indents it using the current indentation level
-        and the zero level.
-        """
-        if compact:
-            # if compact mode is on, split the string into two, trim the first
-            # position and merge the two portions.
-            trim_limit = self.find_trim_limit(string)
-            comment_line = re.search("^[ \t]*;", string, re.M)
-            if comment_line and INDENT_COMMENTS:
-                trim_limit = -1
-            substr1 = string[0:trim_limit]
-            substr2 = string[trim_limit:]
-            substr1 = self.trim(substr1)
-            string = substr1 + substr2
-        else:
-            # if in nocompact mode, pad with zero_level spaces.
-            string = re.sub("^[ \t]+", '', string, count=0, flags=re.M)
-            string = ' ' * zero_level + string
+    example: split_preserve('''
+    "My dear Holmes, " said I, "this is too much. You would certainly
+    have been burned, had you lived a few centuries ago.
+                ''', "\\n")
+            ==>  ['\\n',
+                    '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
+                    '    have been burned, had you lived a few centuries ago.\\n',
+                    '                ']
+    Splits the string and sticks the separator back to every string in the
+    list.
+    """
+    # split the whole string into a list so that you can iterate line by line.
+    str_list = string.split(sep)
+    if str_list[-1] == "":
+        # If you split "this\nthat\n" you get ["this", "that", ""] if
+        # you add newlines to every string in the list you get
+        # ["this\n", "that\n", "\n"]. You've just added
+        # another newline at the end of the file.
+        del str_list[-1]
+        str_list = map(lambda x: x + sep, str_list)
+    else:
+        # ["this", "that"] will become ["this\n", "that\n"] when
+        # mapped. A newline has been added to the file. We don't want
+        # this, so we strip it below.
+        str_list     = map(lambda x: x + sep, str_list)
+        str_list[-1] = str_list[-1].rstrip(sep)
+    return str_list
 
-        if blist:
-            # if there are unclosed blocks, you pad the line with the
-            # current indent level minus the zero level that was
-            # added earlier
-            current_level = blist[-1]['indent_level']
-            string = ' ' * (current_level - zero_level) + string
-            return string, current_level
-        else:
-            # Otherwise(all blocks finished), return the string as it is since
-            # it's the head of a new block
-            return string, 0
 
-    def split_preserve(self, string, sep):
-        """ split_preserve(string : str, sep : str)  -> [str]
+def all_whitespace(string):
+    """ all_whitespace(string : str) -> bool
 
-        example: split_preserve('''
-        "My dear Holmes, " said I, "this is too much. You would certainly
-        have been burned, had you lived a few centuries ago.
-                    ''', "\\n")
-               ==>  ['\\n',
-                     '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
-                     '    have been burned, had you lived a few centuries ago.\\n',
-                     '                ']
-        Splits the string and sticks the separator back to every string in the
-        list.
-        """
-        # split the whole string into a list so that you can iterate line by line.
-        str_list = string.split(sep)
-        if str_list[-1] == "":
-            # If you split "this\nthat\n" you get ["this", "that", ""] if
-            # you add newlines to every string in the list you get
-            # ["this\n", "that\n", "\n"]. You've just added
-            # another newline at the end of the file.
-            del str_list[-1]
-            str_list = map(lambda x: x + sep, str_list)
-        else:
-            # ["this", "that"] will become ["this\n", "that\n"] when
-            # mapped. A newline has been added to the file. We don't want
-            # this, so we strip it below.
-            str_list     = map(lambda x: x + sep, str_list)
-            str_list[-1] = str_list[-1].rstrip(sep)
-        return str_list
+    example: all_whitespace("      ")
+                ==> True
+    Returns True if a string has only whitespace.
+    """
+    return re.search("^[ \t]*(\r|\n|$)", string)
 
-    def line_ending(self, string):
-        """ line_ending(string : str) -> str
 
-        example: line_ending("Elementary my dear Watson. \\r")
-                    ==> '\\r'
-        Find the line ending in the file so that we can try to preserve it.
-        """
-        CR   = "\r"
-        LF   = "\n"
-        CRLF = CR + LF
+def pad_leading_whitespace(string, zero_level, compact, blist):
+    """ pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
 
-        if CRLF in string:
-            return CRLF
-        elif CR in string:
-            return CR
-        else:
-            return LF
+    example: pad_leading_whitespace("(print 'Yello)")
+                ==> "         (print 'Yello)"
+    Takes a string and indents it using the current indentation level
+    and the zero level.
+    """
+    if compact:
+        # if compact mode is on, split the string into two, trim the first
+        # position and merge the two portions.
+        trim_limit = find_trim_limit(string)
+        comment_line = re.search("^[ \t]*;", string, re.M)
+        if comment_line and INDENT_COMMENTS:
+            trim_limit = -1
+        substr1 = string[0:trim_limit]
+        substr2 = string[trim_limit:]
+        substr1 = trim(substr1)
+        string = substr1 + substr2
+    else:
+        # if in nocompact mode, pad with zero_level spaces.
+        string = re.sub("^[ \t]+", '', string, count=0, flags=re.M)
+        string = ' ' * zero_level + string
 
-    def indent(self, zerolevel, bracket_list, line, in_comment, in_symbol_region):
-        """ indent(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
-                    in_symbol_region : bool)
+    if blist:
+        # if there are unclosed blocks, you pad the line with the
+        # current indent level minus the zero level that was
+        # added earlier
+        current_level = blist[-1]['indent_level']
+        string = ' ' * (current_level - zero_level) + string
+        return string, current_level
+    else:
+        # Otherwise(all blocks finished), return the string as it is since
+        # it's the head of a new block
+        return string, 0
 
-        Most important function in the indentation process. It uses the bracket
-        locations stored in the list to indent the line.
-        """
-        comment_line = re.search("^[ \t]*;", line, re.M)
-        if INDENT_COMMENTS:
-            # We are allowed to indent comment lines
-            comment_line = False
-        if not COMPACT and zerolevel == 0 and bracket_list == [] and not in_comment:
-            # If nocompact mode is on and there are no unclosed blocks, try to
-            # find the zero level by simply counting spaces before a line that
-            # is not empty or has a comment
-            leading_spaces = re.search("^[ \t]+[^; )\n\r]", line)
-            if leading_spaces:
-                # NOTE: If you don't subtract one here, the zero level will increase
-                # every time you indent the file because the character at the end of
-                # the regex is part of the capture.
-                zerolevel = leading_spaces.end() - 1
+def indent(zerolevel, bracket_list, line, in_comment, in_symbol_region):
+    """ indent(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
+                in_symbol_region : bool)
 
-        if in_symbol_region:
-            # No processing done in strings and comments
-            return zerolevel, line, 0
-        elif not comment_line and not self.all_whitespace(line):
-            # If this is not a comment line indent the line.
-            # If the list is empty, then the current_level defaults
-            # to zero
-            curr_line, current_level = self.pad_leading_whitespace(line, zerolevel, COMPACT, bracket_list)
-            return zerolevel, curr_line, current_level
-        else:
-            return zerolevel, line, 0
+    Most important function in the indentation process. It uses the bracket
+    locations stored in the list to indent the line.
+    """
+    comment_line = re.search("^[ \t]*;", line, re.M)
+    if INDENT_COMMENTS:
+        # We are allowed to indent comment lines
+        comment_line = False
+    if not COMPACT and zerolevel == 0 and bracket_list == [] and not in_comment:
+        # If nocompact mode is on and there are no unclosed blocks, try to
+        # find the zero level by simply counting spaces before a line that
+        # is not empty or has a comment
+        leading_spaces = re.search("^[ \t]+[^; )\n\r]", line)
+        if leading_spaces:
+            # NOTE: If you don't subtract one here, the zero level will increase
+            # every time you indent the file because the character at the end of
+            # the regex is part of the capture.
+            zerolevel = leading_spaces.end() - 1
+
+    if in_symbol_region:
+        # No processing done in strings and comments
+        return zerolevel, line, 0
+    elif not comment_line and not all_whitespace(line):
+        # If this is not a comment line indent the line.
+        # If the list is empty, then the current_level defaults
+        # to zero
+        curr_line, current_level = pad_leading_whitespace(line, zerolevel, COMPACT, bracket_list)
+        return zerolevel, curr_line, current_level
+    else:
+        return zerolevel, line, 0
 
 # ****************************************************************************************
 # GLOBAL CONSTANTS::
+
+CR   = '\r'
+LF   = '\n'
+CRLF = CR + LF
 
 # Keywords that indent by two spaces
 SCHEME_KEYWORDS = \
@@ -560,7 +556,7 @@ def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
                 "func_name": func_name,
                 "spaces": 0}
 
-    two_spacer = func_name in TWO_SPACE_INDENTERS or indenter.is_macro_name(func_name, DIALECT)
+    two_spacer = func_name in TWO_SPACE_INDENTERS or is_macro_name(func_name, DIALECT)
 
     if in_list_literal or char == '{' or (char == '[' and DIALECT == "Clojure"):
         # found quoted list or clojure hashmap/vector
@@ -587,8 +583,6 @@ def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
     except:
         pass
     return lst
-
-indenter = Indenter()
 
 
 def indent_code(original_code, fpath=None):
@@ -634,7 +628,7 @@ def indent_code(original_code, fpath=None):
     # any unclosed strings, we can pinpoint them
     last_quote_location = ()
 
-    code_lines = indenter.split_preserve(original_code, indenter.line_ending(original_code))
+    code_lines = split_preserve(original_code, line_ending(original_code))
 
     indented_code = ""
 
@@ -644,8 +638,8 @@ def indent_code(original_code, fpath=None):
         curr_line    = line
 
         # Get the indent level and the indented line
-        zero_level, curr_line, indent_level = indenter.indent(zero_level, bracket_locations,
-                                                              line, in_comment, in_symbol_region)
+        zero_level, curr_line, indent_level = indent(zero_level, bracket_locations,
+                                                     line, in_comment, in_symbol_region)
         # Build up the indented string.
         indented_code += curr_line
         offset = 0
