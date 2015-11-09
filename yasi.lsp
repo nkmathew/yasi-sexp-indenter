@@ -1,10 +1,10 @@
-
-;; @author    ng'etich mathew <kipkoechmathew@gmail.com>
+#!/usr/bin/newlisp
+;; @author    nkmathew <kipkoechmathew@gmail.com>
 ;; @started   20th November 2013
 ;; @Finished  4th December 2013
 
-;; Translated from the python version. 
-;; It's faster than yasi.py by about 0.6 seconds. 
+;; Translated from the python version.
+;; It's faster than yasi.py by about 0.6 seconds.
 
 (define (lisp-dialect lst)
   "Tells the Lisp dialect specified from the list provided, usually
