@@ -11,7 +11,7 @@ that was
 written first in *Python* and later translated to *newLISP*.  
 
 Its style of indentation is  very close to that of *Dorai's* *lispindent.lisp*  
-and tries to follow *Dorai's* [style guidelines][2] where reasonable.
+and tries to follow *Dorai's* [style guidelines][0] where reasonable.
 (Refer to file dorai-test.lisp)
 
 
@@ -138,7 +138,7 @@ start in the subsequent lines. Like a `cond` expression:
  ((= those these) 'No))
 ```
 
-According to Dorai's [guidelines][3]
+According to Dorai's [guidelines][0]
 the above indentation is correct. However,  
 some people may prefer the test expressions to be two spaces past the bracket,  
 like this:  
@@ -255,5 +255,3 @@ run in *GNU Common Lisp* because it doesn't have the macro.
 
 [0]: http://www.ccs.neu.edu/home/dorai/scmindent/
 [1]: http://www.ccs.neu.edu/home/dorai/scmindent/lispindent.lisp
-[2]: http://www.ccs.neu.edu/home/dorai/scmindent/
-[3]: http://www.ccs.neu.edu/home/dorai/scmindent/
