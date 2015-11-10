@@ -8,11 +8,7 @@ import os
 import re
 import sys
 import shutil
-
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 PROJECT_DIR = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 sys.path.insert(0, PROJECT_DIR)
