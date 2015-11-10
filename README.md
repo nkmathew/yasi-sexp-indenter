@@ -2,19 +2,17 @@
 
 ##yasi- yet another s-expression indenter
 yasi is a dialect-aware s-expression indenter that tries to improve  
-on
-[Dorai's indenter](http://www.ccs.neu.edu/home/dorai/scmindent/)
-and *Vim's* built in indenter. It can handle  
+on [Dorai's indenter][0] and *Vim's* built in indenter. It can handle  
 *Common Lisp*, *Clojure*, *Scheme* and *newLISP* code and their  
 unique syntaxes.
 
-It's a batch mode indenter inspired by Dorai's [lispindent.lisp](http://www.ccs.neu.edu/home/dorai/scmindent/lispindent.lisp)
+It's a batch mode indenter inspired by Dorai's [lispindent.lisp][1]
 that was  
 written first in *Python* and later translated to *newLISP*.  
 
 Its style of indentation is  very close to that of *Dorai's* *lispindent.lisp*  
-and tries to follow *Dorai's* [style guidelines](http://www.ccs.neu.edu/home/dorai/scmindent/)
-where reasonable. (Refer to file dorai-test.lisp)
+and tries to follow *Dorai's* [style guidelines][2] where reasonable.
+(Refer to file dorai-test.lisp)
 
 
 ###Features
@@ -140,7 +138,7 @@ start in the subsequent lines. Like a `cond` expression:
  ((= those these) 'No))
 ```
 
-According to Dorai's [guidelines](http://www.ccs.neu.edu/home/dorai/scmindent/)
+According to Dorai's [guidelines][3]
 the above indentation is correct. However,  
 some people may prefer the test expressions to be two spaces past the bracket,  
 like this:  
@@ -254,3 +252,8 @@ run in *GNU Common Lisp* because it doesn't have the macro.
     |           --no-output ;; Don't output the indented code, false by default |
     |           --no-modify ;; Don't modify the file, false by default          |
     +---------------------------------------------------------------------------+
+
+[0]: http://www.ccs.neu.edu/home/dorai/scmindent/
+[1]: http://www.ccs.neu.edu/home/dorai/scmindent/lispindent.lisp
+[2]: http://www.ccs.neu.edu/home/dorai/scmindent/
+[3]: http://www.ccs.neu.edu/home/dorai/scmindent/
