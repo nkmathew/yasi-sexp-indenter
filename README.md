@@ -7,8 +7,7 @@ on [Dorai's indenter][0] and *Vim's* built in indenter. It can handle
 unique syntaxes.
 
 It's a batch mode indenter inspired by Dorai's [lispindent.lisp][1]
-that was  
-written first in *Python* and later translated to *newLISP*.  
+that was written first in *Python* and later translated to *newLISP*.  
 
 Its style of indentation is  very close to that of *Dorai's* *lispindent.lisp*  
 and tries to follow *Dorai's* [style guidelines][0] where reasonable.
@@ -68,7 +67,7 @@ features include:
 + Overkill feature: You get to know the last time you indented the
   file.
 
-###Command Line Arguments
+### Command Line Arguments
      _________________________________________________________________________________________________________________
     |    Usage: newlisp yasi.lsp [[<file>] [--backup-dir<directory>] [--no-compact] [--no-backup] [--no-warning]      |
     |                   [--clojure] [--lisp] [--scheme] [--default-indent <num>]]                                     |
@@ -91,13 +90,13 @@ features include:
     |                                        messing with any deliberate comment layout                               |
     +-----------------------------------------------------------------------------------------------------------------+
 
-###What yasi does not handle
+### What yasi does not handle
 There are some syntaxes used in some dialects of scheme that I didn't feel like  
 including because they are not that common. An example is *MzScheme* and  
 *Gauche's* use of `#//` or `#[]` for regular expressions. I just saw it as too  
 much an effort for something I would not use that often.
 
-###Customization
+### Customization
 *yasi* is customized differently from of Dorai's indenter. Instead of you  
 storing extra keywords in a *.lispwords* file in your home directory, you are  
 advised  to edit the list of keywords in the source file so that you have only  
@@ -127,7 +126,7 @@ if DIALECT == 'Common Lisp': # Lisp
 ```
 and simply remove `multiple-value-bind` from the list.
 
-####About the default indent
+#### About the default indent
 
 The *--default-indent* comes in in expressions whose subforms usually  
 start in the subsequent lines. Like a `cond` expression:  
@@ -155,23 +154,9 @@ the style above, you pass the parameter like so:
 
     yasi.py test.lisp --lisp --default-indent 2
 
-####Testing
-I used a rather unorthodox method of testing the three programs(*yasi.py*,  
-*original_yasi.py*, *yasi.lsp*). I figured, since the programs follow the  
-same logic, they should give the same result for any file with the same  
-parameters passed to them.  
-This guarantees that the programs were translated correctly but doesn't mean  
-that the way they are indenting is the right way. You should get similar results  
-when you run a command like this:  
-
-    forfiles /c "cmd /c newlisp ..\yasi.lsp @file --scheme -nb -no -ne"
-    forfiles /c "cmd /c python ..\yasi.py @file --scheme -nb -no -ne"
-    forfiles /c "cmd /c python ..\original-yasi.py @file --scheme -nb -no -ne"
-
-
 ----------
 
-####Changes made to Dorai's Indenter
+#### Changes made to Dorai's Indenter
 I made a couple of modifications to *lispindent.lisp* and renamed it to  
 *lispindent2.lisp*. It contains some of *yasi's* features. The changes  
 include:  
@@ -205,7 +190,7 @@ include:
 * *lispindent2.lisp* writes files using *LF* line endings be default. It's less  
   irritating than *CRLF* endings which usually light up in an annoying way in *Vim*.  
 
-####lispindent2.lisp's Issues
+#### lispindent2.lisp's Issues
 
 I inadvertently added a bug in an attempt to prevent it from evaluating  
 brackets inside multiline comments and symbols with whitespace. It uses the pipe  
@@ -246,7 +231,7 @@ class method will not be indented because of the error. An example is this code:
 *lispindent2.lisp* uses the `ignore-errors` macro as a workaround. Doing that means that it can't  
 run in *GNU Common Lisp* because it doesn't have the macro.
 
-####lispindent2.lisp's command-line options
+#### lispindent2.lisp's command-line options
      ___________________________________________________________________________
     |   Usage:  lispindent2.lisp [[<file>] [--no-modify] [--no-output]]         |
     |           --no-output ;; Don't output the indented code, false by default |
