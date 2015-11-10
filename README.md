@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nkmathew/yasi-sexp-indenter.svg?branch=master)](https://travis-ci.org/nkmathew/yasi-sexp-indenter)
+
 ##yasi- yet another s-expression indenter
 yasi is a dialect-aware s-expression indenter that tries to improve  
 on
@@ -252,4 +254,3 @@ run in *GNU Common Lisp* because it doesn't have the macro.
     |           --no-output ;; Don't output the indented code, false by default |
     |           --no-modify ;; Don't modify the file, false by default          |
     +---------------------------------------------------------------------------+
-
