@@ -36,6 +36,5 @@
 (define-test (test_cr_lf_mixed_line_ending)
   (assert= (find-line-ending "hello\r world \n mixed\r line endings\n") "\r"))
 
-(print $main-args)
 (UnitTest:run-all 'MAIN)
 (exit)
