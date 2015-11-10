@@ -4,9 +4,9 @@ all:
 	@echo "Usage:"
 	@echo "    make test"
 
-test: tests/test_yasi.py
-	@echo Running unit tests...
-	@${PYTHON} $^
+test:
+	@${PYTHON} tests/test_yasi.py
+	@newlisp tests/test-yasi-module.lsp
 
 tags: yasi.py
 	ctags yasi.py
