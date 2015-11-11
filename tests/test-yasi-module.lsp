@@ -27,6 +27,9 @@
 (define-test (test_cr_line_ending)
   (assert= (find-line-ending "hello\r world\r") "\r"))
 
+(define-test (test_cr_line_ending)
+  (assert= (find-line-ending "hello\r world\r") "\r"))
+
 (define-test (test_lf_line_ending)
   (assert= (find-line-ending "hello\n world\n") "\n"))
 
