@@ -15,6 +15,7 @@ sys.path.insert(0, PROJECT_DIR)
 
 import yasi
 
+
 class UnitTests(unittest.TestCase):
 
     def test_find_line_ending_only_lf(self):
@@ -100,6 +101,7 @@ class UnitTests(unittest.TestCase):
     def test_find_first_arg_pos_no_function2(self):
         source = '('
         self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
+
 
 class SystemTests(unittest.TestCase):
     pass
