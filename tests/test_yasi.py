@@ -49,6 +49,26 @@ class UnitTests(unittest.TestCase):
         source = 'Line without ending'
         self.assertEqual(yasi.LF, yasi.find_line_ending(source))
 
+    def test_all_whitespace_spaces_only(self):
+        source = '           '
+        self.assertTrue(yasi.all_whitespace(source))
+
+    def test_all_whitespace_no_whitespace(self):
+        source = 'karamba!!'
+        self.assertFalse(yasi.all_whitespace(source))
+
+    def test_all_whitespace_empty_string(self):
+        source = ''
+        self.assertTrue(yasi.all_whitespace(source))
+
+    def test_all_whitespace_tabs_and_spaces(self):
+        source = '	    	    	    	    	    	    		'
+        self.assertTrue(yasi.all_whitespace(source))
+
+    def test_all_whitespace_tabs_only(self):
+        source = '								'
+        self.assertTrue(yasi.all_whitespace(source))
+
 class SystemTests(unittest.TestCase):
     pass
 
