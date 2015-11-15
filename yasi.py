@@ -676,7 +676,8 @@ def indent_code(original_code, fpath=None):
                 # the next character has been escaped
                 escaped = True
 
-            if curr_char == ';' and not in_symbol_region and not ((prev_char == '#' and DIALECT == 'Scheme')):
+            if curr_char == ';' and not in_symbol_region and not \
+                    (prev_char == '#' and DIALECT == 'Scheme'):
                 # a comment has been found, go to the next line
                 # A sharp sign(#) before a semi-colon in Scheme is used to
                 # comment out sections or code. We don't treat it as a comment
