@@ -69,6 +69,38 @@ class UnitTests(unittest.TestCase):
         source = '								'
         self.assertTrue(yasi.all_whitespace(source))
 
+    def test_find_first_arg_pos1(self):
+        source = "(     list 'one-sheep 'two-sheep )"
+        self.assertEqual([11, 5], yasi.find_first_arg_pos(0, source))
+
+    def test_find_first_arg_pos2(self):
+        source = "(    list 'one-sheep 'two-sheep )"
+        self.assertEqual([10, 4], yasi.find_first_arg_pos(0, source))
+
+    def test_find_first_arg_pos3(self):
+        source = "   (    list 'one-sheep 'two-sheep )"
+        self.assertEqual([10, 4], yasi.find_first_arg_pos(3, source))
+
+    def test_find_first_arg_pos_argument_in_next_line_no_trailing_space(self):
+        source = "(    list"
+        self.assertEqual([5, 4], yasi.find_first_arg_pos(0, source))
+
+    def test_find_first_arg_pos_argument_in_next_line_no_spaces_before_func(self):
+        source = "(list     "
+        self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
+
+    def test_find_first_arg_pos_argument_is_func_call(self):
+        source = "(list (* 12 13) (* 13 14)  "
+        self.assertEqual([6, 0], yasi.find_first_arg_pos(0, source))
+
+    def test_find_first_arg_pos_no_function1(self):
+        source = "(        "
+        self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
+
+    def test_find_first_arg_pos_no_function2(self):
+        source = "("
+        self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
+
 class SystemTests(unittest.TestCase):
     pass
 
