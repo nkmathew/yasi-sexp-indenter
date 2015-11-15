@@ -249,8 +249,7 @@ def split_preserve(string, sep):
                     '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
                     '    have been burned, had you lived a few centuries ago.\\n',
                     '                ']
-    Splits the string and sticks the separator back to every string in the
-    list.
+    Splits the string and sticks the separator back to every string in the list.
     """
     # split the whole string into a list so that you can iterate line by line.
     str_list = string.split(sep)
@@ -260,12 +259,12 @@ def split_preserve(string, sep):
         # ['this\n', 'that\n', '\n']. You've just added
         # another newline at the end of the file.
         del str_list[-1]
-        str_list = map(lambda x: x + sep, str_list)
+        str_list = [x + sep for x in str_list]
     else:
         # ['this', 'that'] will become ['this\n', 'that\n'] when
         # mapped. A newline has been added to the file. We don't want
         # this, so we strip it below.
-        str_list     = map(lambda x: x + sep, str_list)
+        str_list     = [x + sep for x in str_list]
         str_list[-1] = str_list[-1].rstrip(sep)
     return str_list
 
