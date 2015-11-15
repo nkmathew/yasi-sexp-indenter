@@ -451,54 +451,64 @@ elif DIALECT == 'All':
 # ************************************************************************************* #
 
 
-def find_first_arg_pos(curr_pos, string):
-    """ find_first_arg_pos(curr_pos : int, string : str) -> int
+def find_first_arg_pos(bracket_offset, curr_line):
+    """ find_first_arg_pos(bracket_offset : int, curr_line : str) -> [int, int]
 
-    example: find_first_arg_pos(0, "(     list 'one-sheep 'two-sheep )")
-                ==> 11
-    Returns the position of the first argument to the function.
+    Arguments:
+    bracket_offset - The position of the bracket in the current line e.g
+        "    (  list 'timey 'wimey  )" --> 4
+        " (  list 'timey 'wimey  )"    --> 1
+        "(  list 'timey 'wimey  )"     --> 0
+
+    >>> find_first_arg_pos(0, "(     list 'one-sheep 'two-sheep )")
+    [11, 5]
+
+    Returns the position of the first argument to the function relative to the
+    position of the opening bracket and the number of spaces between the opening
+    bracket and the function name.
+    The two values will to be used to align the other arguments in the subsequent line
     """
-    leading_spaces = 0
-    substr = string[curr_pos + 1:]
-    if re.search("^[ \t]*($|\r)", substr):
+    spaces_before_func = 0
+    subline = curr_line[bracket_offset + 1:]
+    if re.search("^[ \t]*($|\r)", subline):
         # whitespace extending to the end of the line means there's no
         # function in this line. The indentation level defaults to one.
         arg_pos = 1
     else:
-        if curr_pos != len(string) - 1 and string[curr_pos + 1] == ' ':
+        if bracket_offset != len(curr_line) - 1 and curr_line[bracket_offset + 1] == ' ':
             # control reaches here if we are not at the end of the line
             # and whitespace follows. We must first find the position of the
             # function and then the arguments position
-            match = re.search(" +[^)\]]| \)", substr)  # Find the first non whitespace/bracket character
+            match = re.search(" +[^)\]]| \)", subline)  # Find the first non whitespace/bracket character
             if match:
-                leading_spaces = match.end() - match.start() - 1
+                spaces_before_func = match.end() - match.start() - 1
                 end = match.end()
             else:
                 end = 0
             # Then use the end of the whitespace group as the first argument
-            arg_pos = re.search(" +([^)])|( *(\(|\[))", substr[end:])
+            arg_pos = re.search(" +([^)])|( *(\(|\[))", subline[end:])
             if arg_pos:
-                arg_pos = arg_pos.end() + leading_spaces + 1
+                arg_pos = arg_pos.end() + spaces_before_func + 1
             else:
-                arg_pos = leading_spaces + 1
+                arg_pos = spaces_before_func + 1
             if re.match("^[ \t]*(#\||;|$|\r)",
-                        substr[(end - 1 + substr[end - 1:].find(' ')):]):
+                        subline[(end - 1 + subline[end - 1:].find(' ')):]):
                 # But, if a comment if found after the function name, the
                 # indent level becomes one
-                arg_pos = leading_spaces + DEFAULT_INDENT
+                arg_pos = spaces_before_func + DEFAULT_INDENT
         else:
             # If there's no space after the bracket, simply find the end of the
             # whitespace group
-            match = re.search(" +([^)}\n\r])|( *(\(|\[|{))", substr)
+            match = re.search(" +([^)}\n\r])|( *(\(|\[|{))", subline)
             if match:  # found the argument
                 arg_pos = match.end()
             else:  # Either empty list or argument is in the next line
                 arg_pos = 1
-            if re.match("^[\t ]*(;|$|\r)", substr[substr.find(' '):]):
+            if re.match("^[\t ]*(;|$|\r)", subline[subline.find(' '):]):
                 # Again if a comment is found after the function name, the
                 # indent level defaults to 1
-                arg_pos = leading_spaces + DEFAULT_INDENT
-    return [arg_pos, leading_spaces]
+                arg_pos = spaces_before_func + DEFAULT_INDENT
+    return [arg_pos, spaces_before_func]
 
 
 def pop_from_list(bracket, lst, fname, line, real_pos, offset):
@@ -719,7 +729,7 @@ def indent_code(original_code, fpath=None):
                 or in_newlisp_string or in_newlisp_tag_string
 
             if in_symbol_region:
-                # move on if you are in a string, a symbol with space or a comment
+                # move on if we are in a string, a symbol with a space or a comment
                 # altogether known as the symbol region
                 offset += 1
                 continue
@@ -736,7 +746,7 @@ def indent_code(original_code, fpath=None):
                     offset += 1
                     continue
 
-                first_arg_pos, leading_spaces = find_first_arg_pos(offset, curr_line)
+                first_arg_pos, spaces_before_func = find_first_arg_pos(offset, curr_line)
                 func_name = substr[0:first_arg_pos - 1].strip(')]\t\n\r ').lower()
                 in_list_literal = False
                 if re.search("('|`|#)([ \t]*\(|\[)($|\r)", curr_line[0:offset + 1]):
@@ -769,7 +779,7 @@ def indent_code(original_code, fpath=None):
                 first_item = re.search("[ \t]*", curr_line[offset + 1:]).end() + offset + 1
                 bracket_locations = push_to_list(bracket_locations[:], func_name, curr_char, line_number,
                                                  offset, first_arg_pos, first_item, in_list_literal,
-                                                 leading_spaces)
+                                                 spaces_before_func)
 
             elif curr_char in [']', ')', '}']:
                 if curr_char in [']', '}'] and DIALECT in ["Common Lisp", "newLISP"]:
