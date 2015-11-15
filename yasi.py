@@ -126,10 +126,10 @@ def md5sum(content):
     return hashlib.md5(content).hexdigest()
 
 
-def line_ending(string):
-    """ line_ending(string : str) -> str
+def find_line_ending(string):
+    """ find_line_ending(string : str) -> str
 
-    example: line_ending("Elementary my dear Watson. \\r")
+    example: find_line_ending("Elementary my dear Watson. \\r")
                 ==> '\\r'
     Find the line ending in the file so that we can try to preserve it.
     """
@@ -628,7 +628,7 @@ def indent_code(original_code, fpath=None):
     # any unclosed strings, we can pinpoint them
     last_quote_location = ()
 
-    code_lines = split_preserve(original_code, line_ending(original_code))
+    code_lines = split_preserve(original_code, find_line_ending(original_code))
 
     indented_code = ""
 
