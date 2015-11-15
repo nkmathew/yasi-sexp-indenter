@@ -16,9 +16,9 @@ tags: yasi.py
 	ctags yasi.py
 
 checks:
-	pep8 yasi.py
+	pep8 yasi.py tests/test_yasi.py
 	@printf "\n-------------------\n"
-	pylint yasi.py
+	pylint yasi.py tests/test_yasi.py
 
 clean:
 	rm -rf __pycache__ tags *.pyc
