@@ -20,7 +20,7 @@ import hashlib
 def read_file(fname):
     """ read_file(fname : str) -> str
 
-    example: read_file(r'C:\mine\\test.lisp')
+    example: read_file(r'C:\\mine\\test.lisp')
                 ==> r'(print "No, no, there\'s \\r\\nlife in him!. ")\\r\\n\\r\\n'
     The file is read in binary mode in order to preserve original line endings.
         Line ending    Binary mode Text mode
