@@ -798,17 +798,16 @@ def indent_code(original_code, fpath=None):
                 bracket_locations = pop_from_list(curr_char, bracket_locations[:], fname, line_number, real_position, offset)
 
             if bracket_locations and curr_char in [' ', '\t'] and bracket_locations[-1]['func_name'] in IF_LIKE:
-                """ This part changes the indentation level of a then clause so that
-                    we can achieve something like:
-                            (if (= this that)
-                                'then-form
-                              'else-form)
-                    This is done by keeping track of the number of spaces found. If
-                    you find two spaces it means that, for example that we have just
-                    passed the then-form and hence should decrease the indentation
-                    level by 2.(I shamelessly copied this algorithm from Dorai's
-                    indenter)
-                """
+                # This part changes the indentation level of a then clause so that
+                # we can achieve something like:
+                #         (if (= this that)
+                #             'then-form
+                #           'else-form)
+                # This is done by keeping track of the number of spaces found. If
+                # you find two spaces it means that, for example that we have just
+                # passed the then-form and hence should decrease the indentation
+                # level by 2.(I shamelessly copied this algorithm from Dorai's
+                # indenter)
                 if prev_char not in [' ', '\t', ''] or not \
                         re.search('^[ \t]*(;|#\||$|\r)', curr_line):
                     # The level shouldn't be decreased if the line is a comment
