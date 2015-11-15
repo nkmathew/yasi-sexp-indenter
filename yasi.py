@@ -312,8 +312,8 @@ def pad_leading_whitespace(string, zero_level, compact, blist):
         # it's the head of a new block
         return string, 0
 
-def indent(zerolevel, bracket_list, line, in_comment, in_symbol_region):
-    """ indent(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
+def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region):
+    """ indent_line(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
                 in_symbol_region : bool)
 
     Most important function in the indentation process. It uses the bracket
@@ -638,7 +638,7 @@ def indent_code(original_code, fpath=None):
         curr_line    = line
 
         # Get the indent level and the indented line
-        zero_level, curr_line, indent_level = indent(zero_level, bracket_locations,
+        zero_level, curr_line, indent_level = indent_line(zero_level, bracket_locations,
                                                      line, in_comment, in_symbol_region)
         # Build up the indented string.
         indented_code += curr_line
