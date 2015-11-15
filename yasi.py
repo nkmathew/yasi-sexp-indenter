@@ -169,6 +169,7 @@ def trim(string):
     string = re.sub(r" ('|`) (\(|\[|{)", r' \1\2', string)
     return string
 
+
 def find_trim_limit(string):
     """ find_trim_limit(string : str) -> int
 
@@ -311,6 +312,7 @@ def pad_leading_whitespace(string, zero_level, compact, blist):
         # Otherwise(all blocks finished), return the string as it is since
         # it's the head of a new block
         return string, 0
+
 
 def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region):
     """ indent_line(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
@@ -648,8 +650,10 @@ def indent_code(original_code, fpath=None):
         curr_line    = line
 
         # Get the indent level and the indented line
-        zero_level, curr_line, indent_level = indent_line(zero_level, bracket_locations,
-                                                     line, in_comment, in_symbol_region)
+        zero_level, curr_line, indent_level = indent_line(zero_level,
+                                                          bracket_locations,
+                                                          line, in_comment,
+                                                          in_symbol_region)
         # Build up the indented string.
         indented_code += curr_line
         offset = 0
