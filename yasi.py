@@ -426,7 +426,7 @@ if '--default-indent' in sys.argv:
     if len(sys.argv) > pos:
         try:
             DEFAULT_INDENT = int(sys.argv[pos + 1])
-        except:
+        except (IndexError, ValueError):
             DEFAULT_INDENT = 1
 
 # The 'if' and 'else' part of an if block should have different indent levels so
@@ -594,7 +594,7 @@ def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
         parent_func = lst[-3]['func_name']
         if parent_func in ['flet', 'labels', 'macrolet']:
             lst[-1]['indent_level'] = offset + 2
-    except:
+    except IndexError:
         pass
     return lst
 
