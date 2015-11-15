@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
-# started: 20th November 2013
 
-__author__  = 'nkmathew <kipkoechmathew@gmail.com>'
-__date__    = '4th December 2013'
+""" yasi
+
+Date: 20th November 2013
+Author: nkmathew <kipkoechmathew@gmail.com>
+
+Dialect aware s-expression indenter
+"""
+
 
 import re
 import os
