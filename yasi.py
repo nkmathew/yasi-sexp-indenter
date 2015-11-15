@@ -836,7 +836,7 @@ def after_indentation(indentation_state):
     """
     # Receive all the state variables. *This is the price you for modularity*
     first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations, \
-        newlisp_brace_locations, in_string, in_comment, in_symbol_with_space, \
+        newlisp_brace_locations, in_string, _, _, \
         bracket_locations, last_quote_location, fpath, original_code, indented_code \
         = indentation_state
 
