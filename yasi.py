@@ -9,14 +9,12 @@ Author: nkmathew <kipkoechmathew@gmail.com>
 Dialect aware s-expression indenter
 """
 
-
 import re
 import os
 import sys
-import time     # to tell you the last time you indented a file.
-import shutil   # to create backup file
-import hashlib  # to determine if a file has already been formatted
-import pprint   # for debugging
+import time
+import shutil
+import hashlib
 
 
 def read_file(fname):
