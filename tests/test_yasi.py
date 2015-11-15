@@ -82,23 +82,23 @@ class UnitTests(unittest.TestCase):
         self.assertEqual([10, 4], yasi.find_first_arg_pos(3, source))
 
     def test_find_first_arg_pos_argument_in_next_line_no_trailing_space(self):
-        source = "(    list"
+        source = '(    list'
         self.assertEqual([5, 4], yasi.find_first_arg_pos(0, source))
 
     def test_find_first_arg_pos_argument_in_next_line_no_spaces_before_func(self):
-        source = "(list     "
+        source = '(list     '
         self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
 
     def test_find_first_arg_pos_argument_is_func_call(self):
-        source = "(list (* 12 13) (* 13 14)  "
+        source = '(list (* 12 13) (* 13 14)  '
         self.assertEqual([6, 0], yasi.find_first_arg_pos(0, source))
 
     def test_find_first_arg_pos_no_function1(self):
-        source = "(        "
+        source = '(        '
         self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
 
     def test_find_first_arg_pos_no_function2(self):
-        source = "("
+        source = '('
         self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
 
 class SystemTests(unittest.TestCase):
