@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# Disable pylint warning on methods without docstrings
-# pylint: disable=C0111
+# Disable pylint warnings on methods without docstrings and too many public methods
+# pylint: disable=C0111,R0904
 
 """ Test suite for yasi
 """
