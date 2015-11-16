@@ -135,6 +135,30 @@ class UnitTests(unittest.TestCase):
         source = "'        (12 13 14)"
         self.assertEqual("'(12 13 14)", yasi.trim(source))
 
+    def test_find_trim_limit_literal_double_quote(self):
+        source = r'(list #\; #\")'
+        self.assertEqual(len(source), yasi.find_trim_limit(source))
+
+    def test_find_trim_limit_double_quote(self):
+        source = '(list 1123 " ) " 542)'
+        self.assertEqual(12, yasi.find_trim_limit(source))
+
+    def test_find_trim_limit_double_and_single_quote(self):
+        source = """(list 1123 ' " ) " 542)"""
+        self.assertEqual(14, yasi.find_trim_limit(source))
+
+    def test_find_trim_limit_double_quote_after_semi_colon(self):
+        source = """(list 1123 ; " )" ";" 542)"""
+        self.assertEqual(11, yasi.find_trim_limit(source))
+
+    def test_find_trim_limit_double_quote_after_comment_block(self):
+        source = """(list 1123 '  #|  " ); "  |# 542) """
+        self.assertEqual(19, yasi.find_trim_limit(source))
+
+    def test_find_trim_limit_double_quote_before_semi_colon(self):
+        source = """(list 1123 ' " ); " 542)"""
+        self.assertEqual(14, yasi.find_trim_limit(source))
+
 
 class SystemTests(unittest.TestCase):
     pass
