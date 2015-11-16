@@ -186,6 +186,32 @@ class UnitTests(unittest.TestCase):
                           'Sobre todo \n',
                           ' en este mundo\n'], yasi.split_preserve(source, '\n'))
 
+    def test_is_macro_name_newlisp_macros(self):
+        newlisp_macro_list = [
+        ]
+        for x in newlisp_macro_list:
+            self.assertTrue(x)
+
+    def test_is_macro_name_scheme_macros(self):
+        scheme_macro_list = [
+        ]
+        for x in scheme_macro_list:
+            self.assertTrue(x)
+
+    def test_is_macro_name_clojure_macros(self):
+        clojure_macro_list = [
+            "defmacro"
+        ]
+        for x in clojure_macro_list:
+            self.assertTrue(x)
+
+    def test_is_macro_name_lisp_macros(self):
+        lisp_macro_list = [
+            "defmacro"
+        ]
+        for x in lisp_macro_list:
+            self.assertTrue(x)
+
 
 class SystemTests(unittest.TestCase):
     pass
