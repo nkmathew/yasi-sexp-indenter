@@ -33,7 +33,7 @@ def read_file(fname):
         return fp.read()
 
 
-def issue_warning(warning_message, format_tuple, warn, exit_after_warning, fname):
+def print_warning(warning_message, format_tuple, warn, exit_after_warning, fname):
     """
     Issues all the warning messages.
     """
@@ -88,7 +88,7 @@ def backup_source_file(fname, backup_dir='.'):
     except IOError:
         message = "\n--%s-- Warning: Couldn't backup the file `%s' in `%s', check if you have enough permissions. "
         tpl = (current_time(), fname, backup_dir)
-        issue_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, WARN, EXIT, fname)
 
 
 def get_backup_directory(lst, fname):
@@ -105,13 +105,13 @@ def get_backup_directory(lst, fname):
         if len(lst) <= index:
             message = "\n--%s-- `%s': Warning: Backup option specified but no backup directory provided.\n"
             tpl = (current_time(), fname)
-            issue_warning(message, tpl, WARN, False, None)
+            print_warning(message, tpl, WARN, False, None)
             return False
         backup_dir = lst[index]
         if not os.path.exists(os.path.abspath(backup_dir)):
             message = "\n--%s-- `%s': Warning: The directory `%s' does not exist and can't be used as a backup directory."
             tpl = (current_time(), fname, backup_dir)
-            issue_warning(message, tpl, WARN, True, fname)
+            print_warning(message, tpl, WARN, True, fname)
         else:
             return backup_dir
     else:
@@ -539,7 +539,7 @@ def pop_from_list(bracket, lst, fname, line, real_pos, offset):
         if popped_char is not correct_closer:
             message = "\n--%s-- %s: Warning: Bracket `%s' at (%d, %d) does not match `%s' at (%d, %d)"
             tpl = (current_time(), fname, popped_char, popped_pos, popped_offset, bracket, line, real_pos)
-            issue_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, WARN, EXIT, fname)
     else:
         # If the list if empty and a closing bracket is found, it means we have
         # excess brackets. That warning is issued here. The coordinates used
@@ -551,7 +551,7 @@ def pop_from_list(bracket, lst, fname, line, real_pos, offset):
             bpos = offset + 1
         message = "\n--%s-- %s: Warning: Unmatched `%s' near (%d, %d). "
         tpl = (current_time(), fname, bracket, line, bpos)
-        issue_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, WARN, EXIT, fname)
     return lst
 
 
@@ -718,7 +718,7 @@ def indent_code(original_code, fpath=None):
                         else:
                             message = "\n--%s-- `%s': Warning: Attempt to close a non-existent newLISP string"
                             tpl = (current_time(), fname)
-                            issue_warning(message, tpl, WARN, EXIT, fname)
+                            print_warning(message, tpl, WARN, EXIT, fname)
                         in_newlisp_string -= 1
 
             if curr_char == '[' and DIALECT == 'newLISP' and not \
@@ -853,39 +853,39 @@ def after_indentation(indentation_state):
             # the same.
             message = "\n--%s-- `%s': Warning : Unmatched `%s' near (%d, %d). "
             tpl = (current_time(), fname, character, y, x)
-            issue_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, WARN, EXIT, fname)
 
     if newlisp_brace_locations:
         for brace in newlisp_brace_locations:
             message = "\n--%s-- `%s': Warning: Unclosed newLISP string near: (%d, %d)"
             tpl = (current_time(), fname) + brace
-            issue_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, WARN, EXIT, fname)
 
     if comment_locations:
         for comment in comment_locations:
             message = "\n--%s-- `%s': Warning: Unclosed comment near: (%d, %d)"
             tpl = (current_time(), fname) + comment
-            issue_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, WARN, EXIT, fname)
 
     if last_symbol_location:
         message = "\n--%s-- `%s': Warning: Unclosed symbol near: (%d, %d). "
         tpl = (current_time(), fname) + last_symbol_location
-        issue_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, WARN, EXIT, fname)
 
     if in_string:
         message = "\n--%s-- `%s': Warning: The string starting from (%d, %d) extends to end-of-file. "
         tpl = ((current_time(), ) + last_quote_location)
-        issue_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, WARN, EXIT, fname)
 
     if in_newlisp_tag_string:
         message = "\n--%s-- `%s': Warning: The tag string starting from (%d, %d) extends to end-of-file. "
         tpl = (current_time(), fname) + first_tag_string
-        issue_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, WARN, EXIT, fname)
 
     if md5sum(indented_code.encode('utf-8')) == md5sum(original_code.encode('utf-8')):
         message = "\n--%s-- File `%s' has already been formatted. Leaving it unchanged. . .\n"
         tpl = (current_time(), fname)
-        issue_warning(message, tpl, True, False, fname)
+        print_warning(message, tpl, True, False, fname)
     else:
         if OUTPUT:
             print(indented_code)
