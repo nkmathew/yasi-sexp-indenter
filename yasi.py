@@ -16,6 +16,7 @@ import time
 import shutil
 import hashlib
 
+__version__ = '0.1.0'
 
 def read_file(fname):
     """ read_file(fname : str) -> str
@@ -899,10 +900,10 @@ def after_indentation(indentation_state):
 def indent_file(fname):
     """ indent_file(fname : str)
 
-        1. Creates a backup of the source file(backup_source_file())
-        2. Reads the files contents(read_file())
-        3. Indents the code(indent_code())
-        4. Writes the file or print the indented code(after_indentation())
+    1. Creates a backup of the source file(backup_source_file())
+    2. Reads the files contents(read_file())
+    3. Indents the code(indent_code())
+    4. Writes the file or print the indented code(after_indentation())
     """
     fname = os.path.abspath(fname)
     code = read_file(fname).decode('utf-8')

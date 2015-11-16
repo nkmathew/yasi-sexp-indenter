@@ -5,6 +5,8 @@
 
 ;; Translated from the python version.
 
+(define __version__ "0.1.0")
+
 (define (lisp-dialect lst)
   "Tells the Lisp dialect specified from the list provided, usually
   command line arguments. Defaults to all if non is specified"
