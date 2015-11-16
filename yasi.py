@@ -18,6 +18,7 @@ import hashlib
 
 __version__ = '0.1.0'
 
+
 def read_file(fname):
     """ read_file(fname : str) -> str
 
@@ -157,8 +158,8 @@ def trim(string):
     string = re.sub(r'(\)|\]|})(\[|\(|{)', r'\1 \2', string)
     # Remove any space before closing brackets '(print 12   )' ==> '(print 12)'
     string = re.sub('[ \t]*(\)|\]|})', r'\1', string)
-    # remove extra whitespace '(print     'this) ==> '(print 'this)"
-    string = re.sub('[ \t]{2, }', ' ', string)
+    # remove extra whitespace "(print     'this)" ==> "(print 'this)"
+    string = re.sub('[ \t]{2,}', ' ', string)
     # turn ') ) ) ' into '))) '
     string = re.sub(r'(\))[ \t]*(?=(\)))', r'\1', string)
     string = re.sub(r'(\])[ \t]*(?=(\]))', r'\1', string)
