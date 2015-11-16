@@ -159,6 +159,33 @@ class UnitTests(unittest.TestCase):
         source = """(list 1123 ' " ); " 542)"""
         self.assertEqual(14, yasi.find_trim_limit(source))
 
+    def test_split_preserve_empty_lines_at_EOF(self):
+        source = "Tengo una pregunta\nSobre todo \n en este mundo\n\n\n\n\n"
+        self.assertEqual(['Tengo una pregunta\n',
+                          'Sobre todo \n',
+                          ' en este mundo\n',
+                          '\n',
+                          '\n',
+                          '\n',
+                          '\n'], yasi.split_preserve(source, '\n'))
+
+    def test_split_preserve_no_line_ending_at_EOF(self):
+        source = "Tengo una pregunta\nSobre todo \n en este mundo"
+        self.assertEqual(['Tengo una pregunta\n',
+                          'Sobre todo \n',
+                          ' en este mundo'], yasi.split_preserve(source, '\n'))
+
+    def test_split_preserve_no_delimiter(self):
+        source = "Tengo una pregunta  Sobre todo    en este mundo  "
+        self.assertEqual(["Tengo una pregunta  Sobre todo    en este mundo  "],
+                         yasi.split_preserve(source, '\n'))
+
+    def test_split_preserve(self):
+        source = "Tengo una pregunta\nSobre todo \n en este mundo\n"
+        self.assertEqual(['Tengo una pregunta\n',
+                          'Sobre todo \n',
+                          ' en este mundo\n'], yasi.split_preserve(source, '\n'))
+
 
 class SystemTests(unittest.TestCase):
     pass
