@@ -170,8 +170,8 @@ def trim(string):
     string = re.sub(r'({)[ \t]*(?=({))', r'\1', string)
     # remove leading whitespace '   print' ==> 'print'
     string = re.sub('^[ \t]*', '', string)
-    # Remove space before list literal, " ' (1 2 3)" ==> " '(1 2 3)"
-    string = re.sub(r" ('|`) (\(|\[|{)", r' \1\2', string)
+    # Remove space between quote and opening bracket, "' (1 2 3)" ==> "'(1 2 3)"
+    string = re.sub("('|`)[ \t]+(\(|\[|{)", r'\1\2', string)
     return string
 
 
