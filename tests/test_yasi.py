@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
+# pylint: disable=C0111, "Missing docstring"
 
 """ Test suite for yasi
 """
 
 import os
-import re
 import sys
-import shutil
 import unittest
 
 PROJECT_DIR = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
