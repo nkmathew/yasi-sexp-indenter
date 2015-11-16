@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
-# pylint: disable=C0111, "Missing docstring"
+
+# Disable pylint warning on methods without docstrings
+# pylint: disable=C0111
 
 """ Test suite for yasi
 """
