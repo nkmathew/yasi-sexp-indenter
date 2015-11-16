@@ -178,17 +178,19 @@ def trim(string):
 def find_trim_limit(string):
     """ find_trim_limit(string : str) -> int
 
-    examples: find_trim_limit(r'(list #\; #\")')
-                ==> 14
-                find_trim_limit(r'(list ; ")')
-                ==> 6
-                find_trim_limit(r'(list " ;)')
-                ==> 7
+    >>> find_trim_limit(r'(list #\; #\")')
+    14
+    >>> find_trim_limit(r'(list ; ")')
+    6
+    >>> find_trim_limit(r'(list " ;)')
+    7
+
     The function attempts to identify upto which point we are supposed to trim
     so that we don't mess with strings or any aligned comments.
+
     It does this by comparing the positions of semicolons and double
     quotes. It doesn't consider the multiline comment marker. If your
-    code uses multiline comments, you'll have to use --no-compact mode
+    code uses multiline comments(#| ... |#), you'll have to use --no-compact mode
     """
     # Find position of the first unescaped semi colon
     comment_start = re.search(r'([^\\];)|(^;)', string)
