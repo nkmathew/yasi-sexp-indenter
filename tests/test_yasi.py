@@ -103,6 +103,38 @@ class UnitTests(unittest.TestCase):
         source = '('
         self.assertEqual([1, 0], yasi.find_first_arg_pos(0, source))
 
+    def test_trim_separate_adjacent_opening_and_closing_brackets(self):
+        source = ')('
+        self.assertEqual(') (', yasi.trim(source))
+
+    def test_trim_space_between_succeeding_opening_brackets(self):
+        source = '( ( ( '
+        self.assertEqual('((( ', yasi.trim(source))
+
+    def test_trim_adjacent_function_and_argument_opening_bracket(self):
+        source = '(print(+ 1 1))'
+        self.assertEqual('(print (+ 1 1))', yasi.trim(source))
+
+    def test_trim_space_between_succeeding_closing_brackets(self):
+        source = ') ) ) '
+        self.assertEqual('))) ', yasi.trim(source))
+
+    def test_trim_spaces_before_closing_brackets(self):
+        source = '(print 12    )'
+        self.assertEqual('(print 12)', yasi.trim(source))
+
+    def test_trim_extra_whitespace(self):
+        source = "(print       'this)"
+        self.assertEqual("(print 'this)", yasi.trim(source))
+
+    def test_trim_leading_whitespace(self):
+        source = '       (exit)'
+        self.assertEqual('(exit)', yasi.trim(source))
+
+    def test_trim_spaces_between_quote_and_opening_bracket_in_list_literal(self):
+        source = "'        (12 13 14)"
+        self.assertEqual("'(12 13 14)", yasi.trim(source))
+
 
 class SystemTests(unittest.TestCase):
     pass
