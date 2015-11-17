@@ -257,10 +257,10 @@ def split_preserve(string, sep):
     "My dear Holmes, " said I, "this is too much. You would certainly
     have been burned, had you lived a few centuries ago.
                 ''', '\\n')
-            ==>  ['\\n',
-                    '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
-                    '    have been burned, had you lived a few centuries ago.\\n',
-                    '                ']
+    ['\\n',
+     '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
+     '    have been burned, had you lived a few centuries ago.\\n',
+     '                ']
 
     Splits the string and sticks the separator back to every string in the list.
     """
@@ -534,9 +534,9 @@ def pop_from_list(bracket, lst, fname, line, real_pos, offset):
     """ pop_from_list(char : str, lst : [str], fname : str, line : str,
                         real_pos : int, offset : int)
 
-        The function is called when a closing bracket is encountered. The function
-        simply pops the last pushed item and issues a warning if an error is
-        encountered.
+    The function is called when a closing bracket is encountered. The function
+    simply pops the last pushed item and issues a warning if an error is
+    encountered.
     """
     # Try to spot a case when a square bracket is used to close a round bracket
     # block
