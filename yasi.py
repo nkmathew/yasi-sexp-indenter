@@ -22,8 +22,9 @@ __version__ = '0.1.0'
 def read_file(fname):
     """ read_file(fname : str) -> str
 
-    example: read_file(r'C:\\mine\\test.lisp')
-                ==> r'(print "No, no, there\'s \\r\\nlife in him!. ")\\r\\n\\r\\n'
+    >>> read_file(r'C:\\mine\\test.lisp')
+    r'(print "No, no, there\'s \\r\\nlife in him!. ")\\r\\n\\r\\n'
+
     The file is read in binary mode in order to preserve original line endings.
         Line ending    Binary mode Text mode
             CRLF            CRLF    LF
@@ -48,8 +49,9 @@ def print_warning(warning_message, format_tuple, warn, exit_after_warning, fname
 def current_time():
     """ current_time() -> str
 
-    example: current_time()
-                ==> 14:28:04
+    >>> current_time()
+    14:28:04
+
     Returns the current local time in 24 clock system.
     """
     return time.strftime('%X', (time.localtime()))
@@ -58,7 +60,9 @@ def current_time():
 def lisp_dialect(lst):
     """ lisp_dialect(lst : [list]) -> str
 
-    example: lisp_dialect(['quicklisp.lisp', '--no-backup', '--clojure'])
+    >>> lisp_dialect(['quicklisp.lisp', '--no-backup', '--clojure'])
+    'Clojure'
+
     Find the lisp dialect specified in the list(sys.argv). The lisp
     dialect determines the keywords to be used.
     """
@@ -77,7 +81,8 @@ def lisp_dialect(lst):
 def backup_source_file(fname, backup_dir='.'):
     """ backup_source_file(fname : str)
 
-    example: backup_source_file('~/Desktop/lisp/test.lisp')
+    >>> backup_source_file('~/Desktop/lisp/test.lisp')
+
     Create a backup copy of the source file.
     """
     assert os.path.exists(fname), \
@@ -123,8 +128,9 @@ def get_backup_directory(lst, fname):
 def md5sum(content):
     """ md5sum(content : str) -> str
 
-    example: md5sum('Keyboard not found!! Press F1 to continue...')
-                ==> 'ad98cde09016d2e99a726966a4291acf'
+    >>> md5sum('Keyboard not found!! Press F1 to continue...')
+    'ad98cde09016d2e99a726966a4291acf'
+
     Returns a checksum to be used to determine whether the file has changed.
     A simple textual comparison can still do the work
     """
@@ -134,8 +140,9 @@ def md5sum(content):
 def find_line_ending(string):
     """ find_line_ending(string : str) -> str
 
-    example: find_line_ending('Elementary my dear Watson. \\r')
-                ==> '\\r'
+    >>> find_line_ending('Elementary my dear Watson. \\r')
+    '\\r'
+
     Find the line ending in the file so that we can try to preserve it.
     """
     if CRLF in string:
@@ -223,12 +230,13 @@ def find_trim_limit(string):
 def is_macro_name(form, dialect):
     """ is_macro_name(form : str, dialect : str) -> bool
 
-    example: is_macro_name('yacc:define-parser')
-                True
-        Tests if a word is a macro using the language's/dialect's convention,
-        e.g macros in Lisp usually start with 'def' and 'with' in Scheme. Saves
-        the effort of finding all the macros in Lisp/Scheme/Clojure/newLISP and storing
-        them in a list.
+    >>> is_macro_name('yacc:define-parser')
+    True
+
+    Tests if a word is a macro using the language's/dialect's convention,
+    e.g macros in Lisp usually start with 'def' and 'with' in Scheme. Saves
+    the effort of finding all the macros in Lisp/Scheme/Clojure/newLISP and storing
+    them in a list.
     """
     if not form:
         return form
@@ -245,7 +253,7 @@ def is_macro_name(form, dialect):
 def split_preserve(string, sep):
     """ split_preserve(string : str, sep : str)  -> [str]
 
-    example: split_preserve('''
+    >>> split_preserve('''
     "My dear Holmes, " said I, "this is too much. You would certainly
     have been burned, had you lived a few centuries ago.
                 ''', '\\n')
@@ -253,6 +261,7 @@ def split_preserve(string, sep):
                     '    "My dear Holmes, " said I, "this is too much. You would certainly\\n',
                     '    have been burned, had you lived a few centuries ago.\\n',
                     '                ']
+
     Splits the string and sticks the separator back to every string in the list.
     """
     # split the whole string into a list so that you can iterate line by line.
@@ -276,8 +285,9 @@ def split_preserve(string, sep):
 def all_whitespace(string):
     """ all_whitespace(string : str) -> bool
 
-    example: all_whitespace('      ')
-                ==> True
+    >>> all_whitespace('      ')
+    True
+
     Returns True if a string has only whitespace.
     """
     return re.search('^[ \t]*(\r|\n|$)', string)
@@ -286,8 +296,9 @@ def all_whitespace(string):
 def pad_leading_whitespace(string, zero_level, compact, blist):
     """ pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
 
-    example: pad_leading_whitespace("(print 'Yello)")
-                ==> "         (print 'Yello)"
+    >>> pad_leading_whitespace("(print 'Yello)")
+    "         (print 'Yello)"
+
     Takes a string and indents it using the current indentation level
     and the zero level.
     """
@@ -606,8 +617,9 @@ def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
 def indent_code(original_code, fpath=None):
     """ indented_code(string : str, fname : str) -> [...]
 
-    example: indented_code("(print\\n'Hello)")
-                ==> [False, False, False, [], [], None, "(print\\n'Hello)", "(print\\n 'Hello)"]
+    >>> indented_code("(print\\n'Hello)")
+    [False, False, False, [], [], None, "(print\\n'Hello)", "(print\\n 'Hello)"]
+
     The last entry in the list is the indented string.
     """
     # get the filename only not its full path
