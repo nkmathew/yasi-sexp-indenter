@@ -1,26 +1,20 @@
-;Dorai Sitaram
-;Oct 8, 1999
-;last change 2010-10-30
-
-;this script takes lines of Lisp or Scheme code from its
-;stdin and produces an indented version thereof on its
-;stdout
+;; Original Author: Dorai Sitaram
+;; Original Version: https://github.com/ds26gte/scmindent/blob/master/lispindent.lisp
 
 (defvar *lisp-keywords* '())
-
 (defvar *file-name* (first *args*))
 (defvar *output-to-stdout* (not (member "--no-output" *args* :test #'string-equal)))
 (defvar *modify-file* (not (member "--no-modify" *args* :test #'string-equal)))
 
-(unless *args* ;; print help if no command-line arguments are passed to the file 
+
+(unless *args* ;; print help if no command-line arguments are passed to the file
   (princ "
  ___________________________________________________________________________
 |   Usage:  lispindent2.0.lisp [[<file>] [--no-modify] [--no-output]]       |
 |           --no-output ;; Don't output the indented code, false by default |
 |           --no-modify ;; Don't modify the file, false by default          |
 +---------------------------------------------------------------------------+
-"
-         )
+")
   (exit))
 
 
@@ -34,10 +28,12 @@
         (push (setq c (cons x nil)) *lisp-keywords*))
       (setf (cdr c) n))))
 
+
 (define-with-lisp-indent-number 0
   '(block
     handler-bind
     loop))
+
 
 (define-with-lisp-indent-number 1
   '(case
@@ -53,12 +49,14 @@
     when with-input-from-string with-open-file with-open-socket
     with-open-stream with-output-to-string))
 
+
 (define-with-lisp-indent-number 2
   '(assert
     defun destructuring-bind do do*
     if
     multiple-value-bind
     with-slots))
+
 
 ;; Get lisp keywords stored in your home directory and add them to the *lisp-words*
 ;; list.
@@ -70,8 +68,7 @@
         (define-with-lisp-indent-number (car w) (cdr w))))))
 
 
-(defun past-next-token (str i n)
-  #|
+#|
   Basically returns the position of the end of this token(symbol,variable e.t.c), e.g:
     (print (past-next-token " this that " 0 8))      ==> 0
     (print (past-next-token " this that " 1 8))      ==> 5
@@ -85,6 +82,7 @@
     (print (past-next-token "thishash" 0 20)) ==> ERROR!!
    if not found, it returns n.
 |#
+(defun past-next-token (str i n)
   (let ((escapep nil))
     (loop
       (when (>= i n) (return i))
@@ -102,8 +100,9 @@
                (return i))))
       (incf i))))
 
+
 (defun lisp-indent-number (str &optional (possible-keyword-p t))
-  " Returns the indentation number for the keyword if it is *lisp-keywords*. If it 
+  " Returns the indentation number for the keyword if it is *lisp-keywords*. If it
  starts with 'def', it's indent value is 0. if it has a semi-colon preceding it, the
  rest of the string is tested recursively to see whether it is a keyword."
   (or (cdr (assoc str *lisp-keywords* :test #'string-equal))
@@ -116,27 +115,28 @@
                 -1))
           -1))))
 
-(defun literal-token-p (str)
-  #| 
+
+ #|
  Finds if the next token(anything after whitespace) is a literal, i.e a string, number
  or character. read-from-string fetches this token.
     (print (type-of (read-from-string "this"))) ;; ==> SYMBOL
-    (print (type-of (read-from-string "12 13 14"))) ;; ==> (INTEGER 0 16777215) 
+    (print (type-of (read-from-string "12 13 14"))) ;; ==> (INTEGER 0 16777215)
     (print (type-of (read-from-string "'(this that) 13 14"))) ;; ==> CONS
     (print (type-of (read-from-string "12.25 13 14"))) ;; ==> SINGLE-FLOAT
     (print (type-of (read-from-string ":if 13 14"))) ;; ==> KEYWORD
     (print (type-of (read-from-string "#() 13 14"))) ;; ==> (SIMPLE-VECTOR 0)
     (print (type-of (read-from-string "{} 13 14"))) ;; ==> SYMBOL
-|#   
+|#
+(defun literal-token-p (str)
   (let ((colon-pos (position #\: str)))
     (if colon-pos
         (if (= colon-pos 0) t nil)
-      (let ((read-token 
-             (ignore-errors 
+      (let ((read-token
+             (ignore-errors
                (read-from-string str))))
         (or (characterp read-token) (numberp read-token) (stringp read-token))))))
 
-;(trace lisp-indent-number literal-token-p read-from-string past-next-token)
+;; (trace lisp-indent-number literal-token-p read-from-string past-next-token)
 
 ;; stores the necessary data.
 (defstruct lparen
@@ -144,8 +144,7 @@
   num-aligned-subforms
   (num-finished-subforms 0))
 
-(defun calc-subindent (str i n)
-  #|
+#|
  (print (calc-subindent "eval-when (condition that)" 0 20)) ;; ==> 2
  (print (calc-subindent "some-func (condition that)" 0 20)) ;; ==> 11
  (print (calc-subindent "some-func   (condition that)" 0 20)) ;; ==> 11
@@ -155,6 +154,7 @@
  (print (calc-subindent "'(   (condition that)" 0 20)) ;; ==> 1
  (print (calc-subindent ":define   (condition that)" 0 20)) ;; ==> 2
 |#
+(defun calc-subindent (str i n)
   (let* ((j (past-next-token str i n)) ;; store position of start of the next token
          (num-aligned-subforms 0)
          (left-indent
@@ -163,7 +163,7 @@
             (let ((token (subseq str i j))) ;; store the function name
               (if (or (and (and (search ".clj" *file-name*) ;; If the file is a Clojure file, treat curly brackets and square brackets
                                                             ;; as literal lists with an indentation of 1
-                                (= 4 (- (length *file-name*) 
+                                (= 4 (- (length *file-name*)
                                         (search ".clj" *file-name* :from-end t)))
                                 (member (char str (if (= i 0) i (- i 1))) '(#\{ #\[))))
                       (and (>= i 2) (member (char str (- i 2)) '(#\' #\`))))
@@ -175,6 +175,7 @@
                         ((= j n) 1) ;; first argument probably in next lines
                         (t (+ (- j i) 2))))))))) ;; assumes that the first argument starts after the space at the end of the token
     (values left-indent num-aligned-subforms (1- j)))) ;; j stores where we last stopped processing
+
 
 (defun num-leading-spaces (str)
   (let ((n (length str))
@@ -191,6 +192,7 @@
 (defun string-trim-blanks (s)
   " Remove leading and trailing whitespace even in a string."
   (string-trim '(#\space #\tab #\newline #\return) s))
+
 
 (with-open-file (file-with-code *file-name*
                   :direction :input)
@@ -262,8 +264,7 @@
                  (incf i))))))))
     (indent-lines)))
 
+
 (when *modify-file*
   (delete-file *file-name*)
   (rename-file "indented-file.lisp" *file-name*))
-
-;eof
