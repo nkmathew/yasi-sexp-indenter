@@ -819,8 +819,8 @@ def indent_code(original_code, fpath=None):
                     bracket_locations[-1]['spaces'] += 1
                 if bracket_locations[-1]['spaces'] == 2:
                     bracket_locations[-1]['indent_level'] -= 0 if UNIFORM else 2
-                    bracket_locations[-1]['spaces'] = 999  # some dummy value to prevent it
-                                                # from coming here again
+                    # some dummy value to prevent control from reaching here again
+                    bracket_locations[-1]['spaces'] = 999
 
             offset += 1
         line_number += 1
