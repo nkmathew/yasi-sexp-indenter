@@ -18,6 +18,7 @@
             ("--newlisp" (throw "newLISP"))
             ("--scheme"  (throw "Scheme"))))) "All"))
 
+
 (define (fprint)
   (println (format (args 0) (rest (args)))))
 
@@ -46,6 +47,7 @@
 +-----------------------------------------------------------------------------------------------------------------+
 [/text]))
 
+
 ;; ****************************************************************************************
 ;; GLOBAL CONSTANTS::
 
@@ -70,6 +72,7 @@
     "with-output-to-string" "with-source-path" "with-syntax" "with-implicit"
     "with-error-handler" "module" "parameterize"))
 
+
 (define *clojure-keywords*
   '("defn" "fn" "dorun" "doseq" "loop" "when" "let" "defmacro" "binding" "doto"
     "ns" ":import" "defstruct" "condp" "defmacro" "comment" "when" "when-let"
@@ -77,6 +80,7 @@
     "try" "finally" "for" "letfn" "catch" "iterate" "while" "with-local-vars"
     "locking" "defmulti" "defmethod" "extend"
     ))
+
 
 (define *lisp-keywords*
   '(":implementation" ":method" "case" "defclass" "defconstant" "defgeneric"
@@ -90,14 +94,15 @@
     "labels" "multiple-value-bind"
     ))
 
+
 (define *newlisp-keywords*
   '("while" "if" "case" "dotimes" "define" "dolist" "catch" "throw" "lambda"
     "lambda-macro" "when" "unless" "letex" "letn" "begin" "dostring" "let" "letn"
     "doargs" "define-macro" "until" "do-until" "do-while" "for-all" "for"
     ))
 
-;; Keywords that indent by one space
 
+;; Keywords that indent by one space
 (define *one-space-indenters* '("call-with-port"))
 
 ;; ------ Command line options: ----------------------------------------------
@@ -137,7 +142,6 @@
       nil
     true))
 
-
 (define *indent-comments*
   (if (or (find "--indent-comments"  $main-args) (find "-ic" $main-args))
       true
@@ -171,6 +175,7 @@
   (set '*two-space-indenters* (append *lisp-keywords* *scheme-keywords*
                                       *clojure-keywords* *newlisp-keywords*))))
 
+
 (define *default-indent* 1)
 (let (pos (find "--default-indent" $main-args))
   (when pos
@@ -186,6 +191,7 @@
       (read-file filename)
     (issue-warning "--%s-- Exiting. Filename `%s' is not valid"
                    (list (current-time) filename) *warn* true filename))) ;; Exit if the filename is invalid
+
 
 (define (issue-warning warning-message message-format warn? exit-after-warning? fname)
   (when warn?
@@ -218,6 +224,7 @@
           (issue-warning "\n--%s-- `%s' : Warning: The directory `%s' is unusable for backup. "
                          (list (current-time) fname backup-dir) *warn* *exit* fname)))
     nil))
+
 
 (define (filename-from-path path)
   " Returns the filename by splitting the file path along a slash "
@@ -263,11 +270,13 @@
   (set 'str (replace " ('|`) (\\(|\\[|{)" str (string " " $1 $2) 0))
   str)
 
+
 (define (rstrip str chars)
   " Keeps deleting the last character while that character is in chars "
   (while (find (last str) chars)
     (setf (last str) ""))
   str)
+
 
 (define (lstrip str chars)
   " Like rstrip but from the left. "
@@ -275,8 +284,10 @@
     (setf (first str) ""))
   str)
 
+
 (define (strip str chars)
   (lstrip (rstrip str chars) chars))
+
 
 (define (split-preserve str sep)
   "Split the string into a list but preserve the separator in
@@ -296,6 +307,7 @@
           (setf (last str-list) (rstrip (last str-list) sep))
           str-list)))))
 
+
 (define (find-line-ending str)
   "Find the line ending of the file by simply testing for existence of
   the three possible line endings hoping that the line endings are not mixed
@@ -308,6 +320,7 @@
      ((find CR str) CR)
      (true LF))))
 
+
 (define (is-macro-name? form dialect)
   "Going to be used to determine whether the form should be indented by two spaces- since
   almost all macros do- using the dialect's conventions. "
@@ -319,11 +332,13 @@
         ((= dialect "newLISP")     (regex "macro|def" form 0)))
        true)) ;; Return true if any of the regexes above match
 
+
 (define (all-whitespace? str)
   "Returns true if the line has only whitespace to the end. Such a line
   should not be messed with. If you don't want any whitespace to be preserved,
   make the function return true for every value"
   (and (regex "^[ \t]*(\r|\n|$)" str 0) true))
+
 
 (define (find-trim-limit str)
   "Returns the maximum index to stop trimming at so that we don't alter the structure
@@ -351,6 +366,7 @@
             ;; Make sure -1 is not returned
             (set 'limit (length str)))))
     limit))
+
 
 (define (pad-leading-whitespace str zero-level compact? blist)
   "Indents the correct number of whitespace before the line using the current
@@ -476,7 +492,6 @@ indent level and the zero level"
         (when (find parent-func '("flet" "labels" "macrolet"))
           (setf ((first lst) *indent-level*) (+ 2 offset)))))
     lst))
-
 
 
 (define (indent-code original-code fpath)
@@ -624,6 +639,7 @@ indent level and the zero level"
     (list newlisp-brace-locations in-string? in-comment? in-symbol-with-space? bracket-locations last-quote-location
           fpath original-code indented-code last-symbol-location comment-locations in-newlisp-tag-string? first-tag-string)))
 
+
 (define (after-indentation indentation-state)
   (letn ((newlisp-brace-locations (first indentation-state))
          (in-string? (indentation-state 1))
@@ -683,6 +699,7 @@ indent level and the zero level"
           ;(delete-file fpath)
           ;(rename-file "temp.yasi" fpath)
           )))))
+
 
 (define (indent-file fpath)
   (letn ((fname (real-path fpath))
