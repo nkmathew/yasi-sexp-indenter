@@ -207,22 +207,22 @@ def find_trim_limit(string):
     limit = limit.end() if limit else -1
     comment_start = comment_start.end() if comment_start else -1
     if comment_start != -1:
-        # If semi colon is found, include all the whitespace before it so
-        # just in case someone had 'prettified' and aligned the comments
+        # If a semi colon is found, include all the whitespace before it to preserve
+        # any aligned comments
         comment_start = re.search('[ \t]*;', string).start() + 1
 
     if comment_start != -1 and limit != -1:
         if comment_start < limit:
-            # If the semicolon comes before the comma, it means the string
-            # has been commented out
+            # If the semicolon comes before the comma, it means the string has been
+            # commented out
             limit = comment_start
     elif comment_start != -1 and limit == -1:
-        # If there's a semicolon but no quote, use the semicolon position
-        # as the limit
+        # If there's a semicolon but no quote, use the semicolon position as the
+        # limit
         limit = comment_start
     elif limit == -1:
-        # If neither a semicolon nor a double quote have been found, use
-        # the length of the string as the limit
+        # If neither a semicolon nor a double quote has been found, use the length
+        # of the string as the limit
         limit = len(string)
     return limit
 
