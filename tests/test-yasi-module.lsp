@@ -89,5 +89,30 @@
    (find-line-ending "Line without ending")
    *LF*))
 
+(define-test (test_all_whitespace_tabs_only)
+  (assert=
+   (all-whitespace? "								")
+   true))
+
+(define-test (test_all_whitespace_tabs_and_spaces)
+  (assert=
+   (all-whitespace? "	    	    	    	    	    	    		")
+   true))
+
+(define-test (test_all_whitespace_empty_string)
+  (assert=
+   (all-whitespace? "")
+   true))
+
+(define-test (test_all_whitespace_no_whitespace)
+  (assert=
+   (all-whitespace? "NoSpace")
+   nil))
+
+(define-test (test_all_whitespace_spaces_only)
+  (assert=
+   (all-whitespace? "           ")
+   true))
+
 (UnitTest:run-all 'MAIN)
 (exit)
