@@ -114,5 +114,45 @@
    (all-whitespace? "           ")
    true))
 
+(define-test (test_find_first_arg_pos1)
+  (assert=
+   (find-first-arg-pos 0 "(     list 'one-sheep 'two-sheep )")
+   '(11 5)))
+
+(define-test (test_find_first_arg_pos2)
+  (assert=
+   (find-first-arg-pos 0 "(    list 'one-sheep 'two-sheep )")
+   '(10 4)))
+
+(define-test (test_find_first_arg_pos3)
+  (assert=
+   (find-first-arg-pos 3 "   (    list 'one-sheep 'two-sheep )")
+   '(10 4)))
+
+(define-test (test_find_first_arg_pos_argument_in_next_line_no_trailing_space)
+  (assert=
+   (find-first-arg-pos 0 "(    list")
+   '(5 4)))
+
+(define-test (test_find_first_arg_pos_argument_in_next_line_no_spaces_before_func)
+  (assert=
+   (find-first-arg-pos 0 "(list     ")
+   '(1 0)))
+
+(define-test (test_find_first_arg_pos_argument_is_func_call)
+  (assert=
+   (find-first-arg-pos 0 "(list (* 12 13) (* 13 14)  ")
+   '(6 0)))
+
+(define-test (test_find_first_arg_pos_no_function1)
+  (assert=
+   (find-first-arg-pos 0 "(        ")
+   '(1 0)))
+
+(define-test (test_find_first_arg_pos_no_function2)
+  (assert=
+   (find-first-arg-pos 0 "(")
+   '(1 0)))
+
 (UnitTest:run-all 'MAIN)
 (exit)
