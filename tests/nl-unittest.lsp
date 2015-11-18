@@ -11,6 +11,14 @@
 ;;; conjuction with other programs.
 
 ;;; need cleaning up!!!!!!!!!!!!
+
+;; Modified by nkmathew
+;; Original: https://github.com/cmpitg/newlisp-unittest/blob/master/nl-unittest.lsp
+;;
+;; Modifications include color changes and the ability to suppress reports on
+;; passed test cases that forces one to scroll everytime a test case fails when
+;; running with (UnitTest:run-all 'MAIN)
+
 (context 'TermColor)
 
 ;;; define some terminal color
@@ -18,6 +26,7 @@
 (constant '+fg-light-red+     "\027[1;31m")
 (constant '+fg-light-green+   "\027[1;32m")
 (constant '+fg-light-yellow+  "\027[1;33m")
+(constant '+fg-purple+        "\027[1;35m")
 (constant '+fg-red+           "\027[31m")
 (constant '+fg-green+         "\027[32m")
 (constant '+fg-yellow+        "\027[33m")
@@ -58,11 +67,11 @@
   (let (report
         (if (true? *verbose*)
             (colorize 'fg-red "--> " (string expression) " FAILED!")
-            (colorize 'fg-red
+            (colorize 'fg-purple
                       ;; "--> Expression: " (string (expression 2))
                       "--> " (string expression)
-                      " => Expected: " (string (eval (expression 1)))
-                      " -> Received: " (string (eval (expression 2))) ".")))
+                      "\n => Expected: " (string (eval (expression 1)))
+                      "\n -> Received: " (string (eval (expression 2))) ".")))
     (if *report-failed*
         (println report)))
   nil)
@@ -114,7 +123,6 @@
 
 (define-macro (check test-cases cur-test)
 ;;  (println)
-  (println "=== Testing " (eval cur-test))
 
   (letn (time-running 0 result-list '())
 
@@ -138,11 +146,15 @@
       (if (< 0 failed-ass)
           (setq msg-failed (colorize 'fg-light-red msg-failed)))
 
-      (println ">>> Total assertions: " total-ass)
-      (println "  - " msg-passed)
-      (println "  - " msg-failed)
-      (println "  - Total time: " time-running "ms")
-      (println)
+      (when (and *report-failed* (< 0 failed-ass))
+        (println "=== Testing " (eval cur-test))
+        (println ">>> Total assertions: " total-ass)
+        (println "  - " msg-passed)
+        (println "  - " msg-failed)
+        (println "  - Total time: " time-running "ms")
+        (println)
+        (println "----------------------------------------------------------------------")
+        )
 
       ;; the test case is considered passed only if there's no failure
       (= 0 failed-ass))))
@@ -159,7 +171,7 @@
                  (time (if (apply symbol)
                            (inc passed)
                            (inc failed))))
-            (println "----------------------------------------------------------------------"))))
+            )))
 
     ;; make report and colorize if necessary
     (setq counter (+ failed passed))
