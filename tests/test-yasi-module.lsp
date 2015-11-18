@@ -154,5 +154,45 @@
    (find-first-arg-pos 0 "(")
    '(1 0)))
 
+(define-test (test_trim_separate_adjacent_opening_and_closing_brackets)
+  (assert=
+   (string-trim! ")(")
+   ") ("))
+
+(define-test (test_trim_space_between_succeeding_opening_brackets)
+  (assert=
+   (string-trim! "( ( (")
+   "((("))
+
+(define-test (test_trim_adjacent_function_and_argument_opening_bracket)
+  (assert=
+   (string-trim! "(print(+ 1 1))")
+   "(print (+ 1 1))"))
+
+(define-test (test_trim_space_between_succeeding_closing_brackets)
+  (assert=
+   (string-trim! ")  )  )")
+   ")))"))
+
+(define-test (test_trim_spaces_before_closing_brackets)
+  (assert=
+   (string-trim! "(print 12    )")
+   "(print 12)"))
+
+(define-test (test_trim_extra_whitespace)
+  (assert=
+   (string-trim! "(print       'this)")
+   "(print 'this)"))
+
+(define-test (test_trim_leading_whitespace)
+  (assert=
+   (string-trim! "       (exit)")
+   "(exit)"))
+
+(define-test (test_trim_spaces_between_quote_and_opening_bracket_in_list_literal)
+  (assert=
+   (string-trim! "'        (12 13 14)")
+   "'(12 13 14)"))
+
 (UnitTest:run-all 'MAIN)
 (exit)
