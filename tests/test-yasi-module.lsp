@@ -22,6 +22,13 @@
 (load (string (get-parent-path (script-dir "test-yasi-module.lsp")) "\\yasi-module.lsp"))
 (load (string (script-dir "test-yasi-module.lsp") "nl-unittest.lsp"))
 
+;; Unit test library settings
+(setq UnitTest:*enable-term-color*       true) ;; use colors in console?
+(setq UnitTest:*report-failed*           true) ;; report failed assertions?
+(setq UnitTest:*report-passed*           nil)  ;; report passed assertions?
+(setq UnitTest:*continue-after-failure*  nil)
+(setq UnitTest:*verbose*                 nil)
+
 (context 'MAIN)
 
 (define-test (test_cr_line_ending)
@@ -193,6 +200,37 @@
   (assert=
    (string-trim! "'        (12 13 14)")
    "'(12 13 14)"))
+
+(define-test (test_find_trim_limit_double_quote)
+  (assert=
+   (find-trim-limit "(list 1123 \" ) \" 542)")
+   12))
+
+(define-test (test_find_trim_limit_literal_double_quote)
+ (let (code "(list #\\; #\\| #\\\")")
+  (assert=
+   (find-trim-limit code)
+   (length code))))
+
+(define-test (test_find_trim_limit_double_and_single_quote)
+  (assert=
+   (find-trim-limit [text](list 1123 ' " ) " 542)[/text])
+   14))
+
+(define-test (test_find_trim_limit_double_quote_after_semi_colon)
+  (assert=
+   (find-trim-limit [text](list 1123 ;     " )" ";" 542)[/text])
+   11))
+
+(define-test (test_find_trim_limit_double_quote_after_comment_block)
+  (assert=
+   (find-trim-limit [text](list 1123 '  #|  " ); "  |# 542) [/text])
+   19))
+
+(define-test (test_find_trim_limit_double_quote_before_semi_colon)
+  (assert=
+   (find-trim-limit [text](list 1123 ' " ); " 542)[/text])
+   14))
 
 (UnitTest:run-all 'MAIN)
 (exit)
