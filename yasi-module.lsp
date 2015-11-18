@@ -253,7 +253,7 @@
 (define (string-trim! str)
   " Trim the string making sure there's no whitespace where it's not necessary"
   ;; "(print(++ 1))" ==> "(print (++ 1))"
-  (set 'str (replace [text] ([^\\(\[,{@~`'^#]) (\(|\[| {) [/text] str (string $1 " " $2) 0))
+  (set 'str (replace [text]([^\\(\[,{@~`'^#])(\(|\[|{)[/text] str (string $1 " " $2) 0))
   ;; "(print (++ 1)(-- 1))" ==> "(print (++ 1) (-- 1))"
   (set 'str (replace "(\\)|\]|\})(\\[|\\(|\{)" str (string $1 " " $2) 0))
   ;; "(print 'hello     )" ==> "(print 'hello)"
@@ -271,7 +271,7 @@
   ;; Remove leading whitespace
   (set 'str (replace "^[ \t]*" str "" 0))
   ;; " ' ( "  ==> " '("
-  (set 'str (replace " ('|`) (\\(|\\[|{)" str (string " " $1 $2) 0))
+  (set 'str (replace "('|`)[ \t]+(\\(|\\[|{)" str (string $1 $2) 0))
   str)
 
 
