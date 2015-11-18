@@ -59,6 +59,10 @@
 (define *func-name* 4)
 (define *spaces* 5)
 
+(define *CR* "\r")
+(define *LF* "\n")
+(define *CRLF* "\r\n")
+
 ;; Keywords that indent by two spaces
 (define *scheme-keywords*
   '("define" "local-odd?" "when" "begin" "case" "local-even?" "do"
