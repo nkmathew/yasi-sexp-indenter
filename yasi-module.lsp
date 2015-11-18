@@ -250,7 +250,7 @@
     (copy-file filename backup-name)))
 
 
-(define (my-trim! str)
+(define (string-trim! str)
   " Trim the string making sure there's no whitespace where it's not necessary"
   ;; "(print(++ 1))" ==> "(print (++ 1))"
   (set 'str (replace [text] ([^\\(\[,{@~`'^#]) (\(|\[| {) [/text] str (string $1 " " $2) 0))
@@ -382,7 +382,7 @@ indent level and the zero level"
                                   (find-trim-limit str)))
                     (substr-1 (slice str 0 trim-limit)) ;; split into two portions
                     (substr-2 (slice str trim-limit))
-                    (substr-1 (my-trim! substr-1))) ;; strip the first portion
+                    (substr-1 (string-trim! substr-1))) ;; strip the first portion
                (string substr-1 substr-2)) ;; join the portions
            (let (str (replace "^[ \t]+" str "" 0)) ;; pad with zero-level spaces if in nocompact mode
              (append (dup " " zero-level) str)))))
