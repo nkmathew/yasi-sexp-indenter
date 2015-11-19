@@ -227,8 +227,8 @@ def find_trim_limit(string):
     return limit
 
 
-def is_macro_name(form, dialect):
-    """ is_macro_name(form : str, dialect : str) -> bool
+def is_macro_name(func_name, dialect):
+    """ is_macro_name(func_name : str, dialect : str) -> bool
 
     >>> is_macro_name('yacc:define-parser')
     True
@@ -238,16 +238,16 @@ def is_macro_name(form, dialect):
     the effort of finding all the macros in Lisp/Scheme/Clojure/newLISP and storing
     them in a list.
     """
-    if not form:
-        return form
+    if not func_name:
+        return False
     if dialect == 'Common Lisp':
-        return re.search('macro|def|do|with-', form, re.I)
+        return re.search('macro|def|do|with-', func_name, re.I)
     if dialect == 'Scheme':
-        return re.search('call-|def|with-', form)
+        return re.search('call-|def|with-', func_name)
     if dialect == 'Clojure':
-        return re.search('def|with', form)
+        return re.search('def|with', func_name)
     if dialect == 'newLISP':
-        return re.search('macro|def', form)
+        return re.search('macro|def', func_name)
 
 
 def split_preserve(string, sep):
