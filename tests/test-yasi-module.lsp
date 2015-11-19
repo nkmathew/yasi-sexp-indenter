@@ -262,5 +262,32 @@
      "Sobre todo \n"
      " en este mundo\n")))
 
+(define-test (test_is_macro_name_newlisp_macros)
+ (letn ((macro-list
+         '("define-test"
+           "define-macro")))
+  (dolist (func-name macro-list)
+   (assert= (is-macro-name? func-name "newLISP") true))))
+
+(define-test (test_is_macro_name_scheme_macros)
+ (letn ((macro-list
+         '()))
+  (dolist (func-name macro-list)
+   (assert= (is-macro-name? func-name "Scheme") true))))
+
+(define-test (test_is_macro_name_clojure_macros)
+ (letn ((macro-list
+         '("defmacro")))
+  (dolist (func-name macro-list)
+   (assert= (is-macro-name? func-name "Clojure") true))))
+
+(define-test (test_is_macro_name_lisp_macros)
+ (letn ((macro-list
+         '("defmacro"
+           "define-macro"
+           "defstruct")))
+  (dolist (func-name macro-list)
+   (assert= (is-macro-name? func-name "Common Lisp") true))))
+
 (UnitTest:run-all 'MAIN)
 (exit)
