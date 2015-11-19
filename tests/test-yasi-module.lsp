@@ -232,5 +232,35 @@
    (find-trim-limit [text](list 1123 ' " ); " 542)[/text])
    14))
 
+(define-test (test_split_preserve_empty_lines_at_EOF)
+  (assert=
+   (split-preserve "Tengo una pregunta\nSobre todo \n en este mundo\n\n\n\n\n" "\n")
+   '("Tengo una pregunta\n"
+     "Sobre todo \n"
+     " en este mundo\n"
+     "\n"
+     "\n"
+     "\n"
+     "\n")))
+
+(define-test (test_split_preserve_no_line_ending_at_EOF)
+  (assert=
+   (split-preserve  "Tengo una pregunta\nSobre todo \n en este mundo" "\n")
+   '("Tengo una pregunta\n"
+     "Sobre todo \n"
+     " en este mundo")))
+
+(define-test (test_split_preserve_no_delimiter)
+  (assert=
+   (split-preserve  "Tengo una pregunta  Sobre todo    en este mundo  " "\n")
+   '("Tengo una pregunta  Sobre todo    en este mundo  ")))
+
+(define-test (test_split_preserve)
+  (assert=
+   (split-preserve "Tengo una pregunta\nSobre todo \n en este mundo\n" "\n")
+   '("Tengo una pregunta\n"
+     "Sobre todo \n"
+     " en este mundo\n")))
+
 (UnitTest:run-all 'MAIN)
 (exit)
