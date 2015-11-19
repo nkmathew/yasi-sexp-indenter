@@ -327,15 +327,15 @@
      (true LF))))
 
 
-(define (is-macro-name? form dialect)
+(define (is-macro-name? func-name dialect)
   "Going to be used to determine whether the form should be indented by two spaces- since
   almost all macros do- using the dialect's conventions. "
   (and (cond
-        ((null? form) nil)
-        ((= dialect "Common Lisp") (regex "macro|def|do|with-" form 0))
-        ((= dialect "Scheme")      (regex "call-|def|with-" form 0))
-        ((= dialect "Clojure")     (regex "def|with" form 0))
-        ((= dialect "newLISP")     (regex "macro|def" form 0)))
+        ((null? func-name) nil)
+        ((= dialect "Common Lisp") (regex "macro|def|do|with-" func-name 0))
+        ((= dialect "Scheme")      (regex "call-|def|with-" func-name 0))
+        ((= dialect "Clojure")     (regex "def|with" func-name 0))
+        ((= dialect "newLISP")     (regex "macro|def" func-name 0)))
        true)) ;; Return true if any of the regexes above match
 
 
