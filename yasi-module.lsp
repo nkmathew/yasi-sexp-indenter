@@ -304,8 +304,10 @@
     (if str-list ;; an empty list will raise an error with function 'last'
       (if (empty? (last str-list))
           (begin
-            (set 'str-list (map-separator sep str-list)) ;; restore the separator in the split strings
-            (setf (last str-list) "") ;; set the last string to nothing in order to prevent the string from growing
+            ;; restore the separator in the split strings
+            (set 'str-list (map-separator sep str-list))
+            ;; set the last string to nothing in order to prevent the string from growing
+            (pop str-list -1)
             str-list)
         (let (str-list (map-separator sep str-list))
           (setf (last str-list) (rstrip (last str-list) sep))
