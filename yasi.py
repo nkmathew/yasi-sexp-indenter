@@ -9,12 +9,15 @@ Author: nkmathew <kipkoechmathew@gmail.com>
 Dialect aware s-expression indenter
 """
 
-import re
+import argparse
+import hashlib
 import os
+import re
+import shutil
 import sys
 import time
-import shutil
-import hashlib
+
+from pprint import pprint
 
 __version__ = '0.1.0'
 
@@ -61,21 +64,21 @@ def lisp_dialect(lst):
     """ lisp_dialect(lst : [list]) -> str
 
     >>> lisp_dialect(['quicklisp.lisp', '--no-backup', '--clojure'])
-    'Clojure'
+    'clojure'
 
     Find the lisp dialect specified in the list(sys.argv). The lisp
     dialect determines the keywords to be used.
     """
     if '--clojure' in lst:
-        return 'Clojure'
+        return 'clojure'
     elif '--scheme' in lst:
-        return 'Scheme'
+        return 'scheme'
     elif '--lisp' in lst:
-        return 'Common Lisp'
+        return 'lisp'
     elif '--newlisp' in lst:
-        return 'newLISP'
+        return 'newlisp'
     else:
-        return 'All'
+        return 'all'
 
 
 def backup_source_file(fname, backup_dir='.'):
@@ -240,13 +243,13 @@ def is_macro_name(func_name, dialect):
     """
     if not func_name:
         return False
-    if dialect == 'Common Lisp':
+    if dialect == 'lisp':
         return re.search('macro|def|do|with-', func_name, re.I)
-    if dialect == 'Scheme':
+    if dialect == 'scheme':
         return re.search('call-|def|with-', func_name)
-    if dialect == 'Clojure':
+    if dialect == 'clojure':
         return re.search('def|with', func_name)
-    if dialect == 'newLISP':
+    if dialect == 'newlisp':
         return re.search('macro|def', func_name)
 
 
@@ -451,16 +454,16 @@ IF_LIKE = ['if']
 
 DIALECT = lisp_dialect(sys.argv)
 
-if DIALECT == 'Common Lisp':  # Lisp
+if DIALECT == 'lisp':  # Lisp
     TWO_SPACE_INDENTERS = LISP_KEYWORDS
     IF_LIKE += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
-elif DIALECT == 'Scheme':  # Scheme
+elif DIALECT == 'scheme':  # Scheme
     TWO_SPACE_INDENTERS = SCHEME_KEYWORDS
     IF_LIKE += ['with-slots', 'do', 'do*']
-elif DIALECT == 'Clojure':  # Clojure
+elif DIALECT == 'clojure':  # Clojure
     TWO_SPACE_INDENTERS = CLOJURE_KEYWORDS
     IF_LIKE += []
-elif DIALECT == 'newLISP':  # newLISP
+elif DIALECT == 'newlisp':  # newLISP
     TWO_SPACE_INDENTERS = NEWLISP_KEYWORDS
     IF_LIKE += []
 elif DIALECT == 'All':
@@ -587,7 +590,7 @@ def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
 
     two_spacer = func_name in TWO_SPACE_INDENTERS or is_macro_name(func_name, DIALECT)
 
-    if in_list_literal or char == '{' or (char == '[' and DIALECT == 'Clojure'):
+    if in_list_literal or char == '{' or (char == '[' and DIALECT == 'clojure'):
         # found quoted list or clojure hashmap/vector
         pos_hash['indent_level'] = first_item
 
@@ -692,7 +695,7 @@ def indent_code(original_code, fpath=None):
                 escaped = True
 
             if curr_char == ';' and not in_symbol_region and not \
-                    (prev_char == '#' and DIALECT == 'Scheme'):
+                    (prev_char == '#' and DIALECT == 'scheme'):
                 # a comment has been found, go to the next line
                 # A sharp sign(#) before a semi-colon in Scheme is used to
                 # comment out sections or code. We don't treat it as a comment
@@ -701,7 +704,7 @@ def indent_code(original_code, fpath=None):
             # ----------------------------------------------------------
             # Comments are dealt with here. Clojure and newLISP don't have Lisp
             # style multiline comments so don't include them.
-            if DIALECT not in ['Clojure', 'newLISP'] and curr_char == '|' and not in_string:
+            if DIALECT not in ['clojure', 'newlisp'] and curr_char == '|' and not in_string:
                 if prev_char == '#' and not in_symbol_with_space:
                     comment_locations.append((line_number, offset))
                     in_comment += 1
@@ -723,7 +726,7 @@ def indent_code(original_code, fpath=None):
                 if curr_char == '"':
                     last_quote_location = (fname, line_number, offset)
                     in_string = True if not in_string else False
-                if DIALECT == 'newLISP' and not in_string:
+                if DIALECT == 'newlisp' and not in_string:
                     # We handle newLISP's multiline strings here
                     if curr_char == '{':
                         newlisp_brace_locations.append((line_number, offset))
@@ -737,7 +740,7 @@ def indent_code(original_code, fpath=None):
                             print_warning(message, tpl, WARN, EXIT, fname)
                         in_newlisp_string -= 1
 
-            if curr_char == '[' and DIALECT == 'newLISP' and not \
+            if curr_char == '[' and DIALECT == 'newlisp' and not \
                     (in_newlisp_string or in_string):
                 # We have to handle tag strings in newLISP here.
                 if re.match('\[text\]', curr_line[offset:offset + 7]):
@@ -763,7 +766,7 @@ def indent_code(original_code, fpath=None):
             # trimmed string not the original.
             real_position = (offset - zero_level) + len(re.findall('^[ \t]*', line)[0]) - indent_level
             if curr_char in ['(', '[', '{']:
-                if curr_char in ['[', '{'] and DIALECT in ['Common Lisp', 'newLISP']:
+                if curr_char in ['[', '{'] and DIALECT in ['lisp', 'newlisp']:
                     # Square/Curly brackets are used should not contribute to
                     # the indentation in CL and newLISP
                     offset += 1
@@ -805,7 +808,7 @@ def indent_code(original_code, fpath=None):
                                                  spaces_before_func)
 
             elif curr_char in [']', ')', '}']:
-                if curr_char in [']', '}'] and DIALECT in ['Common Lisp', 'newLISP']:
+                if curr_char in [']', '}'] and DIALECT in ['lisp', 'newlisp']:
                     # Square/Curly brackets are used should not contribute to
                     # the indentation in CL and newLISP
                     offset += 1
