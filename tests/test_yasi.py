@@ -190,28 +190,29 @@ class UnitTests(unittest.TestCase):
         newlisp_macro_list = [
         ]
         for x in newlisp_macro_list:
-            self.assertTrue(yasi.is_macro_name(x, 'newLISP'))
+            self.assertTrue(yasi.is_macro_name(x, 'newlisp'))
 
     def test_is_macro_name_scheme_macros(self):
         scheme_macro_list = [
         ]
         for x in scheme_macro_list:
-            self.assertTrue(yasi.is_macro_name(x, 'Scheme'))
+            self.assertTrue(yasi.is_macro_name(x, 'scheme'))
 
     def test_is_macro_name_clojure_macros(self):
         clojure_macro_list = [
             "defmacro"
         ]
         for x in clojure_macro_list:
-            self.assertTrue(yasi.is_macro_name(x, 'Clojure'))
+            self.assertTrue(yasi.is_macro_name(x, 'clojure'))
 
     def test_is_macro_name_lisp_macros(self):
         lisp_macro_list = [
             "defmacro",
+            "define-macro",
             "defstruct"
         ]
         for x in lisp_macro_list:
-            self.assertTrue(yasi.is_macro_name(x, 'Common Lisp'))
+            self.assertTrue(yasi.is_macro_name(x, 'lisp'))
 
 
 class SystemTests(unittest.TestCase):
