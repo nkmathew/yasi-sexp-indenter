@@ -72,10 +72,10 @@ def create_args_parser():
     return parser
 
 
-def parse_args(arguments=None):
+def parse_options(arguments=None):
     """ Reads command-line arguments
 
-    >>> parse_args('--indent-comments')
+    >>> parse_options('--indent-comments')
     """
     if arguments is None:
         arguments = sys.argv[1:]
@@ -141,7 +141,7 @@ def backup_source_file(fname, options=None):
 
     Create a backup copy of the source file.
     """
-    args = parse_args(options)
+    args = parse_options(options)
     backup_dir = args.backup_dir
     assert os.path.exists(fname), \
         ("\n--%s-- Warning: File `%s' does not exist. . ." % (current_time(), fname))
@@ -333,7 +333,7 @@ def pad_leading_whitespace(string, zero_level, compact, blist, options=None):
     Takes a string and indents it using the current indentation level
     and the zero level.
     """
-    args = parse_args(options)
+    args = parse_options(options)
     if compact:
         # if compact mode is on, split the string into two, trim the first
         # position and merge the two portions.
@@ -371,7 +371,7 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
     Most important function in the indentation process. It uses the bracket
     locations stored in the list to indent the line.
     """
-    args = parse_args(options)
+    args = parse_options(options)
     comment_line = re.search('^[ \t]*;', line, re.M)
     if args.indent_comments:
         # We are allowed to indent comment lines
@@ -511,7 +511,7 @@ def find_first_arg_pos(bracket_offset, curr_line, options=None):
     bracket and the function name.
     The two values will to be used to align the other arguments in the subsequent line
     """
-    args = parse_args(options)
+    args = parse_options(options)
     spaces_before_func = 0
     subline = curr_line[bracket_offset + 1:]
     if re.search('^[ \t]*($|\r)', subline):
@@ -565,7 +565,7 @@ def _pop_from_list(bracket, lst, fname, line, real_pos, offset, options=None):
     """
     # Try to spot a case when a square bracket is used to close a round bracket
     # block
-    args = parse_args(options)
+    args = parse_options(options)
     if bracket == ']':
         correct_closer = '['
     elif bracket == ')':
@@ -607,7 +607,7 @@ def _push_to_list(lst, func_name, char, line, offset,
     necessary data to pin point errors and the indentation level is stored in
     the list and the list returned.
     """
-    args = parse_args(options)
+    args = parse_options(options)
     keywords = add_keywords(args.dialect)
     pos_hash = {'character': char,
                 'line_number': line,
@@ -671,7 +671,7 @@ def indent_code(original_code, fpath='', options=None):
     The last entry in the list is the indented string.
     """
 
-    args = parse_args(options)
+    args = parse_options(options)
     keywords = add_keywords(args.dialect)
 
     # get the filename only not its full path
@@ -914,7 +914,7 @@ def _after_indentation(indentation_state, options=None):
         = indentation_state
 
     fname = os.path.split(fpath)[1]
-    args = parse_args(options)
+    args = parse_options(options)
 
     if bracket_locations:
         # If the bracket_locations list is not empty it means that there are some
@@ -979,7 +979,7 @@ def indent_file(fname, options=None):
     3. Indents the code(indent_code())
     4. Writes the file or print the indented code(_after_indentation())
     """
-    args = parse_args(options)
+    args = parse_options(options)
     fname = os.path.abspath(fname)
     code = read_file(fname)
     indent_result = indent_code(code, fname, options)
