@@ -17,6 +17,7 @@ import shutil
 import sys
 import time
 
+# pylint: disable=unused-import
 from pprint import pprint
 
 __version__ = '0.1.0'
@@ -710,7 +711,8 @@ def indent_code(original_code, fpath='', options=None):
     # any unclosed strings, we can pinpoint them
     last_quote_location = ()
 
-    code_lines = split_preserve(original_code, find_line_ending(original_code))
+    line_ending = find_line_ending(original_code)
+    code_lines = split_preserve(original_code, line_ending)
 
     indented_code = ""
 
