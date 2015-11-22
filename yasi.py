@@ -22,6 +22,77 @@ from pprint import pprint
 __version__ = '0.1.0'
 
 
+def create_args_parser():
+    """ Return command line parser """
+    parser = argparse.ArgumentParser(
+        description='Dialect-aware s-expression indenter', prog='yasi')
+    parser.add_argument("files", help="List of files to be indented", nargs="*")
+    parser.add_argument(
+        '-nc', '--no-compact',
+        help="Don't compact the code, just indent", action='store_true')
+    parser.add_argument(
+        '-nb', '--no-backup',
+        help="Don't create a backup file even if --backup-dir is specified ", action='store_true')
+    parser.add_argument(
+        '-nm', '--no-modify',
+        help="Don't modify the file", action='store_true')
+    parser.add_argument(
+        '-nw', '--no-warning',
+        help="Don't display warnings", action='store_true')
+    parser.add_argument(
+        '-no', '--no-output',
+        help="Suppress output of the indented code", action='store_true')
+    parser.add_argument(
+        '-ne', '--no-exit',
+        help="Instructs the program not to exit when a warning is raised.", action='store_true')
+    parser.add_argument(
+        '--dialect',
+        help="Use Scheme keywords", type=str, default="all")
+    parser.add_argument(
+        '-bd', '--backup-dir',
+        help="The directory where the backup file is to be written",
+        type=str, default=os.getcwd())
+    parser.add_argument(
+        '-di', '--default-indent',
+        help="The indent level to be used in case a " +
+        "function's argument is in the next line. Vim uses 2, the most common being 1.",
+        type=int, default=1)
+    parser.add_argument(
+        '-ic', '--indent-comments',
+        help="If true, comment lines will be indented possibly " +
+        "messing with any deliberate comment layout", action='store_true')
+    parser.add_argument(
+        '-uni', '--uniform',
+        help="Dictates whether the if-clause and else-clause of an if-like" +
+        "block should have the same indent level.",
+        action='store_true')
+    return parser
+
+
+def parse_args(arguments=None):
+    """ Reads command-line arguments
+
+    >>> parse_args('--indent-comments')
+    """
+    if arguments is None:
+        arguments = sys.argv[1:]
+    if isinstance(arguments, str):
+        arguments = arguments.split()
+    if isinstance(arguments, argparse.Namespace):
+        return arguments
+    parser = create_args_parser()
+    args = parser.parse_args(arguments)
+    # pprint(args.__dict__)
+
+    args.dialect = args.dialect.lower()
+    if args.dialect not in ['lisp', 'newlisp', 'clojure', 'scheme', 'all']:
+        parser.error("`{0}' is not a recognized dialect".format(args.dialect))
+
+    if not os.path.exists(args.backup_dir):
+        parser.error("Directory `{0}' does not exist".format(args.backup_dir))
+    return args
+
+
 def read_file(fname):
     """ read_file(fname : str) -> str
 
@@ -36,7 +107,7 @@ def read_file(fname):
     assert os.path.exists(fname), "\n--%s-- Warning: File `%s' does not exist. . ." \
         % (current_time(), fname)
     with open(fname, 'rb') as fp:
-        return fp.read()
+        return fp.read().decode('utf-8')
 
 
 def print_warning(warning_message, format_tuple, warn, exit_after_warning, fname):
@@ -60,34 +131,15 @@ def current_time():
     return time.strftime('%X', (time.localtime()))
 
 
-def lisp_dialect(lst):
-    """ lisp_dialect(lst : [list]) -> str
-
-    >>> lisp_dialect(['quicklisp.lisp', '--no-backup', '--clojure'])
-    'clojure'
-
-    Find the lisp dialect specified in the list(sys.argv). The lisp
-    dialect determines the keywords to be used.
-    """
-    if '--clojure' in lst:
-        return 'clojure'
-    elif '--scheme' in lst:
-        return 'scheme'
-    elif '--lisp' in lst:
-        return 'lisp'
-    elif '--newlisp' in lst:
-        return 'newlisp'
-    else:
-        return 'all'
-
-
-def backup_source_file(fname, backup_dir='.'):
+def backup_source_file(fname, options=None):
     """ backup_source_file(fname : str)
 
     >>> backup_source_file('~/Desktop/lisp/test.lisp')
 
     Create a backup copy of the source file.
     """
+    args = parse_args(options)
+    backup_dir = args.backup_dir
     assert os.path.exists(fname), \
         ("\n--%s-- Warning: File `%s' does not exist. . ." % (current_time(), fname))
     assert os.path.exists(os.path.abspath(backup_dir)), \
@@ -98,34 +150,7 @@ def backup_source_file(fname, backup_dir='.'):
     except IOError:
         message = "\n--%s-- Warning: Couldn't backup the file `%s' in `%s', check if you have enough permissions. "
         tpl = (current_time(), fname, backup_dir)
-        print_warning(message, tpl, WARN, EXIT, fname)
-
-
-def get_backup_directory(lst, fname):
-    """ get_backup_directory(lst : list, fname : str) -> str
-
-    get_backup_directory(['--no-warning', '--no-output', '--backup-dir', 'desktop'])
-            ==> 'desktop'
-    Returns the backup directory, assuming it's always after the '--backup-dir'
-    parameter. The filename is not really necessary, it's just for issuing the
-    error message.
-    """
-    if '--backup-dir' in lst:
-        index = lst.index('--backup-dir') + 1
-        if len(lst) <= index:
-            message = "\n--%s-- `%s': Warning: Backup option specified but no backup directory provided.\n"
-            tpl = (current_time(), fname)
-            print_warning(message, tpl, WARN, False, None)
-            return False
-        backup_dir = lst[index]
-        if not os.path.exists(os.path.abspath(backup_dir)):
-            message = "\n--%s-- `%s': Warning: The directory `%s' does not exist and can't be used as a backup directory."
-            tpl = (current_time(), fname, backup_dir)
-            print_warning(message, tpl, WARN, True, fname)
-        else:
-            return backup_dir
-    else:
-        return False
+        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
 
 
 def md5sum(content):
@@ -296,7 +321,7 @@ def all_whitespace(string):
     return re.search('^[ \t]*(\r|\n|$)', string)
 
 
-def pad_leading_whitespace(string, zero_level, compact, blist):
+def pad_leading_whitespace(string, zero_level, compact, blist, options=None):
     """ pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
 
     >>> pad_leading_whitespace("(print 'Yello)")
@@ -305,12 +330,13 @@ def pad_leading_whitespace(string, zero_level, compact, blist):
     Takes a string and indents it using the current indentation level
     and the zero level.
     """
+    args = parse_args(options)
     if compact:
         # if compact mode is on, split the string into two, trim the first
         # position and merge the two portions.
         trim_limit = find_trim_limit(string)
         comment_line = re.search('^[ \t]*;', string, re.M)
-        if comment_line and INDENT_COMMENTS:
+        if comment_line and args.indent_comments:
             trim_limit = -1
         substr1 = string[0:trim_limit]
         substr2 = string[trim_limit:]
@@ -334,18 +360,20 @@ def pad_leading_whitespace(string, zero_level, compact, blist):
         return string, 0
 
 
-def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region):
+def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
+                options=None):
     """ indent_line(zerolevel : int, bracket_list : list, line : str, in_comment : bool,
-                in_symbol_region : bool)
+                    in_symbol_region : bool, options : string|list)
 
     Most important function in the indentation process. It uses the bracket
     locations stored in the list to indent the line.
     """
+    args = parse_args(options)
     comment_line = re.search('^[ \t]*;', line, re.M)
-    if INDENT_COMMENTS:
+    if args.indent_comments:
         # We are allowed to indent comment lines
         comment_line = False
-    if not COMPACT and zerolevel == 0 and bracket_list == [] and not in_comment:
+    if not args.no_compact and zerolevel == 0 and bracket_list == [] and not in_comment:
         # If nocompact mode is on and there are no unclosed blocks, try to
         # find the zero level by simply counting spaces before a line that
         # is not empty or has a comment
@@ -363,7 +391,9 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region):
         # If this is not a comment line indent the line.
         # If the list is empty, then the current_level defaults
         # to zero
-        curr_line, current_level = pad_leading_whitespace(line, zerolevel, COMPACT, bracket_list)
+        curr_line, current_level = pad_leading_whitespace(line, zerolevel,
+                                                          not args.no_compact,
+                                                          bracket_list, args)
         return zerolevel, curr_line, current_level
     else:
         return zerolevel, line, 0
@@ -425,55 +455,43 @@ NEWLISP_KEYWORDS = \
 # Keywords that indent by one space
 ONE_SPACE_INDENTERS = ['call-with-port']
 
-
-# Assign default values here depending on the command line arguments
-BACKUP   = False if '--no-backup' in sys.argv or '-nb' in sys.argv else True
-COMPACT  = False if '--no-compact' in sys.argv or '-nc' in sys.argv else True
-EXIT     = False if '--no-exit' in sys.argv or '-ne' in sys.argv else True
-MODIFY   = False if '--no-modify' in sys.argv or '-nm' in sys.argv else True
-OUTPUT   = False if '--no-output' in sys.argv or '-no' in sys.argv else True
-UNIFORM  = True if '--uniform' in sys.argv or '-uni' in sys.argv else False
-WARN     = False if '--no-warning' in sys.argv or '-nw' in sys.argv else True
-INDENT_COMMENTS = True if '--indent-comments' in sys.argv or '-ic' in sys.argv else False
-
-DEFAULT_INDENT = 1
-if '--default-indent' in sys.argv:
-    # The default is the value to be used in case a functions's argument is in
-    # the next line and that function is not a two or one space indenter
-    pos = sys.argv.index('--default-indent')
-    if len(sys.argv) > pos:
-        try:
-            DEFAULT_INDENT = int(sys.argv[pos + 1])
-        except (IndexError, ValueError):
-            DEFAULT_INDENT = 1
-
 # The 'if' and 'else' part of an if block should have different indent levels so
 # that they can stand out since there's no else Keyword in Lisp/Scheme to make
 # this explicit.  list IF_LIKE helps us track these keywords.
 IF_LIKE = ['if']
 
-DIALECT = lisp_dialect(sys.argv)
 
-if DIALECT == 'lisp':  # Lisp
-    TWO_SPACE_INDENTERS = LISP_KEYWORDS
-    IF_LIKE += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
-elif DIALECT == 'scheme':  # Scheme
-    TWO_SPACE_INDENTERS = SCHEME_KEYWORDS
-    IF_LIKE += ['with-slots', 'do', 'do*']
-elif DIALECT == 'clojure':  # Clojure
-    TWO_SPACE_INDENTERS = CLOJURE_KEYWORDS
-    IF_LIKE += []
-elif DIALECT == 'newlisp':  # newLISP
-    TWO_SPACE_INDENTERS = NEWLISP_KEYWORDS
-    IF_LIKE += []
-elif DIALECT == 'All':
-    TWO_SPACE_INDENTERS = LISP_KEYWORDS + SCHEME_KEYWORDS + CLOJURE_KEYWORDS + \
-        NEWLISP_KEYWORDS
+def add_keywords(dialect):
+    """ add_keywords(dialect : str) -> [str, str]
+
+    Takens a lisp dialect name and returns a list of keywords that increase
+    indentation by two spaces and those that can be one-armed like 'if'
+    """
+    if dialect == 'lisp':  # Lisp
+        two_spacers = LISP_KEYWORDS
+        one_armed = ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
+        return [two_spacers, IF_LIKE + one_armed]
+    elif dialect == 'scheme':  # Scheme
+        two_spacers = SCHEME_KEYWORDS
+        one_armed = ['with-slots', 'do', 'do*']
+        return [two_spacers, IF_LIKE + one_armed]
+    elif dialect == 'clojure':  # Clojure
+        two_spacers = CLOJURE_KEYWORDS
+        one_armed = []
+        return [two_spacers, IF_LIKE + one_armed]
+    elif dialect == 'newlisp':  # newLISP
+        two_spacers = NEWLISP_KEYWORDS
+        one_armed = []
+        return [two_spacers, IF_LIKE + one_armed]
+    elif dialect == 'all':
+        two_spacers = LISP_KEYWORDS + SCHEME_KEYWORDS + \
+            CLOJURE_KEYWORDS + NEWLISP_KEYWORDS
+        return [two_spacers, IF_LIKE]
 
 # ************************************************************************************* #
 
 
-def find_first_arg_pos(bracket_offset, curr_line):
+def find_first_arg_pos(bracket_offset, curr_line, options=None):
     """ find_first_arg_pos(bracket_offset : int, curr_line : str) -> [int, int]
 
     Arguments:
@@ -490,6 +508,7 @@ def find_first_arg_pos(bracket_offset, curr_line):
     bracket and the function name.
     The two values will to be used to align the other arguments in the subsequent line
     """
+    args = parse_args(options)
     spaces_before_func = 0
     subline = curr_line[bracket_offset + 1:]
     if re.search('^[ \t]*($|\r)', subline):
@@ -517,7 +536,7 @@ def find_first_arg_pos(bracket_offset, curr_line):
                         subline[(end - 1 + subline[end - 1:].find(' ')):]):
                 # But, if a comment if found after the function name, the
                 # indent level becomes one
-                arg_pos = spaces_before_func + DEFAULT_INDENT
+                arg_pos = spaces_before_func + args.default_indent
         else:
             # If there's no space after the bracket, simply find the end of the
             # whitespace group
@@ -529,12 +548,12 @@ def find_first_arg_pos(bracket_offset, curr_line):
             if re.match('^[\t ]*(;|$|\r)', subline[subline.find(' '):]):
                 # Again if a comment is found after the function name, the
                 # indent level defaults to 1
-                arg_pos = spaces_before_func + DEFAULT_INDENT
+                arg_pos = spaces_before_func + args.default_indent
     return [arg_pos, spaces_before_func]
 
 
-def pop_from_list(bracket, lst, fname, line, real_pos, offset):
-    """ pop_from_list(char : str, lst : [str], fname : str, line : str,
+def _pop_from_list(bracket, lst, fname, line, real_pos, offset, options=None):
+    """ _pop_from_list(char : str, lst : [str], fname : str, line : str,
                         real_pos : int, offset : int)
 
     The function is called when a closing bracket is encountered. The function
@@ -543,6 +562,7 @@ def pop_from_list(bracket, lst, fname, line, real_pos, offset):
     """
     # Try to spot a case when a square bracket is used to close a round bracket
     # block
+    args = parse_args(options)
     if bracket == ']':
         correct_closer = '['
     elif bracket == ')':
@@ -557,30 +577,35 @@ def pop_from_list(bracket, lst, fname, line, real_pos, offset):
         if popped_char is not correct_closer:
             message = "\n--%s-- %s: Warning: Bracket `%s' at (%d, %d) does not match `%s' at (%d, %d)"
             tpl = (current_time(), fname, popped_char, popped_pos, popped_offset, bracket, line, real_pos)
-            print_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
     else:
         # If the list if empty and a closing bracket is found, it means we have
         # excess brackets. That warning is issued here. The coordinates used
         # will be slightly or largely off target depending on how much your
         # code was 'messed' up when used with compact mode
-        if EXIT:
+        if not options.no_exit:
             bpos = real_pos + 1
         else:
             bpos = offset + 1
         message = "\n--%s-- %s: Warning: Unmatched `%s' near (%d, %d). "
         tpl = (current_time(), fname, bracket, line, bpos)
-        print_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, not options.no_warning, not options.no_exit, fname)
     return lst
 
 
-def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, in_list_literal, lead_spaces):
-    """ push_to_list(lst : [str], func_name : str, char : str, line : int, offset : int,
-                        first_arg_pos :int , first_item : int, in_list_literal : bool, lead_spaces : int)
+def _push_to_list(lst, func_name, char, line, offset,
+                  first_arg_pos, first_item, in_list_literal,
+                  lead_spaces, options=None):
+    """ _push_to_list(lst : [str], func_name : str, char : str, line : int, offset : int,
+                        first_arg_pos :int , first_item : int, in_list_literal : bool,
+                        lead_spaces : int, options : str)
 
     Called when an opening bracket is encountered. A hash containing the
     necessary data to pin point errors and the indentation level is stored in
     the list and the list returned.
     """
+    args = parse_args(options)
+    keywords = add_keywords(args.dialect)
     pos_hash = {'character': char,
                 'line_number': line,
                 'bracket_pos': offset,
@@ -588,15 +613,17 @@ def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
                 'func_name': func_name,
                 'spaces': 0}
 
-    two_spacer = func_name in TWO_SPACE_INDENTERS or is_macro_name(func_name, DIALECT)
+    two_spacer = func_name in keywords[0] or is_macro_name(func_name, args.dialect)
 
-    if in_list_literal or char == '{' or (char == '[' and DIALECT == 'clojure'):
+    if in_list_literal or char == '{' or (char == '[' and args.dialect == 'clojure'):
         # found quoted list or clojure hashmap/vector
         pos_hash['indent_level'] = first_item
 
     elif func_name in IF_LIKE:
         # We only make the if-clause stand out if not in uniform mode
-        pos_hash['indent_level'] = lead_spaces + ((offset + 4) if not UNIFORM else (offset + 2))
+        pos_hash['indent_level'] = lead_spaces + ((offset + 4)
+                                                  if not args.uniform
+                                                  else (offset + 2))
 
     elif func_name in ONE_SPACE_INDENTERS and func_name != '':
         pos_hash['indent_level'] = lead_spaces + offset + 1
@@ -617,14 +644,33 @@ def push_to_list(lst, func_name, char, line, offset, first_arg_pos, first_item, 
     return lst
 
 
-def indent_code(original_code, fpath=None):
+def indent_code(original_code, fpath='', options=None):
     """ indented_code(string : str, fname : str) -> [...]
 
-    >>> indented_code("(print\\n'Hello)")
-    [False, False, False, [], [], None, "(print\\n'Hello)", "(print\\n 'Hello)"]
+    Arguments:
+    fpath: Simply used in formatting the warning messages
+
+    >>> indent_code("(print\n'Hello)")
+    [(),
+     False,
+     (),
+     [],
+     [],
+     False,
+     0,
+     False,
+     [],
+     (),
+     '',
+     "(print\n'Hello)",
+     "(print\n 'Hello)"]
 
     The last entry in the list is the indented string.
     """
+
+    args = parse_args(options)
+    keywords = add_keywords(args.dialect)
+
     # get the filename only not its full path
     fname = os.path.split(fpath)[1]
 
@@ -674,7 +720,7 @@ def indent_code(original_code, fpath=None):
         zero_level, curr_line, indent_level = indent_line(zero_level,
                                                           bracket_locations,
                                                           line, in_comment,
-                                                          in_symbol_region)
+                                                          in_symbol_region, args)
         # Build up the indented string.
         indented_code += curr_line
         offset = 0
@@ -695,7 +741,7 @@ def indent_code(original_code, fpath=None):
                 escaped = True
 
             if curr_char == ';' and not in_symbol_region and not \
-                    (prev_char == '#' and DIALECT == 'scheme'):
+                    (prev_char == '#' and args.dialect == 'scheme'):
                 # a comment has been found, go to the next line
                 # A sharp sign(#) before a semi-colon in Scheme is used to
                 # comment out sections or code. We don't treat it as a comment
@@ -704,7 +750,8 @@ def indent_code(original_code, fpath=None):
             # ----------------------------------------------------------
             # Comments are dealt with here. Clojure and newLISP don't have Lisp
             # style multiline comments so don't include them.
-            if DIALECT not in ['clojure', 'newlisp'] and curr_char == '|' and not in_string:
+            if args.dialect not in ['clojure', 'newlisp'] and curr_char == '|' \
+                    and not in_string:
                 if prev_char == '#' and not in_symbol_with_space:
                     comment_locations.append((line_number, offset))
                     in_comment += 1
@@ -726,7 +773,7 @@ def indent_code(original_code, fpath=None):
                 if curr_char == '"':
                     last_quote_location = (fname, line_number, offset)
                     in_string = True if not in_string else False
-                if DIALECT == 'newlisp' and not in_string:
+                if args.dialect == 'newlisp' and not in_string:
                     # We handle newLISP's multiline strings here
                     if curr_char == '{':
                         newlisp_brace_locations.append((line_number, offset))
@@ -737,10 +784,10 @@ def indent_code(original_code, fpath=None):
                         else:
                             message = "\n--%s-- `%s': Warning: Attempt to close a non-existent newLISP string"
                             tpl = (current_time(), fname)
-                            print_warning(message, tpl, WARN, EXIT, fname)
+                            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
                         in_newlisp_string -= 1
 
-            if curr_char == '[' and DIALECT == 'newlisp' and not \
+            if curr_char == '[' and args.dialect == 'newlisp' and not \
                     (in_newlisp_string or in_string):
                 # We have to handle tag strings in newLISP here.
                 if re.match('\[text\]', curr_line[offset:offset + 7]):
@@ -764,9 +811,10 @@ def indent_code(original_code, fpath=None):
             # the unclosed bracket is. The real position is different from the offset
             # because current offset is the position of the bracket in the
             # trimmed string not the original.
-            real_position = (offset - zero_level) + len(re.findall('^[ \t]*', line)[0]) - indent_level
+            real_position = (offset - zero_level) + \
+                len(re.findall('^[ \t]*', line)[0]) - indent_level
             if curr_char in ['(', '[', '{']:
-                if curr_char in ['[', '{'] and DIALECT in ['lisp', 'newlisp']:
+                if curr_char in ['[', '{'] and args.dialect in ['lisp', 'newlisp']:
                     # Square/Curly brackets are used should not contribute to
                     # the indentation in CL and newLISP
                     offset += 1
@@ -789,7 +837,7 @@ def indent_code(original_code, fpath=None):
                     func_name = False
 
                 if func_name in ['define-macro', 'defmacro']:
-                    # Macro names are part of TWO_SPACE_INDENTERS space indenters.
+                    # Macro names are part of two space indenters.
                     # This part tries to find the name so that it is not indented
                     # like a function the next time it's used.
                     end_of_space = re.search('^[ \t]*', substr).end()
@@ -797,24 +845,28 @@ def indent_code(original_code, fpath=None):
                     substr = substr[re.search('[ \t]*', substr).start():].strip()
                     macro_name = substr[:substr.find(' ')]  # macro name is delimeted by whitespace
                     if macro_name != '':
-                        TWO_SPACE_INDENTERS.append(macro_name)
+                        keywords[0].append(macro_name)
 
                 # first_item stores the position of the first item in the literal list
                 # it's necessary so that we don't assume that the first item is always
                 # after the opening bracket.
                 first_item = re.search('[ \t]*', curr_line[offset + 1:]).end() + offset + 1
-                bracket_locations = push_to_list(bracket_locations[:], func_name, curr_char, line_number,
-                                                 offset, first_arg_pos, first_item, in_list_literal,
-                                                 spaces_before_func)
+                bracket_locations = _push_to_list(bracket_locations[:], func_name,
+                                                  curr_char, line_number, offset,
+                                                  first_arg_pos, first_item,
+                                                  in_list_literal,
+                                                  spaces_before_func)
 
             elif curr_char in [']', ')', '}']:
-                if curr_char in [']', '}'] and DIALECT in ['lisp', 'newlisp']:
+                if curr_char in [']', '}'] and args.dialect in ['lisp', 'newlisp']:
                     # Square/Curly brackets are used should not contribute to
                     # the indentation in CL and newLISP
                     offset += 1
                     continue
 
-                bracket_locations = pop_from_list(curr_char, bracket_locations[:], fname, line_number, real_position, offset)
+                bracket_locations = _pop_from_list(curr_char, bracket_locations[:],
+                                                   fname, line_number, real_position,
+                                                   offset, args)
 
             if bracket_locations and curr_char in [' ', '\t'] and bracket_locations[-1]['func_name'] in IF_LIKE:
                 # This part changes the indentation level of a then clause so that
@@ -833,7 +885,7 @@ def indent_code(original_code, fpath=None):
                     # line. The regex above takes care of that.
                     bracket_locations[-1]['spaces'] += 1
                 if bracket_locations[-1]['spaces'] == 2:
-                    bracket_locations[-1]['indent_level'] -= 0 if UNIFORM else 2
+                    bracket_locations[-1]['indent_level'] -= 0 if args.uniform else 2
                     # some dummy value to prevent control from reaching here again
                     bracket_locations[-1]['spaces'] = 999
 
@@ -845,8 +897,8 @@ def indent_code(original_code, fpath=None):
             last_quote_location, fpath, original_code, indented_code]
 
 
-def after_indentation(indentation_state):
-    """ after_indentation(indentation_state : lst):
+def _after_indentation(indentation_state, options=None):
+    """ _after_indentation(indentation_state : lst):
 
     Called after the string has been indented appropriately.
     It takes care of writing the file and checking for unclosed strings
@@ -859,6 +911,7 @@ def after_indentation(indentation_state):
         = indentation_state
 
     fname = os.path.split(fpath)[1]
+    args = parse_args(options)
 
     if bracket_locations:
         # If the bracket_locations list is not empty it means that there are some
@@ -872,70 +925,66 @@ def after_indentation(indentation_state):
             # the same.
             message = "\n--%s-- `%s': Warning : Unmatched `%s' near (%d, %d). "
             tpl = (current_time(), fname, character, y, x)
-            print_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
 
     if newlisp_brace_locations:
         for brace in newlisp_brace_locations:
             message = "\n--%s-- `%s': Warning: Unclosed newLISP string near: (%d, %d)"
             tpl = (current_time(), fname) + brace
-            print_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
 
     if comment_locations:
         for comment in comment_locations:
             message = "\n--%s-- `%s': Warning: Unclosed comment near: (%d, %d)"
             tpl = (current_time(), fname) + comment
-            print_warning(message, tpl, WARN, EXIT, fname)
+            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
 
     if last_symbol_location:
         message = "\n--%s-- `%s': Warning: Unclosed symbol near: (%d, %d). "
         tpl = (current_time(), fname) + last_symbol_location
-        print_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
 
     if in_string:
         message = "\n--%s-- `%s': Warning: The string starting from (%d, %d) extends to end-of-file. "
         tpl = ((current_time(), ) + last_quote_location)
-        print_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
 
     if in_newlisp_tag_string:
         message = "\n--%s-- `%s': Warning: The tag string starting from (%d, %d) extends to end-of-file. "
         tpl = (current_time(), fname) + first_tag_string
-        print_warning(message, tpl, WARN, EXIT, fname)
+        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
 
     if md5sum(indented_code.encode('utf-8')) == md5sum(original_code.encode('utf-8')):
         message = "\n--%s-- File `%s' has already been formatted. Leaving it unchanged. . .\n"
         tpl = (current_time(), fname)
         print_warning(message, tpl, True, False, fname)
     else:
-        if OUTPUT:
+        if not args.no_output:
             print(indented_code)
 
-        if MODIFY:
+        if not args.no_modify:
             # write in binary mode to preserve the original line ending
             with open(fpath, 'w') as indented_file:
                 indented_file.write(indented_code)
 
 
-def indent_file(fname):
+def indent_file(fname, options=None):
     """ indent_file(fname : str)
 
     1. Creates a backup of the source file(backup_source_file())
     2. Reads the files contents(read_file())
     3. Indents the code(indent_code())
-    4. Writes the file or print the indented code(after_indentation())
+    4. Writes the file or print the indented code(_after_indentation())
     """
+    args = parse_args(options)
     fname = os.path.abspath(fname)
-    code = read_file(fname).decode('utf-8')
-    indent_result = indent_code(code, fname)
-    after_indentation(indent_result)
+    code = read_file(fname)
+    indent_result = indent_code(code, fname, options)
+    _after_indentation(indent_result)
 
-    backup_dir = get_backup_directory(sys.argv[1:], fname)
-    if BACKUP and not backup_dir:
-        # The backup directory hasn't been specified, default
-        # to the current directory
-        backup_source_file(fname)
-    elif BACKUP and backup_dir:
+    if not args.no_backup:
         # Create a backup file in the directory specified
-        backup_source_file(fname, backup_dir)
+        backup_source_file(fname, args)
 
 USAGE_HELP = """
  _________________________________________________________________________________________________________________
@@ -961,9 +1010,14 @@ USAGE_HELP = """
 +-----------------------------------------------------------------------------------------------------------------+
 """
 
-if __name__ == '__main__':
+
+def main():
+    """ Entry point """
     # Print the help menu if no arguments are passed to the file.
     if sys.argv[1:] == []:
         print(USAGE_HELP)
     else:
         indent_file(sys.argv[1])
+
+if __name__ == '__main__':
+    main()
