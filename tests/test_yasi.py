@@ -216,7 +216,21 @@ class UnitTests(unittest.TestCase):
 
 
 class SystemTests(unittest.TestCase):
-    pass
+    def test_all_case_files(self):
+        cases = [
+            {
+                'before': 'tests/cases/#1-if-expression-1.lisp',
+                'after': 'tests/cases/#1-if-expression-1~.lisp',
+                'options': ''
+            },
+        ]
+        for case in cases:
+            before_path = os.path.join(PROJECT_DIR, case['before'])
+            after_path = os.path.join(PROJECT_DIR, case['after'])
+            before = yasi.read_file(before_path)
+            after = yasi.read_file(after_path)
+            indented_code = yasi.indent_code(before, options=case['options'])
+            self.assertEqual(indented_code[-1], after)
 
 if __name__ == '__main__':
     unittest.main()
