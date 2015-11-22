@@ -49,6 +49,9 @@ def create_args_parser():
         '--dialect',
         help="Use Scheme keywords", type=str, default="all")
     parser.add_argument(
+        '-v', '--version', action='version',
+        help='Prints yasi version', version='yasi v%s' % __version__)
+    parser.add_argument(
         '-bd', '--backup-dir',
         help="The directory where the backup file is to be written",
         type=str, default=os.getcwd())
