@@ -28,23 +28,23 @@ def create_args_parser():
         description='Dialect-aware s-expression indenter', prog='yasi')
     parser.add_argument("files", help="List of files to be indented", nargs="*")
     parser.add_argument(
-        '-nc', '--no-compact',
-        help="Don't compact the code, just indent", action='store_true')
+        '-nc', '--no-compact', dest='compact',
+        help="Don't compact the code, just indent", action='store_false')
     parser.add_argument(
-        '-nb', '--no-backup',
-        help="Don't create a backup file even if --backup-dir is specified ", action='store_true')
+        '-nb', '--no-backup', dest='backup', action='store_false',
+        help="Don't create a backup file even if --backup-dir is specified ")
     parser.add_argument(
-        '-nm', '--no-modify',
-        help="Don't modify the file", action='store_true')
+        '-nm', '--no-modify', dest='modify',
+        help="Don't modify the file", action='store_false')
     parser.add_argument(
-        '-nw', '--no-warning',
-        help="Don't display warnings", action='store_true')
+        '-nw', '--no-warning', dest='warning',
+        help="Don't display warnings", action='store_false')
     parser.add_argument(
-        '-no', '--no-output',
-        help="Suppress output of the indented code", action='store_true')
+        '-no', '--no-output', dest='output',
+        help="Suppress output of the indented code", action='store_false')
     parser.add_argument(
-        '-ne', '--no-exit',
-        help="Instructs the program not to exit when a warning is raised.", action='store_true')
+        '-ne', '--no-exit', dest='exit', action='store_false',
+        help="Instructs the program not to exit when a warning is raised.")
     parser.add_argument(
         '--dialect',
         help="Use Scheme keywords", type=str, default="all")
@@ -150,7 +150,7 @@ def backup_source_file(fname, options=None):
     except IOError:
         message = "\n--%s-- Warning: Couldn't backup the file `%s' in `%s', check if you have enough permissions. "
         tpl = (current_time(), fname, backup_dir)
-        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+        print_warning(message, tpl, args.warning, args.exit, fname)
 
 
 def md5sum(content):
@@ -373,7 +373,7 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
     if args.indent_comments:
         # We are allowed to indent comment lines
         comment_line = False
-    if not args.no_compact and zerolevel == 0 and bracket_list == [] and not in_comment:
+    if not args.compact and zerolevel == 0 and bracket_list == [] and not in_comment:
         # If nocompact mode is on and there are no unclosed blocks, try to
         # find the zero level by simply counting spaces before a line that
         # is not empty or has a comment
@@ -392,7 +392,7 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
         # If the list is empty, then the current_level defaults
         # to zero
         curr_line, current_level = pad_leading_whitespace(line, zerolevel,
-                                                          not args.no_compact,
+                                                          args.compact,
                                                           bracket_list, args)
         return zerolevel, curr_line, current_level
     else:
@@ -577,19 +577,19 @@ def _pop_from_list(bracket, lst, fname, line, real_pos, offset, options=None):
         if popped_char is not correct_closer:
             message = "\n--%s-- %s: Warning: Bracket `%s' at (%d, %d) does not match `%s' at (%d, %d)"
             tpl = (current_time(), fname, popped_char, popped_pos, popped_offset, bracket, line, real_pos)
-            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+            print_warning(message, tpl, args.warning, args.exit, fname)
     else:
         # If the list if empty and a closing bracket is found, it means we have
         # excess brackets. That warning is issued here. The coordinates used
         # will be slightly or largely off target depending on how much your
-        # code was 'messed' up when used with compact mode
-        if not options.no_exit:
+        # code was modified when used with compact mode
+        if options.exit:
             bpos = real_pos + 1
         else:
             bpos = offset + 1
         message = "\n--%s-- %s: Warning: Unmatched `%s' near (%d, %d). "
         tpl = (current_time(), fname, bracket, line, bpos)
-        print_warning(message, tpl, not options.no_warning, not options.no_exit, fname)
+        print_warning(message, tpl, options.warning, options.exit, fname)
     return lst
 
 
@@ -784,7 +784,7 @@ def indent_code(original_code, fpath='', options=None):
                         else:
                             message = "\n--%s-- `%s': Warning: Attempt to close a non-existent newLISP string"
                             tpl = (current_time(), fname)
-                            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+                            print_warning(message, tpl, args.warning, args.exit, fname)
                         in_newlisp_string -= 1
 
             if curr_char == '[' and args.dialect == 'newlisp' and not \
@@ -925,44 +925,44 @@ def _after_indentation(indentation_state, options=None):
             # the same.
             message = "\n--%s-- `%s': Warning : Unmatched `%s' near (%d, %d). "
             tpl = (current_time(), fname, character, y, x)
-            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+            print_warning(message, tpl, args.warning, args.exit, fname)
 
     if newlisp_brace_locations:
         for brace in newlisp_brace_locations:
             message = "\n--%s-- `%s': Warning: Unclosed newLISP string near: (%d, %d)"
             tpl = (current_time(), fname) + brace
-            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+            print_warning(message, tpl, args.warning, args.exit, fname)
 
     if comment_locations:
         for comment in comment_locations:
             message = "\n--%s-- `%s': Warning: Unclosed comment near: (%d, %d)"
             tpl = (current_time(), fname) + comment
-            print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+            print_warning(message, tpl, args.warning, args.exit, fname)
 
     if last_symbol_location:
         message = "\n--%s-- `%s': Warning: Unclosed symbol near: (%d, %d). "
         tpl = (current_time(), fname) + last_symbol_location
-        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+        print_warning(message, tpl, args.warning, args.exit, fname)
 
     if in_string:
         message = "\n--%s-- `%s': Warning: The string starting from (%d, %d) extends to end-of-file. "
         tpl = ((current_time(), ) + last_quote_location)
-        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+        print_warning(message, tpl, args.warning, args.exit, fname)
 
     if in_newlisp_tag_string:
         message = "\n--%s-- `%s': Warning: The tag string starting from (%d, %d) extends to end-of-file. "
         tpl = (current_time(), fname) + first_tag_string
-        print_warning(message, tpl, not args.no_warning, not args.no_exit, fname)
+        print_warning(message, tpl, args.warning, args.exit, fname)
 
     if md5sum(indented_code.encode('utf-8')) == md5sum(original_code.encode('utf-8')):
         message = "\n--%s-- File `%s' has already been formatted. Leaving it unchanged. . .\n"
         tpl = (current_time(), fname)
         print_warning(message, tpl, True, False, fname)
     else:
-        if not args.no_output:
+        if args.output:
             print(indented_code)
 
-        if not args.no_modify:
+        if args.modify:
             # write in binary mode to preserve the original line ending
             with open(fpath, 'w') as indented_file:
                 indented_file.write(indented_code)
@@ -982,7 +982,7 @@ def indent_file(fname, options=None):
     indent_result = indent_code(code, fname, options)
     _after_indentation(indent_result)
 
-    if not args.no_backup:
+    if not args.backup:
         # Create a backup file in the directory specified
         backup_source_file(fname, args)
 
