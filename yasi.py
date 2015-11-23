@@ -979,23 +979,23 @@ def _after_indentation(indentation_state, options=None):
                 indented_file.write(indented_code)
 
 
-def indent_file(fname, options=None):
-    """ indent_file(fname : str)
+def indent_files(arguments=sys.argv[1:]):
+    """ indent_files(fname : str)
 
     1. Creates a backup of the source file(backup_source_file())
     2. Reads the files contents(read_file())
     3. Indents the code(indent_code())
     4. Writes the file or print the indented code(_after_indentation())
     """
-    opts = parse_options(options)
-    fname = os.path.abspath(fname)
-    code = read_file(fname)
-    indent_result = indent_code(code, fname, options)
-    _after_indentation(indent_result)
+    opts = parse_options(arguments)
+    for fname in opts.files:
+        code = read_file(fname)
+        indent_result = indent_code(code, fname, opts)
+        _after_indentation(indent_result)
 
-    if not opts.backup:
-        # Create a backup file in the directory specified
-        backup_source_file(fname, opts)
+        if not opts.backup:
+            # Create a backup file in the directory specified
+            backup_source_file(fname, opts)
 
 USAGE_HELP = """
  _________________________________________________________________________________________________________________
@@ -1028,7 +1028,7 @@ def main():
     if sys.argv[1:] == []:
         print(USAGE_HELP)
     else:
-        indent_file(sys.argv[1])
+        indent_files()
 
 if __name__ == '__main__':
     main()
