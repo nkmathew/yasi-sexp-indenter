@@ -1017,30 +1017,6 @@ def indent_files(arguments=sys.argv[1:]):
             # Create a backup file in the directory specified
             backup_source_file(fname, opts)
 
-USAGE_HELP = """
- _________________________________________________________________________________________________________________
-|    Usage: newlisp yasi.lsp [[<file>] [--backup-dir<directory>] [--no-compact] [--no-backup] [--no-warning]      |
-|                   [--clojure] [--lisp] [--scheme] [--default-indent <num>]]                                     |
-|            -nb,    --no-backup     # Don't create a backup file even if --backup-dir is specified               |
-|            -nc,    --no-compact    # Try to preserve the structure of the file.                                 |
-|            -nw,    --no-warning    # Don't issue warnings                                                       |
-|            -ne,    --no-exit       # Instructs the program not to exit when a warning is raised. True by default|
-|            -uni,   --uniform       # Dictates whether the if-clause and else-clause of an if-like block should  |
-|                                       have the same indent level. False by default                              |
-|            -no,    --no-output     # Suppress output of the indented code                                       |
-|            -nm,    --no-modify     # Don't modify the file                                                      |
-|            --backup-dir            # The directory where the backup file is to be written                       |
-|            --clojure               # Use Clojure keywords                                                       |
-|            --lisp                  # Use Lisp keywords                                                          |
-|            --newlisp               # Use newLISP keywords                                                       |
-|            --scheme                # Use Scheme keywords                                                        |
-|            --default-indent <num>  # The indent level to be used in case a                                      |
-|                                    function's argument is in the next line. Vim uses 2, the most common being 1.|
-|            --indent-comments, -ic  # False by default. If true, comment lines will be indented possibly         |
-|                                        messing with any deliberate comment layout                               |
-+-----------------------------------------------------------------------------------------------------------------+
-"""
-
 
 def main():
     """ Entry point """
