@@ -877,7 +877,7 @@ def indent_code(original_code, fpath='', options=None):
                                                   curr_char, line_number, offset,
                                                   first_arg_pos, first_item,
                                                   in_list_literal,
-                                                  spaces_before_func)
+                                                  spaces_before_func, opts)
 
             elif curr_char in [']', ')', '}']:
                 if curr_char in [']', '}'] and opts.dialect in ['lisp', 'newlisp']:
