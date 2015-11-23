@@ -47,6 +47,9 @@ def create_args_parser():
         '-ne', '--no-exit', dest='exit', action='store_false',
         help="Instructs the program not to exit when a warning is raised.")
     parser.add_argument(
+        '-o', dest='output_file',
+        help="Path/name of output file", type=str, default="")
+    parser.add_argument(
         '--dialect',
         help="Use Scheme keywords", type=str, default="all")
     parser.add_argument(
@@ -718,8 +721,8 @@ def indent_code(original_code, fpath='', options=None):
 
     bracket_locations = []
     for line in code_lines:
-        escaped      = False
-        curr_line    = line
+        escaped   = False
+        curr_line = line
 
         # Get the indent level and the indented line
         zero_level, curr_line, indent_level = indent_line(zero_level,
@@ -730,8 +733,8 @@ def indent_code(original_code, fpath='', options=None):
         indented_code += curr_line
         offset = 0
         for curr_char in curr_line:
-            next_char     = curr_line[offset + 1:offset + 2]
-            prev_char     = curr_line[offset - 1:offset]
+            next_char = curr_line[offset + 1:offset + 2]
+            prev_char = curr_line[offset - 1:offset]
 
             substr = curr_line[offset + 1:]  # slice to the end
 
@@ -749,7 +752,7 @@ def indent_code(original_code, fpath='', options=None):
                     (prev_char == '#' and opts.dialect == 'scheme'):
                 # a comment has been found, go to the next line
                 # A sharp sign(#) before a semi-colon in Scheme is used to
-                # comment out sections or code. We don't treat it as a comment
+                # comment out sections of code. We don't treat it as a comment
                 break
 
             # ----------------------------------------------------------
@@ -969,6 +972,9 @@ def _after_indentation(indentation_state, options=None):
 
         if opts.modify:
             # write in binary mode to preserve the original line ending
+            if opts.output_file:
+                fpath = os.path.abspath(opts.output_file)
+
             with open(fpath, 'w') as indented_file:
                 indented_file.write(indented_code)
 
