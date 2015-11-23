@@ -637,7 +637,7 @@ def _push_to_list(lst, func_name, char, line, offset,
         # found quoted list or clojure hashmap/vector
         pos_hash['indent_level'] = first_item
 
-    elif func_name in IF_LIKE:
+    elif func_name in keywords[1]:
         # We only make the if-clause stand out if not in uniform mode
         pos_hash['indent_level'] = lead_spaces + ((offset + 4)
                                                   if not opts.uniform
@@ -890,7 +890,8 @@ def indent_code(original_code, fpath='', options=None):
                                                    fname, line_number, real_position,
                                                    offset, opts)
 
-            if bracket_locations and curr_char in [' ', '\t'] and bracket_locations[-1]['func_name'] in IF_LIKE:
+            if bracket_locations and curr_char in [' ', '\t'] and \
+                    bracket_locations[-1]['func_name'] in keywords[1]:
                 # This part changes the indentation level of a then clause so that
                 # we can achieve something like:
                 #         (if (= this that)
