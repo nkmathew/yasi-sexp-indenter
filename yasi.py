@@ -97,6 +97,10 @@ def parse_options(arguments=None):
 
     if not os.path.exists(args.backup_dir):
         parser.error("Directory `{0}' does not exist".format(args.backup_dir))
+
+    if len(args.files) > 1 and args.output_file:
+        parser.error('Cannot use the -o flag when more than one file is specified')
+
     return args
 
 
