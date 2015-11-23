@@ -219,8 +219,16 @@ class SystemTests(unittest.TestCase):
     def test_all_case_files(self):
         cases = [
             {
-                'before': 'tests/cases/#1-if-expression-1.lisp',
-                'after': 'tests/cases/#1-if-expression-1~.lisp',
+                'before': 'tests/cases/#3-multiple-value-bind.lisp',
+                'after': 'tests/cases/#3-multiple-value-bind~.lisp',
+                'options': '--uniform'
+            }, {
+                'before': 'tests/cases/#2-multiple-value-bind.lisp',
+                'after': 'tests/cases/#2-multiple-value-bind~.lisp',
+                'options': '--dialect=lisp'
+            }, {
+                'before': 'tests/cases/#1-if-expression.lisp',
+                'after': 'tests/cases/#1-if-expression~.lisp',
                 'options': ''
             },
         ]
@@ -229,8 +237,12 @@ class SystemTests(unittest.TestCase):
             after_path = os.path.join(PROJECT_DIR, case['after'])
             before = yasi.read_file(before_path)
             after = yasi.read_file(after_path)
-            indented_code = yasi.indent_code(before, options=case['options'])
-            self.assertEqual(indented_code[-1], after)
+            indented_code = yasi.indent_code(before, options=case['options'])[-1]
+            try:
+                self.assertEqual(indented_code, after)
+            except AssertionError as exception:
+                print('??? Test failed: ' + case['before'] + '\n')
+                print(exception)
 
 if __name__ == '__main__':
     unittest.main()
