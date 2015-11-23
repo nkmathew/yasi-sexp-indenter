@@ -990,8 +990,8 @@ def _after_indentation(indentation_state, options=None):
             if opts.output_file:
                 fpath = os.path.abspath(opts.output_file)
 
-            with open(fpath, 'w') as indented_file:
-                indented_file.write(indented_code)
+            with open(fpath, 'wb') as indented_file:
+                indented_file.write(indented_code.encode('utf8'))
 
 
 def indent_files(arguments=sys.argv[1:]):
@@ -1014,7 +1014,7 @@ def indent_files(arguments=sys.argv[1:]):
         indent_result = indent_code(code, fname, opts)
         _after_indentation(indent_result)
 
-        if not opts.backup:
+        if opts.backup:
             # Create a backup file in the directory specified
             backup_source_file(fname, opts)
 
