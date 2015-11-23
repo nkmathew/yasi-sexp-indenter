@@ -77,7 +77,8 @@ features include:
     Dialect-aware s-expression indenter
 
     positional arguments:
-    files                 List of files to be indented
+    files                 List of files to be indented. Will indent from
+                            standard input if no files are specified
 
     optional arguments:
     -h, --help            show this help message and exit
