@@ -27,7 +27,9 @@ def create_args_parser():
     """ Return command line parser """
     parser = argparse.ArgumentParser(
         description='Dialect-aware s-expression indenter', prog='yasi')
-    parser.add_argument("files", help="List of files to be indented", nargs="*")
+    parser.add_argument("files", help="List of files to be indented. "
+                        "Will indent from standard input if no files are specified",
+                        nargs="*")
     parser.add_argument(
         '-nc', '--no-compact', dest='compact',
         help="Don't compact the code, just indent", action='store_false')
@@ -100,6 +102,11 @@ def parse_options(arguments=None):
 
     if len(args.files) > 1 and args.output_file:
         parser.error('Cannot use the -o flag when more than one file is specified')
+
+    if not args.files:
+        if args.modify and not args.output_file:
+            args.modify = False
+        args.backup = False
 
     return args
 
@@ -685,6 +692,9 @@ def indent_code(original_code, fpath='', options=None):
     # get the filename only not its full path
     fname = os.path.split(fpath)[1]
 
+    if fpath == '<stdin>':
+        fname = '<stdin>'
+
     # Safeguards against processing brackets inside strings
     in_string = False
 
@@ -992,6 +1002,12 @@ def indent_files(arguments=sys.argv[1:]):
     4. Writes the file or print the indented code(_after_indentation())
     """
     opts = parse_options(arguments)
+    if not opts.files:
+        # Indent from stdin
+        code = sys.stdin.read()
+        indent_result = indent_code(code, '<stdin>', opts)
+        _after_indentation(indent_result)
+
     for fname in opts.files:
         code = read_file(fname)
         indent_result = indent_code(code, fname, opts)
@@ -1028,11 +1044,7 @@ USAGE_HELP = """
 
 def main():
     """ Entry point """
-    # Print the help menu if no arguments are passed to the file.
-    if sys.argv[1:] == []:
-        print(USAGE_HELP)
-    else:
-        indent_files()
+    indent_files()
 
 if __name__ == '__main__':
     main()
