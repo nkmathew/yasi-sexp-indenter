@@ -68,37 +68,40 @@ features include:
   file.
 
 ### Command Line Arguments
-    usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [--dialect DIALECT] [-v]
-                [-bd BACKUP_DIR] [-di DEFAULT_INDENT] [-ic] [-uni]
+
+    usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
+                [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-di DEFAULT_INDENT]
+                [-ic] [-uni]
                 [files [files ...]]
 
     Dialect-aware s-expression indenter
 
     positional arguments:
-      files                 List of files to be indented
+    files                 List of files to be indented
 
     optional arguments:
-      -h, --help            show this help message and exit
-      -nc, --no-compact     Don't compact the code, just indent
-      -nb, --no-backup      Don't create a backup file even if --backup-dir is
+    -h, --help            show this help message and exit
+    -nc, --no-compact     Don't compact the code, just indent
+    -nb, --no-backup      Don't create a backup file even if --backup-dir is
                             specified
-      -nm, --no-modify      Don't modify the file
-      -nw, --no-warning     Don't display warnings
-      -no, --no-output      Suppress output of the indented code
-      -ne, --no-exit        Instructs the program not to exit when a warning is
+    -nm, --no-modify      Don't modify the file
+    -nw, --no-warning     Don't display warnings
+    -no, --no-output      Suppress output of the indented code
+    -ne, --no-exit        Instructs the program not to exit when a warning is
                             raised.
-      --dialect DIALECT     Use Scheme keywords
-      -v, --version         Prints script version
-      -bd BACKUP_DIR, --backup-dir BACKUP_DIR
+    -o OUTPUT_FILE        Path/name of output file
+    --dialect DIALECT     Use Scheme keywords
+    -v, --version         Prints script version
+    -bd BACKUP_DIR, --backup-dir BACKUP_DIR
                             The directory where the backup file is to be written
-      -di DEFAULT_INDENT, --default-indent DEFAULT_INDENT
+    -di DEFAULT_INDENT, --default-indent DEFAULT_INDENT
                             The indent level to be used in case a function's
                             argument is in the next line. Vim uses 2, the most
                             common being 1.
-      -ic, --indent-comments
+    -ic, --indent-comments
                             If true, comment lines will be indented possibly
                             messing with any deliberate comment layout
-      -uni, --uniform       Dictates whether the if-clause and else-clause of an
+    -uni, --uniform       Dictates whether the if-clause and else-clause of an
                             if-likeblock should have the same indent level.
 
 ### What yasi does not handle
