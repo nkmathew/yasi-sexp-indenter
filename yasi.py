@@ -972,7 +972,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
     if comment_locations:
         for comment in comment_locations:
             message = "\n%s:%d:%d: Unclosed multiline comment"
-            tpl =  (fname,) + comment
+            tpl = (fname,) + comment
             if opts.warning:
                 sys.stderr.write(message % tpl)
 
@@ -990,7 +990,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
 
     if in_newlisp_tag_string:
         message = "\n%s:%d:%d: Tag string extends to end-of-file"
-        tpl =  (fname,) + last_quote_location
+        tpl = (fname,) + last_quote_location
         if opts.warning:
             sys.stderr.write(message % tpl)
 
