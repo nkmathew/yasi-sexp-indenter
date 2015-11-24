@@ -128,16 +128,6 @@ def read_file(fname):
         return fp.read().decode('utf-8')
 
 
-def print_warning(warning_message, format_tuple, warn, exit_after_warning, fname):
-    """
-    Issues all the warning messages.
-    """
-    if warn:
-        sys.stderr.write(warning_message % format_tuple)
-    if exit_after_warning:
-        exit("\n--%s-- Exiting. File `%s' unchanged. . ." % (current_time(), fname))
-
-
 def current_time():
     """ current_time() -> str
 
@@ -168,7 +158,7 @@ def backup_source_file(fname, options=None):
     except IOError:
         message = "\n--%s-- Warning: Couldn't backup the file `%s' in `%s', check if you have enough permissions. "
         tpl = (current_time(), fname, backup_dir)
-        print_warning(message, tpl, opts.warning, opts.exit, fname)
+        sys.stderr.write(message % tpl)
 
 
 def md5sum(content):
@@ -570,8 +560,9 @@ def find_first_arg_pos(bracket_offset, curr_line, options=None):
     return [arg_pos, spaces_before_func]
 
 
-def _pop_from_list(bracket, lst, fname, line, real_pos, offset, options=None):
-    """ _pop_from_list(char : str, lst : [str], fname : str, line : str,
+def _pop_from_list(bracket, lst, line, real_pos, offset, options=None,
+                   msg_stack=[]):
+    """ _pop_from_list(char : str, lst : [str], line : str,
                         real_pos : int, offset : int)
 
     The function is called when a closing bracket is encountered. The function
@@ -593,21 +584,30 @@ def _pop_from_list(bracket, lst, fname, line, real_pos, offset, options=None):
         popped_pos = popped['line_number']
         popped_offset = popped['bracket_pos']
         if popped_char is not correct_closer:
-            message = "\n--%s-- %s: Warning: Bracket `%s' at (%d, %d) does not match `%s' at (%d, %d)"
-            tpl = (current_time(), fname, popped_char, popped_pos, popped_offset, bracket, line, real_pos)
-            print_warning(message, tpl, opts.warning, opts.exit, fname)
+            message = "Bracket `%s' does not match `%s' at (%d, %d)"
+            message = message % (bracket, popped_char, popped_pos, popped_offset)
+            warning_info = {
+                'msg': message,
+                'line': line,
+                'column': real_pos
+            }
+            msg_stack.append(warning_info)
     else:
         # If the list if empty and a closing bracket is found, it means we have
         # excess brackets. That warning is issued here. The coordinates used
         # will be slightly or largely off target depending on how much your
         # code was modified when used with compact mode
-        if options.exit:
+        if opts.exit:
             bpos = real_pos + 1
         else:
             bpos = offset + 1
         message = "\n--%s-- %s: Warning: Unmatched `%s' near (%d, %d). "
-        tpl = (current_time(), fname, bracket, line, bpos)
-        print_warning(message, tpl, options.warning, options.exit, fname)
+        warning_info = {
+            'msg': message,
+            'line': line,
+            'column': offset
+        }
+        msg_stack.append(warning_info)
     return lst
 
 
@@ -662,7 +662,7 @@ def _push_to_list(lst, func_name, char, line, offset,
     return lst
 
 
-def indent_code(original_code, fpath='', options=None):
+def indent_code(original_code, options=None):
     """ indented_code(string : str, fname : str) -> [...]
 
     Arguments:
@@ -688,12 +688,6 @@ def indent_code(original_code, fpath='', options=None):
 
     opts = parse_options(options)
     keywords = add_keywords(opts.dialect)
-
-    # get the filename only not its full path
-    fname = os.path.split(fpath)[1]
-
-    if fpath == '<stdin>':
-        fname = '<stdin>'
 
     # Safeguards against processing brackets inside strings
     in_string = False
@@ -734,6 +728,10 @@ def indent_code(original_code, fpath='', options=None):
     indented_code = ""
 
     bracket_locations = []
+
+    # List of warnings from errors in the code
+    message_stack = []
+
     for line in code_lines:
         escaped   = False
         curr_line = line
@@ -793,7 +791,7 @@ def indent_code(original_code, fpath='', options=None):
             # Strings are dealt with here only if we are not comment
             if not (in_symbol_with_space or in_comment or in_newlisp_tag_string):
                 if curr_char == '"':
-                    last_quote_location = (fname, line_number, offset)
+                    last_quote_location = (line_number, offset)
                     in_string = True if not in_string else False
                 if opts.dialect == 'newlisp' and not in_string:
                     # We handle newLISP's multiline strings here
@@ -804,9 +802,13 @@ def indent_code(original_code, fpath='', options=None):
                         if newlisp_brace_locations:
                             newlisp_brace_locations.pop()
                         else:
-                            message = "\n--%s-- `%s': Warning: Attempt to close a non-existent newLISP string"
-                            tpl = (current_time(), fname)
-                            print_warning(message, tpl, opts.warning, opts.exit, fname)
+                            message = "Attempt to close a non-existent newLISP string"
+                            warning_info = {
+                                'msg': message,
+                                'line': line_number,
+                                'column': offset
+                            }
+                            message_stack.append(warning_info)
                         in_newlisp_string -= 1
 
             if curr_char == '[' and opts.dialect == 'newlisp' and not \
@@ -887,8 +889,8 @@ def indent_code(original_code, fpath='', options=None):
                     continue
 
                 bracket_locations = _pop_from_list(curr_char, bracket_locations[:],
-                                                   fname, line_number, real_position,
-                                                   offset, opts)
+                                                   line_number, real_position,
+                                                   offset, opts, message_stack)
 
             if bracket_locations and curr_char in [' ', '\t'] and \
                     bracket_locations[-1]['func_name'] in keywords[1]:
@@ -914,13 +916,13 @@ def indent_code(original_code, fpath='', options=None):
 
             offset += 1
         line_number += 1
-    return [first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations,
+    return [message_stack, first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations,
             newlisp_brace_locations, in_string, in_comment,
             in_symbol_with_space, bracket_locations,
-            last_quote_location, fpath, original_code, indented_code]
+            last_quote_location, original_code, indented_code]
 
 
-def _after_indentation(indentation_state, options=None):
+def _after_indentation(indentation_state, options=None, fpath=''):
     """ _after_indentation(indentation_state : lst):
 
     Called after the string has been indented appropriately.
@@ -928,68 +930,82 @@ def _after_indentation(indentation_state, options=None):
     or comments.
     """
     # Receive all the state variables. *This is the price you for modularity*
-    first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations, \
+    message_stack, first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations, \
         newlisp_brace_locations, in_string, _, _, \
-        bracket_locations, last_quote_location, fpath, original_code, indented_code \
+        bracket_locations, last_quote_location, original_code, indented_code \
         = indentation_state
 
-    fname = os.path.split(fpath)[1]
+    fname = os.path.basename(fpath)
     opts = parse_options(options)
+
+    for msg in message_stack:
+        if opts.warning:
+            if opts.files:
+                msg['fname'] = fname
+                sys.stderr.write('{fname}:{line}:{column}: {msg}'.format(**msg))
+            else:
+                # Input was passed through stdin
+                sys.stderr.write(':{line}:{column}: {msg}'.format(**msg))
 
     if bracket_locations:
         # If the bracket_locations list is not empty it means that there are some
         # brackets(opening) that haven't been closed.
         for bracket in bracket_locations:
-            y = bracket['line_number']
-            x = bracket['bracket_pos']
+            line = bracket['line_number']
+            column = bracket['bracket_pos']
             character = bracket['character']
             # The bracket_locations are not very accurate. The warning might be
             # misleading because it considers round and square brackets to be
             # the same.
-            message = "\n--%s-- `%s': Warning : Unmatched `%s' near (%d, %d). "
-            tpl = (current_time(), fname, character, y, x)
-            print_warning(message, tpl, opts.warning, opts.exit, fname)
+            message = "\n%s:%d:%d: Unmatched `%s'"
+            if opts.warning:
+                sys.stderr.write(message % (fname, line, column, character))
 
     if newlisp_brace_locations:
         for brace in newlisp_brace_locations:
-            message = "\n--%s-- `%s': Warning: Unclosed newLISP string near: (%d, %d)"
-            tpl = (current_time(), fname) + brace
-            print_warning(message, tpl, opts.warning, opts.exit, fname)
+            message = "\n%s:%d:%d: Unclosed newLISP string"
+            if opts.warning:
+                sys.stderr.write(message % (fname, line, column))
 
     if comment_locations:
         for comment in comment_locations:
-            message = "\n--%s-- `%s': Warning: Unclosed comment near: (%d, %d)"
-            tpl = (current_time(), fname) + comment
-            print_warning(message, tpl, opts.warning, opts.exit, fname)
+            message = "\n%s:%d:%d: Unclosed multiline comment"
+            tpl =  (fname,) + comment
+            if opts.warning:
+                sys.stderr.write(message % tpl)
 
     if last_symbol_location:
-        message = "\n--%s-- `%s': Warning: Unclosed symbol near: (%d, %d). "
-        tpl = (current_time(), fname) + last_symbol_location
-        print_warning(message, tpl, opts.warning, opts.exit, fname)
+        message = "\n%s:%d:%d: Unclosed symbol"
+        tpl = (fname,) + last_symbol_location
+        if opts.warning:
+            sys.stderr.write(message % tpl)
 
     if in_string:
-        message = "\n--%s-- `%s': Warning: The string starting from (%d, %d) extends to end-of-file. "
-        tpl = ((current_time(), ) + last_quote_location)
-        print_warning(message, tpl, opts.warning, opts.exit, fname)
+        message = "\n%s:%d:%d: String extends to end-of-file"
+        tpl = (fname,) + last_quote_location
+        if opts.warning:
+            sys.stderr.write(message % tpl)
 
     if in_newlisp_tag_string:
-        message = "\n--%s-- `%s': Warning: The tag string starting from (%d, %d) extends to end-of-file. "
-        tpl = (current_time(), fname) + first_tag_string
-        print_warning(message, tpl, opts.warning, opts.exit, fname)
+        message = "\n%s:%d:%d: Tag string extends to end-of-file"
+        tpl =  (fname,) + last_quote_location
+        if opts.warning:
+            sys.stderr.write(message % tpl)
 
-    if md5sum(indented_code.encode('utf-8')) == md5sum(original_code.encode('utf-8')):
-        message = "\n--%s-- File `%s' has already been formatted. Leaving it unchanged. . .\n"
-        tpl = (current_time(), fname)
-        print_warning(message, tpl, True, False, fname)
+    if md5sum(indented_code.encode('utf-8')) == md5sum(original_code.encode('utf-8'))\
+            and opts.files:
+        message = "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
+        sys.stderr.write(message % fname)
     else:
         if opts.output:
-            print(indented_code)
+            print(indented_code, end='')
 
         if opts.modify:
             # write in binary mode to preserve the original line ending
             if opts.output_file:
                 fpath = os.path.abspath(opts.output_file)
 
+            # if fpath
             with open(fpath, 'wb') as indented_file:
                 indented_file.write(indented_code.encode('utf8'))
 
@@ -1006,13 +1022,13 @@ def indent_files(arguments=sys.argv[1:]):
     if not opts.files:
         # Indent from stdin
         code = sys.stdin.read()
-        indent_result = indent_code(code, '<stdin>', opts)
+        indent_result = indent_code(code, opts)
         _after_indentation(indent_result)
 
     for fname in opts.files:
         code = read_file(fname)
-        indent_result = indent_code(code, fname, opts)
-        _after_indentation(indent_result)
+        indent_result = indent_code(code, opts)
+        _after_indentation(indent_result, fpath=fname)
 
         if opts.backup:
             # Create a backup file in the directory specified
