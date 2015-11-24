@@ -566,8 +566,7 @@ def find_first_arg_pos(bracket_offset, curr_line, options=None):
     return [arg_pos, spaces_before_func]
 
 
-def _pop_from_list(bracket, lst, line, real_pos, offset, options=None,
-                   msg_stack=[]):
+def _pop_from_list(bracket, lst, line, real_pos, offset, options, msg_stack):
     """ _pop_from_list(char : str, lst : [str], line : str,
                         real_pos : int, offset : int)
 
