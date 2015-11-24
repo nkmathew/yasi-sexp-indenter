@@ -55,7 +55,7 @@ def create_args_parser():
         help="Path/name of output file", type=str, default="")
     parser.add_argument(
         '--dialect',
-        help="Use Scheme keywords", type=str, default="all")
+        help="Use Scheme keywords", type=str, default='')
     parser.add_argument(
         '-v', '--version', action='version',
         help='Prints script version', version='yasi v%s' % __version__)
@@ -96,7 +96,7 @@ def parse_options(arguments=None):
     # pprint(args.__dict__)
 
     args.dialect = args.dialect.lower()
-    if args.dialect not in ['lisp', 'newlisp', 'clojure', 'scheme', 'all']:
+    if args.dialect not in ['lisp', 'newlisp', 'clojure', 'scheme', 'all', '']:
         parser.error("`{0}' is not a recognized dialect".format(args.dialect))
 
     if not os.path.exists(args.backup_dir):
@@ -286,6 +286,8 @@ def is_macro_name(func_name, dialect):
         return re.search('def|with', func_name)
     if dialect == 'newlisp':
         return re.search('macro|def', func_name)
+    else:
+        return False
 
 
 def split_preserve(string, sep):
@@ -497,6 +499,8 @@ def add_keywords(dialect):
         two_spacers = LISP_KEYWORDS + SCHEME_KEYWORDS + \
             CLOJURE_KEYWORDS + NEWLISP_KEYWORDS
         return [two_spacers, IF_LIKE]
+    else:
+        return [[], []]
 
 # ************************************************************************************* #
 
@@ -1029,6 +1033,17 @@ def indent_files(arguments=sys.argv[1:]):
 
     for fname in opts.files:
         code = read_file(fname)
+        if not opts.dialect:
+            # Guess dialect from the file extensions if none is specified in the
+            # command line
+            if fname.endswith('.lisp'):
+                opts.dialect = 'lisp'
+            elif fname.endswith('.lsp'):
+                opts.dialect = 'newlisp'
+            elif fname.endswith('.clj'):
+                opts.dialect = 'clojure'
+            elif fname.endswith('.ss') or fname.endswith('.scm'):
+                opts.dialect = 'scheme'
         indent_result = indent_code(code, opts)
         _after_indentation(indent_result, fpath=fname)
 
