@@ -968,7 +968,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
 
     if newlisp_brace_locations:
         for brace in newlisp_brace_locations:
-            message = "\n%s:%d:%d: Unclosed newLISP string"
+            message = "\n%s:%d:%d: Unclosed newLISP brace string"
             if opts.warning:
                 sys.stderr.write(message % (fname, line, column))
 
@@ -993,7 +993,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
 
     if in_newlisp_tag_string:
         message = "\n%s:%d:%d: Tag string extends to end-of-file"
-        tpl = (fname,) + last_quote_location
+        tpl = (fname,) + first_tag_string
         if opts.warning:
             sys.stderr.write(message % tpl)
 
