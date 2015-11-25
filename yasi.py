@@ -598,19 +598,15 @@ def _pop_from_list(bracket, lst, line, real_pos, offset, options, msg_stack):
             }
             msg_stack.append(warning_info)
     else:
-        # If the list if empty and a closing bracket is found, it means we have
+        # If the list is empty and a closing bracket is found, it means we have
         # excess brackets. That warning is issued here. The coordinates used
         # will be slightly or largely off target depending on how much your
         # code was modified when used with compact mode
-        if opts.exit:
-            bpos = real_pos + 1
-        else:
-            bpos = offset + 1
         message = "Unmatched closing bracket `%s'" % bracket
         warning_info = {
             'msg': message,
             'line': line,
-            'column': offset
+            'column': offset + 1
         }
         msg_stack.append(warning_info)
     return lst
