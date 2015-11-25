@@ -163,7 +163,6 @@ class UnitTests(unittest.TestCase):
         source = '(string         {   Hello world                }    " message"))'
         self.assertEqual(16, yasi.find_trim_limit(source, '--dialect=newlisp'))
 
-
     def test_split_preserve_empty_lines_at_EOF(self):
         source = "Tengo una pregunta\nSobre todo \n en este mundo\n\n\n\n\n"
         self.assertEqual(['Tengo una pregunta\n',
