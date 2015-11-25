@@ -606,7 +606,7 @@ def _pop_from_list(bracket, lst, line, real_pos, offset, options, msg_stack):
             bpos = real_pos + 1
         else:
             bpos = offset + 1
-        message = "\n--%s-- %s: Warning: Unmatched `%s' near (%d, %d). "
+        message = "Unmatched closing bracket `%s'" % bracket
         warning_info = {
             'msg': message,
             'line': line,
