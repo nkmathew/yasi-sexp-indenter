@@ -234,7 +234,11 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#1-if-expression.lisp',
                 'after': 'tests/cases/#1-if-expression~.lisp',
                 'options': '--dialect=lisp'
-            },
+            }, {
+                'before': 'tests/cases/#4-flet-indentation.lisp',
+                'after': 'tests/cases/#4-flet-indentation~.lisp',
+                'options': '--dialect=lisp'
+            }
         ]
         for case in cases:
             before_path = os.path.join(PROJECT_DIR, case['before'])

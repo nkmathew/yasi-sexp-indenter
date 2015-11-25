@@ -1,0 +1,8 @@
+(defun example (y l)
+  (flet ((attach (x)
+           (setq l (append l (list x)))))
+    (declare (inline attach))
+    (dolist (x y)
+      (unless (null (cdr x))
+        (attach x)))
+    l))
