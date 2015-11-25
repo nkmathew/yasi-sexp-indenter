@@ -220,7 +220,7 @@ def trim(string):
     return string
 
 
-def find_trim_limit(string):
+def find_trim_limit(string, options=None):
     """ find_trim_limit(string : str) -> int
 
     >>> find_trim_limit(r'(list #\; #\")')
@@ -237,6 +237,7 @@ def find_trim_limit(string):
     quotes. It doesn't consider the multiline comment marker. If your
     code uses multiline comments(#| ... |#), you'll have to use --no-compact mode
     """
+    opts = parse_options(options)
     # Find position of the first unescaped semi colon
     comment_start = re.search(r'([^\\];)|(^;)', string)
     # Find position of the first unescaped double quote
@@ -248,6 +249,13 @@ def find_trim_limit(string):
         # If a semi colon is found, include all the whitespace before it to preserve
         # any aligned comments
         comment_start = re.search('[ \t]*;', string).start() + 1
+
+    # Prevents trimming of newlisp tag strings
+    if opts.dialect == 'newlisp':
+        tag_string_start = string.find('{')
+        if comment_start == -1:
+            # No semicolon found
+            comment_start = tag_string_start
 
     if comment_start != -1 and limit != -1:
         if comment_start < limit:
@@ -346,7 +354,7 @@ def pad_leading_whitespace(string, zero_level, compact, blist, options=None):
     if compact:
         # if compact mode is on, split the string into two, trim the first
         # position and merge the two portions.
-        trim_limit = find_trim_limit(string)
+        trim_limit = find_trim_limit(string, opts)
         comment_line = re.search('^[ \t]*;', string, re.M)
         if comment_line and opts.indent_comments:
             trim_limit = -1
