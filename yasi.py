@@ -799,7 +799,8 @@ def indent_code(original_code, options=None):
                     last_quote_location = (line_number, offset)
                     in_string = True if not in_string else False
                 if opts.dialect == 'newlisp' and not in_string:
-                    # We handle newLISP's multiline strings here
+                    # We handle newLISP's multiline(brace) string here. Brace
+                    # strings can nest
                     if curr_char == '{':
                         newlisp_brace_locations.append((line_number, offset))
                         in_newlisp_string += 1
@@ -970,7 +971,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
         for brace in newlisp_brace_locations:
             message = "\n%s:%d:%d: Unclosed newLISP brace string"
             if opts.warning:
-                sys.stderr.write(message % (fname, line, column))
+                sys.stderr.write(message % (fname, brace[0], brace[1]))
 
     if comment_locations:
         for comment in comment_locations:
