@@ -2,6 +2,8 @@
 
 Bugfixes:
 
+  - Newlisp brace strings being trimmed - **yasi.py**
+
 Features:
 
   - Indentation from standard input - **yasi.py**
