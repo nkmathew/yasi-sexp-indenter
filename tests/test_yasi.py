@@ -159,6 +159,11 @@ class UnitTests(unittest.TestCase):
         source = """(list 1123 ' " ); " 542)"""
         self.assertEqual(14, yasi.find_trim_limit(source))
 
+    def test_find_trim_limit_newlisp_tag_string(self):
+        source = '(string         {   Hello world                }    " message"))'
+        self.assertEqual(16, yasi.find_trim_limit(source, '--dialect=newlisp'))
+
+
     def test_split_preserve_empty_lines_at_EOF(self):
         source = "Tengo una pregunta\nSobre todo \n en este mundo\n\n\n\n\n"
         self.assertEqual(['Tengo una pregunta\n',
@@ -221,7 +226,7 @@ class SystemTests(unittest.TestCase):
             {
                 'before': 'tests/cases/#3-multiple-value-bind.lisp',
                 'after': 'tests/cases/#3-multiple-value-bind~.lisp',
-                'options': '--uniform'
+                'options': '--uniform --dialect=lisp'
             }, {
                 'before': 'tests/cases/#2-multiple-value-bind.lisp',
                 'after': 'tests/cases/#2-multiple-value-bind~.lisp',
@@ -229,7 +234,7 @@ class SystemTests(unittest.TestCase):
             }, {
                 'before': 'tests/cases/#1-if-expression.lisp',
                 'after': 'tests/cases/#1-if-expression~.lisp',
-                'options': ''
+                'options': '--dialect=lisp'
             },
         ]
         for case in cases:
