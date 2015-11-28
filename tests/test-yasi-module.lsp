@@ -19,7 +19,7 @@
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ;; Imports
-(load (string (get-parent-path (script-dir "test-yasi-module.lsp")) "\\yasi-module.lsp"))
+(load (string (get-parent-path (script-dir "test-yasi-module.lsp")) "\\yasim.lsp"))
 (load (string (script-dir "test-yasi-module.lsp") "nl-unittest.lsp"))
 
 ;; Unit test library settings

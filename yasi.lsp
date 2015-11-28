@@ -1,16 +1,17 @@
 #!/usr/bin/newlisp
 ;; @author nkmathew <kipkoechmathew@gmail.com>
 
-;; Load 'yasi-module.lsp' using the absolute path so that running it from another
+;; Load 'yasim.lsp' using the absolute path so that running it from another
 ;; directory other than the project folder root will not raise an error like:
-;; ERR: problem accessing file in function load : "yasi-module.lsp"
+;; ERR: problem accessing file in function load : "yasim.lsp"
 
 ;; Returns the directory of the currently running script
 (define (script-dir script-name)
  (let (script-path (real-path (main-args 1)))
   (replace (string script-name "\$") script-path "" 0)))
 
-(load (string (script-dir "yasi.lsp") "yasi-module.lsp"))
+;; Import module
+(load (string (script-dir "yasi.lsp") "yasim.lsp"))
 
 ;; newlisp includes everything typed in the command line in $main-args
 ;; ("newlisp" "yasi.lsp")
