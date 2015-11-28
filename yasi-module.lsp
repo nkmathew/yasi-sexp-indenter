@@ -24,27 +24,41 @@
 
 ;; ****************************************************************************************
 (define *help* (string [text]
- _________________________________________________________________________________________________________________
-|    Usage: newlisp yasi.lsp [[<file>] [--backup-dir<directory>] [--no-compact] [--no-backup] [--no-warning]      |
-|                   [--clojure] [--lisp] [--scheme] [--default-indent <num>]]                                     |
-|            -nb,    --no-backup     # Don't create a backup file even if --backup-dir is specified               |
-|            -nc,    --no-compact    # Try to preserve the structure of the file.                                 |
-|            -nw,    --no-warning    # Don't issue warnings                                                       |
-|            -ne,    --no-exit       # Instructs the program to exit when a warning is raised. True by default    |
-|            -uni,   --uniform       # Dictates whether the if-clause and else-clause of an if-like block should  |
-|                                       have the same indent level. False by default                              |
-|            -no,    --no-output     # Suppress output of the indented code                                       |
-|            -nm,    --no-modify     # Don't modify the file                                                      |
-|            --backup-dir            # The directory where the backup file is to be written                       |
-|            --clojure               # Use Clojure keywords                                                       |
-|            --lisp                  # Use Lisp keywords                                                          |
-|            --newlisp               # Use newLISP keywords                                                       |
-|            --scheme                # Use Scheme keywords                                                        |
-|            --default-indent <num>  # The indent level to be used in case a                                      |
-|                                    function's argument is in the next line. Vim uses 2, the most common being 1.|
-|            --indent-comments, -ic  # False by default. If true, comment lines will be indented possibly         |
-|                                        messing with any deliberate comment layout                               |
-+-----------------------------------------------------------------------------------------------------------------+
+usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
+            [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-di DEFAULT_INDENT]
+            [-ic] [-uni]
+            [files [files ...]]
+
+Dialect-aware s-expression indenter
+
+positional arguments:
+  files                 List of files to be indented. Will indent from
+                        standard input if no files are specified
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -nc, --no-compact     Do not compact the code, just indent
+  -nb, --no-backup      Do not create a backup file even if --backup-dir is
+                        specified
+  -nm, --no-modify      Do not modify the file
+  -nw, --no-warning     Do not display warnings
+  -no, --no-output      Suppress output of the indented code
+  -ne, --no-exit        Instructs the program not to exit when a warning is
+                        raised.
+  -o OUTPUT_FILE        Path/name of output file
+  --dialect DIALECT     Use Scheme keywords
+  -v, --version         Prints script version
+  -bd BACKUP_DIR, --backup-dir BACKUP_DIR
+                        The directory where the backup file is to be written
+  -di DEFAULT_INDENT, --default-indent DEFAULT_INDENT
+                        The indent level to be used in case a function's
+                        argument is in the next line. Vim uses 2, the most
+                        common being 1.
+  -ic, --indent-comments
+                        If true, comment lines will be indented possibly
+                        messing with any deliberate comment layout
+  -uni, --uniform       Dictates whether the if-clause and else-clause of an
+                        if-likeblock should have the same indent level.
 [/text]))
 
 
