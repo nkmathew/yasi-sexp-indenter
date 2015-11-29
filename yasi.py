@@ -287,13 +287,13 @@ def is_macro_name(func_name, dialect):
     if not func_name:
         return False
     if dialect == 'lisp':
-        return re.search('macro|def|do|with-', func_name, re.I)
+        return re.search('^(macro|def|do|with-)', func_name, re.I)
     if dialect == 'scheme':
-        return re.search('call-|def|with-', func_name)
+        return re.search('^(call-|def|with-)', func_name)
     if dialect == 'clojure':
-        return re.search('def|with', func_name)
+        return re.search('^(def|with)', func_name)
     if dialect == 'newlisp':
-        return re.search('macro|def', func_name)
+        return re.search('^(macro|def)', func_name)
     else:
         return False
 

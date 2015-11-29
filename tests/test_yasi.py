@@ -190,6 +190,9 @@ class UnitTests(unittest.TestCase):
                           'Sobre todo \n',
                           ' en este mundo\n'], yasi.split_preserve(source, '\n'))
 
+    def test_is_macro_name_not_actual_macro(self):
+        self.assertFalse(yasi.is_macro_name('files-with-code', 'lisp'))
+
     def test_is_macro_name_newlisp_macros(self):
         newlisp_macro_list = [
         ]
@@ -237,6 +240,10 @@ class SystemTests(unittest.TestCase):
             }, {
                 'before': 'tests/cases/#4-flet-indentation.lisp',
                 'after': 'tests/cases/#4-flet-indentation~.lisp',
+                'options': '--dialect=lisp'
+            }, {
+                'before': 'tests/cases/#5-looks-like-a-macro.lisp',
+                'after': 'tests/cases/#5-looks-like-a-macro~.lisp',
                 'options': '--dialect=lisp'
             }
         ]
