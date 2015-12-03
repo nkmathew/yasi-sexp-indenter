@@ -99,6 +99,7 @@ def parse_options(arguments=None):
     if args.dialect not in ['lisp', 'newlisp', 'clojure', 'scheme', 'all', '']:
         parser.error("`{0}' is not a recognized dialect".format(args.dialect))
 
+    args.backup_dir = os.path.expanduser(args.backup_dir)
     if not os.path.exists(args.backup_dir):
         parser.error("Directory `{0}' does not exist".format(args.backup_dir))
 
