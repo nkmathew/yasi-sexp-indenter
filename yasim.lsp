@@ -1,31 +1,185 @@
 #!/usr/bin/newlisp
-;; @author    nkmathew <kipkoechmathew@gmail.com>
-;; @started   20th November 2013
-;; @Finished  4th December 2013
+;; @author nkmathew <kipkoechmathew@gmail.com>
+;; @date 20th November 2013
 
 ;; Translated from the python version.
 
 (define __version__ "0.1.0")
 
-(define (lisp-dialect lst)
-  "Tells the Lisp dialect specified from the list provided, usually
-  command line arguments. Defaults to all if non is specified"
-  (or (catch
-        (dolist (arg lst)
-          (case arg
-            ("--clojure" (throw "Clojure"))
-            ("--lisp"    (throw "Common Lisp"))
-            ("--newlisp" (throw "newLISP"))
-            ("--scheme"  (throw "Scheme"))))) "All"))
+(define [backup-dir] 0)
+(define [default-indent] 1)
+(define [dialect] 2)
+(define [files] 3)
+(define [indent-comments] 4)
+(define [backup] 5)
+(define [compact] 6)
+(define [warning] 7)
+(define [modify] 8)
+(define [output] 9)
+(define [uniform] 10)
+
+(define [message] 0)
+(define [line] 1)
+(define [column] 2)
+
+(define (parse-args (arguments))
+  " Reads command-line arguments. The arguments can be in a flat list or a string
+    Commandline arguments will instead be read from if no arguments are passed in
+    the function call
+  "
+  (letn ((bool? (lambda (val)
+                  (or (= nil val) (= true val))))
+         (to-integer
+          (lambda (str (default-num 1))
+            (let (num (int str))
+              (if (null? num)
+                  default-num
+                num))))
+         (option-arg?
+          (lambda (arg)
+            (or
+             (zero? (find "--dialect" arg))
+             (zero? (find "-bd" arg))
+             (zero? (find "--backup-dir" arg))
+             (zero? (find "-nb" arg))
+             (zero? (find "--no-backup" arg))
+             (zero? (find "-nc" arg))
+             (zero? (find "--no-compact" arg))
+             (zero? (find "-no" arg))
+             (zero? (find "--no-output" arg))
+             (zero? (find "-nm" arg))
+             (zero? (find "--no-modify" arg))
+             (zero? (find "-uni" arg))
+             (zero? (find "--uniform" arg))
+             (zero? (find "-ic" arg))
+             (zero? (find "--indent-comments" arg)))))
+         (option-list?
+          (lambda (lst)
+            (and
+             (> (length lst) 8) ;; There are at least 8 options right now
+             (list? lst)
+             (string? (lst [backup-dir]))
+             (number? (lst [default-indent]))
+             (string? (lst [dialect]))
+             (list? (lst [files]))
+             (bool? (lst [indent-comments]))
+             (bool? (lst [backup]))
+             (bool? (lst [compact]))
+             (bool? (lst [warning]))
+             (bool? (lst [modify])))))
+         (options (list (real-path) 1 "" '() nil nil true true true true nil))
+         (arguments
+          (if (string? arguments)
+              (parse arguments)
+            (if (list? arguments)
+                arguments
+              (if (null? arguments)
+                  (slice $main-args 2)
+                '())))))
+    (if (option-list? arguments)
+        arguments
+      (let ((i 0) (option-arg-encountered nil))
+        (while (!= i (length arguments))
+          (set 'curr (arguments i))
+          (set 'prev (arguments (if (zero? i) 0 (- i 1))))
+          (++ i)
+          (when (option-arg? curr)
+            (set 'option-arg-encountered true))
+          ;; (when (= prev curr)
+          ;;   (set 'curr ""))
+          (if (not option-arg-encountered)
+              ;; Anything not an argument is considered the path of a file to be
+              ;; formatted
+              (unless (empty? curr)
+                (push curr (options [files])))
+            (let ((indent-pair
+                   (if (or (and (null? (find "--default-indent" prev))
+                                (zero? (find "--default-indent" curr)))
+                           (and (null? (find "-di" prev))
+                                (zero? (find "-di" curr))))
+                       ;; The "--backup-dir" string is at the end of the arg list
+                       (list curr "")
+                     (if (or (zero? (find "--di" prev))
+                             (zero? (find "--default-indent" prev)))
+                         (list prev curr)
+                       (list "" ""))))
+                  (backup-dir-pair
+                   (if (or (and (null? (find "--backup-dir" prev))
+                                (zero? (find "--backup-dir" curr)))
+                           (and (null? (find "-bd" prev))
+                                (zero? (find "-bd" curr))))
+                       ;; The "--backup-dir" string is at the end of the arg list
+                       (list curr "")
+                     (if (or (zero? (find "-bd" prev))
+                             (zero? (find "--backup-dir" prev)))
+                         (list prev curr)
+                       (list "" ""))))
+                  (dialect-pair
+                   (if (and (null? (find "--dialect" prev))
+                            (zero? (find "--dialect" curr)))
+                       ;; The "--dialect" string is at the end of the arg list
+                       (list curr "")
+                     (if (zero? (find "--dialect" prev))
+                         (list prev curr)
+                       (list "" "")))))
+              (when (not (empty? (indent-pair 0)) (empty? (indent-pair 1)))
+                (let ((lst (parse (dialect-pair 0) "=")))
+                  (if (= 1 (length lst))
+                      ;; No characters after the equal sign (no dialect specified)
+                      (setq (options [default-indent]) (to-integer (indent-pair 1) 1))
+                    (setq (options [default-indent]) (to-integer (join (rest lst)
+                                                                       "=") 1)))))
+              (when (not (empty? (dialect-pair 0)) (empty? (dialect-pair 1)))
+                (let ((lst (parse (dialect-pair 0) "=")))
+                  (if (= 1 (length lst))
+                      ;; No characters after the equal sign (no dialect specified)
+                      (setq (options [dialect]) (dialect-pair 1))
+                    (setq (options [dialect]) (join (rest lst) "=")))))
+              (when (not (empty? (backup-dir-pair 0)) (empty? (backup-dir-pair 1)))
+                (let ((lst (parse (backup-dir-pair 0) "=")))
+                  (if (= 1 (length lst))
+                      ;; No characters after the equal sign (no directory specified)
+                      (setq (options [backup-dir]) (backup-dir-pair 1))
+                    (setq (options [backup-dir]) (join (rest lst) "=")))))
+              (case curr
+                ("-nc" (setq (options [compact]) nil))
+                ("--no-compact" (setq (options [compact]) nil))
+                ("-nb" (setq (options [backup]) nil))
+                ("--no-backup" (setq (options [backup]) nil))
+                ("-nm" (setq (options [modify]) nil))
+                ("--no-modify" (setq (options [modify]) nil))
+                ("-uni" (setq (options [uniform]) true))
+                ("--uniform" (setq (options [uniform]) true))
+                ("-ic" (setq (options [indent-comments]) true))
+                ("--indent-commens" (setq (options [indent-comments]) true))
+                ("--no-warning" (setq (options [warning]) nil))
+                ("--nw" (setq (options [warning]) nil))
+                ))))
+        options))))
+
+(define (print-args arg)
+  (let (arg-list (parse-args arg))
+    (println "backup dir: "      (arg-list [backup-dir]))
+    (println "default indent: "  (arg-list [default-indent]))
+    (println "dialect: "         (arg-list [dialect]))
+    (println "files: "           (arg-list [files]))
+    (println "indent comments: " (arg-list [indent-comments]))
+    (println "backup: "          (arg-list [backup]))
+    (println "compact: "         (arg-list [compact]))
+    (println "warning: "         (arg-list [warning]))
+    (println "modify: "          (arg-list [modify]))
+    (println "output: "          (arg-list [output]))
+    (println "uniform: "         (arg-list [uniform]))
+    (println "")))
 
 
-(define (fprint)
+(define (printf)
   (println (format (args 0) (rest (args)))))
 
 ;; ****************************************************************************************
 (define *help* (string [text]
 usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
-            [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-di DEFAULT_INDENT]
+            [--dialect DIALECT] [-v] [-bd backup-dir] [-di default-indent]
             [-ic] [-uni]
             [files [files ...]]
 
@@ -48,9 +202,9 @@ optional arguments:
   -o OUTPUT_FILE        Path/name of output file
   --dialect DIALECT     Use Scheme keywords
   -v, --version         Prints script version
-  -bd BACKUP_DIR, --backup-dir BACKUP_DIR
+  -bd backup-dir, --backup-dir backup-dir
                         The directory where the backup file is to be written
-  -di DEFAULT_INDENT, --default-indent DEFAULT_INDENT
+  -di default-indent, --default-indent default-indent
                         The indent level to be used in case a function's
                         argument is in the next line. Vim uses 2, the most
                         common being 1.
@@ -66,16 +220,18 @@ optional arguments:
 ;; GLOBAL CONSTANTS::
 
 (define *stderr* 2)
-(define *character* 0)
-(define *line-number* 1)
-(define *bracket-pos* 2)
-(define *indent-level* 3)
-(define *func-name* 4)
-(define *spaces* 5)
+(define [character] 0)
+(define [line-number] 1)
+(define [bracket-pos] 2)
+(define [indent-level] 3)
+(define [func-name] 4)
+(define [spaces] 5)
 
 (define *CR* "\r")
 (define *LF* "\n")
 (define *CRLF* "\r\n")
+
+(define *os-sep* (if (= ostype "Win32") "\\" "/"))
 
 ;; Keywords that indent by two spaces
 (define *scheme-keywords*
@@ -123,100 +279,48 @@ optional arguments:
 ;; Keywords that indent by one space
 (define *one-space-indenters* '("call-with-port"))
 
-;; ------ Command line options: ----------------------------------------------
-
-(define *backup*
-  (if (or (find "--no-backup"  $main-args) (find "-nb" $main-args))
-      nil
-    true))
-
-(define *exit*
-  (if (or (find "--no-exit"    $main-args) (find "-ne" $main-args))
-      nil
-    true))
-
-(define *output*
-  (if (or (find "--no-output"  $main-args) (find "-no" $main-args))
-      nil
-    true))
-
-(define *uniform*
-  (if (or (find "--uniform"    $main-args) (find "-uni" $main-args))
-      true
-    nil))
-
-(define *warn*
-  (if (or (find "--no-warning" $main-args) (find "-nw" $main-args))
-      nil
-    true))
-
-(define *modify*
-  (if (or (find "--no-modify"  $main-args) (find "-nm" $main-args))
-      nil
-    true))
-
-(define *compact*
-  (if (or (find "--no-compact"  $main-args) (find "-nc" $main-args))
-      nil
-    true))
-
-(define *indent-comments*
-  (if (or (find "--indent-comments"  $main-args) (find "-ic" $main-args))
-      true
-    nil))
-
-;; -----------------------------------------------------------------------------
-
 ;; The 'if' and 'else' part of an if block should have different indent levels so
 ;; that they can stand out since there's no else Keyword in Lisp/Scheme to make
-;; this explicit.  list IF_LIKE helps us track these keywords.
+;; this explicit. list IF_LIKE helps us track these keywords.
 (define *if-like*
-  '("if"
-    ))
-
-(define *dialect* (lisp-dialect $main-args))
-
-(cond
- ((= "Common Lisp" *dialect*)
-  (set '*two-space-indenters* *lisp-keywords*)
-  (set '*if-like* (append '("multiple-value-bind" "destructuring-bind" "do" "do*")  *if-like*)))
- ((= *dialect* "Scheme")
-  (set '*two-space-indenters* *scheme-keywords*)
-  (set '*if-like* (append '("with-slots" "do" "do*")  *if-like*)))
- ((= *dialect* "Clojure")
-  (set '*two-space-indenters* *clojure-keywords*)
-  (set '*if-like* (append '() *if-like*)))
- ((= *dialect* "newLISP")
-  (set '*two-space-indenters* *newlisp-keywords*)
-  (set '*if-like* (append '() *if-like*)))
- ((= *dialect* "All")
-  (set '*two-space-indenters* (append *lisp-keywords* *scheme-keywords*
-                                      *clojure-keywords* *newlisp-keywords*))))
+  '("if"))
 
 
-(define *default-indent* 1)
-(let (pos (find "--default-indent" $main-args))
-  (when pos
-    (when (> (length $main-args) pos)
-      (set '*default-indent* (or (int (main-args (++ pos))) 1)))))
+(define (add-keywords dialect)
+  (cond
+   ((= "lisp" dialect)
+    (set 'lisp-if-like
+         (append
+          '("multiple-value-bind" "destructuring-bind" "do" "do*") *if-like*))
+    (list *lisp-keywords* lisp-if-like))
+   ((= dialect "scheme")
+    (set 'scheme-if-like (append '("with-slots" "do" "do*")  *if-like*))
+    (list *scheme-keywords* scheme-if-like))
+   ((= dialect "clojure")
+    (list *clojure-keywords* *if-like*))
+   ((= dialect "newlisp")
+    (list *newlisp-keywords* *if-like*))
+   ((= dialect "all")
+    (list
+     (append *lisp-keywords* *scheme-keywords*
+             *clojure-keywords* *newlisp-keywords*) *if-like*))
+   (true '(() ()))))
 
 ;; ---------------------------------------------------------------------------------------
+
+(define (warning warning-message message-format options)
+  (letn ((opts (parse-args options)))
+    (when (opts [warning])
+      (write *stderr* (format warning-message message-format)))))
 
 
 (define (read-file! filename)
   "Exits if the filename provided does not exist"
   (if (file? filename)
       (read-file filename)
-    (issue-warning "--%s-- Exiting. Filename `%s' is not valid"
-                   (list (current-time) filename) *warn* true filename))) ;; Exit if the filename is invalid
-
-
-(define (issue-warning warning-message message-format warn? exit-after-warning? fname)
-  (when warn?
-    (write *stderr* (format warning-message message-format)))
-  (when exit-after-warning?
-    (write *stderr* (format "\n--%s-- Exiting. File `%s' unchanged. . .\n" (cons (current-time) fname)))
-    (exit)))
+    (warning "--%s-- Exiting. Filename `%s' is not valid"
+                   ;; Exit if the filename is invalid
+             (list (current-time) filename))))
 
 
 (define (current-time)
@@ -233,32 +337,23 @@ optional arguments:
     (format "%s:%s:%s" (to-string minutes) (to-string seconds) (slice (to-string micro-seconds) 0 2))))
 
 
-(define (get-backup-directory lst fname)
-  "Returns the backup directory from the command line argument list"
-  (if (find "--backup-dir" lst)
-      (let (backup-dir (lst (++ (find "--backup-dir" lst))))
-        (if (directory? backup-dir)
-            (real-path backup-dir) ;; Return the full path to the backup dir
-          (issue-warning "\n--%s-- `%s' : Warning: The directory `%s' is unusable for backup. "
-                         (list (current-time) fname backup-dir) *warn* *exit* fname)))
-    nil))
-
-
 (define (filename-from-path path)
   " Returns the filename by splitting the file path along a slash "
-  (letn ((lst (parse path (if (= ostype "Win32")
-                              "\\"
-                            "/"))))
-    (last lst)))
+  (letn ((lst (parse path *os-sep*)))
+    (if (null? lst) "" (last lst))))
 
 
-(define (backup-source-file! filename backup-dir exit-on-error?)
+(define (backup-source-file! filename options)
   "Creates a copy of the file to be indented"
+  (set 'opts (parse-args options))
+  (set 'backup-dir (opts [backup-dir]))
   (unless (file? filename)
-    (issue-warning "--%s-- Warning: File `%s' does not exist" (list (current-time) filename) *warn* true filename))
+    (warning "--%s-- Warning: File `%s' does not exist"
+             (list (current-time) filename) (opts [warning]) true filename))
   (unless (directory? backup-dir)
-    (issue-warning "--%s-- `%s': Warning: Directory `%s' does not exist" (list (current-time) filename backup-dir) *warn* true filename))
-  (let (backup-name (string backup-dir {\} ;; Change to forward slash in Unix
+    (warning "--%s-- `%s': Warning: Directory `%s' does not exist"
+             (list (current-time) filename backup-dir) (opts [warning]) true filename))
+  (let (backup-name (string backup-dir "\\" ;; Change to forward slash in Unix
                             ;; Build the backup file name
                             (filename-from-path filename) ".yasi.bak~"))
     (copy-file filename backup-name)))
@@ -308,9 +403,9 @@ optional arguments:
 
 
 (define (split-preserve str sep)
-  "Split the string into a list but preserve the separator in
- every split string in the list without introducing new characters.
- "
+  " Split the string into a list but preserve the separator in
+  every split string in the list without introducing new characters.
+  "
   (let ((str-list (parse str sep))
         (map-separator (lambda (separator lst)
                          (map (lambda (_)
@@ -329,7 +424,7 @@ optional arguments:
 
 
 (define (find-line-ending str)
-  "Find the line ending of the file by simply testing for existence of
+  " Find the line ending of the file by simply testing for existence of
   the three possible line endings hoping that the line endings are not mixed
   up in the file"
   (letn ((CR "\r")
@@ -342,26 +437,26 @@ optional arguments:
 
 
 (define (is-macro-name? func-name dialect)
-  "Going to be used to determine whether the form should be indented by two spaces- since
+  " Going to be used to determine whether the form should be indented by two spaces- since
   almost all macros do- using the dialect's conventions. "
   (and (cond
         ((null? func-name) nil)
-        ((= dialect "Common Lisp") (regex "macro|def|do|with-" func-name 0))
-        ((= dialect "Scheme")      (regex "call-|def|with-" func-name 0))
-        ((= dialect "Clojure")     (regex "def|with" func-name 0))
-        ((= dialect "newLISP")     (regex "macro|def" func-name 0)))
+        ((= dialect "lisp")     (regex "^(macro|def|do|with-)" func-name 0))
+        ((= dialect "scheme")   (regex "^(call-|def|with-)" func-name 0))
+        ((= dialect "clojure")  (regex "^(def|with)" func-name 0))
+        ((= dialect "newlisp")  (regex "^(macro|def)" func-name 0)))
        true)) ;; Return true if any of the regexes above match
 
 
 (define (all-whitespace? str)
-  "Returns true if the line has only whitespace to the end. Such a line
-  should not be messed with. If you don't want any whitespace to be preserved,
-  make the function return true for every value"
+  " Returns true if the line has only whitespace to the end. Such a line
+   should not be messed with. If you don't want any whitespace to be preserved,
+   make the function return true for every value"
   (and (regex "^[ \t]*(\r|\n|$)" str 0) true))
 
 
 (define (find-trim-limit str)
-  "Returns the maximum index to stop trimming at so that we don't alter the structure
+  " Returns the maximum index to stop trimming at so that we don't alter the structure
   of strings ot comments that might have been layed out in some manner"
   (letn ((comment-start (regex {([^\\];)|(^;)} str 0)) ;; find first semicolon
          (limit (regex {([^\\]")|(^")} str 0)) ;; find first double quote
@@ -389,8 +484,8 @@ optional arguments:
 
 
 (define (pad-leading-whitespace str zero-level compact? blist)
-  "Indents the correct number of whitespace before the line using the current
-indent level and the zero level"
+  " Indents the correct number of whitespace before the line using the current
+  indent level and the zero level"
   (let ((str
          (if compact?
              (letn ((trim-limit (if (regex "^[ \t]*;" str 0)
@@ -410,25 +505,30 @@ indent level and the zero level"
       (list str 0))))
 
 
-(define (indent zero-level bracket-list line in-comment? in-symbol-region?)
-  (letn ((comment-line (if *indent-comments*
+(define (indent-line zero-level bracket-list line in-comment? in-symbol-region?
+                     options)
+  (letn ((opts (parse-args options))
+         (comment-line (if (opts [indent-comments])
                            nil
                          (regex "^[ \t]*;" line 0)))
          (leading-spaces (regex "^[ \t]+[^; )\n\r]" line))
          (zero-level
-          (if (and (not *compact*) (zero? zero-level) (empty? bracket-list) (zero? in-comment?))
+          (if (and (not (opts [compact])) (zero? zero-level)
+                   (empty? bracket-list) (zero? in-comment?))
               (if leading-spaces (- (leading-spaces 2) 1) 0)
             zero-level)))
     (if in-symbol-region?
-      (list zero-level line 0)
+        (list zero-level line 0)
       (if (and (not comment-line) (not (all-whitespace? line)))
-          (push zero-level (pad-leading-whitespace line zero-level *compact* bracket-list))
+          (push zero-level
+                (pad-leading-whitespace line zero-level (opts [compact]) bracket-list))
         (list zero-level line 0)))))
 
 
-(define (find-first-arg-pos curr-pos str)
+(define (find-first-arg-pos curr-pos str options)
   (let ((leading-spaces 0)
-        (substr (slice str (+ 1 curr-pos))))
+        (substr (slice str (+ 1 curr-pos)))
+        (opts (parse-args options)))
     (if (regex "^[ \t]*($|\r)" substr)
         (list 1 leading-spaces) ;; Return
       (if (and (!= curr-pos (-- (length str))) (= " " (str (+ 1 curr-pos))))
@@ -450,7 +550,7 @@ indent level and the zero level"
                    (first-space (or (find " " substr-1) 0)))
               (if (regex "^[ \t]*(#\\||;|$|\r)" (slice substr
                                                        (+ first-space space-end)))
-                  (list (+ leading-spaces *default-indent*) leading-spaces) ;; Return if comment found
+                  (list (+ leading-spaces (opts [default-indent])) leading-spaces) ;; Return if comment found
                 (list arg-pos leading-spaces)))) ;; Return if first argument found
         (letn ((space-regex (regex " +([^)}\n\r])|( *(\\(|\\[|{))" substr))
                ;;; No space after bracket. The first argument is simply after the
@@ -460,62 +560,63 @@ indent level and the zero level"
               (set 'arg-pos (+ (space-regex 1) (space-regex 2)))
             (set 'arg-pos 1))
           (if (regex "^[\t ]*(;|$|\r)" (slice substr first-space))
-              (list (+ *default-indent* leading-spaces) leading-spaces)
+              (list (+ (opts [default-indent]) leading-spaces) leading-spaces)
             (list arg-pos leading-spaces))))))) ;; Return
 
 
-(define (pop-from-list bracket lst fname line real-pos offset)
+(define (pop-from-list bracket lst fname line real-pos offset options msg-stack)
+  (set 'opts (parse-args options))
   (if lst
       (letn ((popped-list (pop lst))
-             (popped-bracket (popped-list *character*))
-             (popped-offset (popped-list *indent-level*))
-             (line-number (popped-list *line-number*))
+             (popped-bracket (popped-list [character]))
+             (popped-offset (popped-list [indent-level]))
+             (line-number (popped-list [line-number]))
              (correct-closer
               (cond
                ((= bracket "]") "[")
                ((= bracket ")") "(")
                (true "{"))))
         (when (!= popped-bracket correct-closer)
-          (issue-warning "\n--%s-- %s: Warning: Bracket `%s' at (%d, %d) does not match `%s' at (%d, %d)"
-                         (list (current-time) fname popped-bracket line-number popped-offset bracket line real-pos)
-                         *warn* *exit* fname)))
-    (let ((bpos
-           (if *exit*
-               (+ 1 real-pos)
-             (+ 1 offset))))
-      (issue-warning "\n--%s-- %s: Warning: Unmatched `%s' near (%d, %d). "
-                     (list (current-time) fname bracket line bpos) *warn* *exit* fname)))
-  lst)
+          (push (list line-number popped-offset
+                      (format "Bracket `%s' does not match `%s' at (%d, %d)"
+                              popped-bracket bracket line real-pos)) msg-stack)))
+    (let ()
+      (push (list line (+ 1 offset)
+                  (format "Unmatched closing bracket `%s'" bracket)) msg-stack)))
+  (list lst msg-stack))
 
 
 (define (push-to-list lst func-name bracket line offset first-arg-pos first-item
-                      in-list-literal? leading-spaces)
+                      in-list-literal? leading-spaces options)
   (let ((position-list (list bracket line offset
                              (+ first-arg-pos offset) func-name 0))
-        (two-spacer (or (find func-name *two-space-indenters*)
-                        (is-macro-name? func-name *dialect*))))
+        (opts (parse-args options))
+        (keywords (add-keywords (opts [dialect])))
+        (two-spacer (or (is-macro-name? func-name (opts [dialect]))
+                        (find func-name (keywords 0)))))
     (cond
      ((or in-list-literal? (= bracket "{")
-          (and (= *dialect* "Clojure") (= bracket "[")))
-      (setf (position-list *indent-level*) (+ 0 first-item)))
-     ((find func-name *if-like*)
-      (setf (position-list *indent-level*) (+ leading-spaces (if *uniform*
+          (and (= (opts [dialect]) "clojure") (= bracket "[")))
+      (setf (position-list [indent-level]) (+ 0 first-item)))
+     ((find func-name (keywords 1))
+      (setf (position-list [indent-level]) (+ leading-spaces (if (opts [uniform])
                                                                  (+ offset 2)
                                                                (+ offset 4)))))
      ((and (find func-name *one-space-indenters*)
            (not (empty? func-name))) (+ 1 leading-spaces offset))
      ((and two-spacer (not (empty? func-name)))
-      (setf (position-list *indent-level*) (+ 2 leading-spaces offset))))
+      (setf (position-list [indent-level]) (+ 2 leading-spaces offset))))
     (push position-list lst)
     (when (>= (length lst) 3)
-      (let (parent-func ((lst 2) *func-name*))
+      (let (parent-func ((lst 2) [func-name]))
         (when (find parent-func '("flet" "labels" "macrolet"))
-          (setf ((first lst) *indent-level*) (+ 2 offset)))))
+          (setf ((first lst) [indent-level]) (+ 2 offset)))))
     lst))
 
 
-(define (indent-code original-code fpath)
-  (letn ((fname (filename-from-path fpath))
+(define (indent-code original-code options)
+  (letn ((opts (parse-args options))
+         (keywords (add-keywords (opts [dialect])))
          (in-comment? 0) ;; Multiline comment
          (in-newlisp-string? 0)
          (in-newlisp-tag-string? nil)
@@ -532,6 +633,7 @@ indent level and the zero level"
          (indented-code "")
          (bracket-locations '())
          (comment-locations '())
+         (message-stack '())
          (not-zero? (lambda (val)
                       (not (zero? val))))
          (in-symbol-region? (or in-newlisp-tag-string? in-string? (not-zero? in-comment?) in-symbol-with-space?
@@ -539,8 +641,8 @@ indent level and the zero level"
     (dolist (line code-lines)
       (letn ((escaped? nil)
              (curr-line line)
-             (indent-result (indent zero-level bracket-locations line in-comment?
-                                    in-symbol-region?))
+             (indent-result (indent-line zero-level bracket-locations line in-comment?
+                                         in-symbol-region?))
              (curr-line (indent-result 1))
              (indent-level (indent-result 2))
              (offset 0))
@@ -552,8 +654,8 @@ indent level and the zero level"
          (dostring (chr curr-line)
            (letn ((next-char (slice curr-line (+ 1 offset) 1))
                   (prev-char (if (zero? offset)
-                                  ;; using slice to get the previous character
-                                  ;; won't always work.
+                                 ;; using slice to get the previous character
+                                 ;; won't always work.
                                  ""
                                (nth (- offset 1) curr-line)))
                   (substr (slice curr-line (+ 1 offset)))
@@ -561,13 +663,18 @@ indent level and the zero level"
              (if escaped?
                  (set 'escaped? nil)
                (begin
-                 (when (and (= curr-char "\\") (not in-newlisp-tag-string?) (zero? in-newlisp-string?))
-                   (set 'escaped? true)) ;; The backslash only escapes when not in raw strings
-                 (when (and (= curr-char ";") (not in-symbol-region?) (not (and (= "#" prev-char) (= *dialect* "Scheme"))))
+                 (when (and (= curr-char "\\") (not in-newlisp-tag-string?)
+                            (zero? in-newlisp-string?))
+                   ;; The backslash only escapes when not in raw strings
+                   (set 'escaped? true))
+                 (when (and (= curr-char ";") (not in-symbol-region?)
+                            (not (and (= "#" prev-char)
+                                      (= (opts [dialect]) "scheme"))))
                    (throw)) ;; Skip to the next line
-                 (when (and (not (find *dialect* '("Clojure" "newLISP"))) (= "|" curr-char) (not in-string?))
-                    ;; Take care of multiline comments when the dialect is not
-                    ;; Clojure or newLISP
+                 (when (and (not (find (opts [dialect]) '("clojure" "newlisp")))
+                            (= "|" curr-char) (not in-string?))
+                   ;; Take care of multiline comments when the dialect is not
+                   ;; Clojure or newLISP
                    (cond
                     ((and (= "#" prev-char) (not in-symbol-with-space?))
                      (++ in-comment?)
@@ -584,25 +691,24 @@ indent level and the zero level"
                          (set 'last-symbol-location (list line-number offset))
                          (set 'in-symbol-with-space? true))))))
                  (when (not (or in-symbol-with-space? (not-zero? in-comment?) in-newlisp-tag-string?))
-                    ;; Deal with strings here
+                   ;; Deal with strings here
                    (when (= "\"" curr-char)
-                     (set 'last-quote-location (list fname line-number offset))
+                     (set 'last-quote-location (list line-number offset))
                      (set 'in-string? (if (not in-string?)
                                           true
                                         nil)))
-                   (when (and (not in-string?) (= *dialect* "newLISP"))
+                   (when (and (not in-string?) (= (opts [dialect]) "newlisp"))
                      (when (= "{" curr-char)
                        (push (list line-number offset) newlisp-brace-locations)
                        (++ in-newlisp-string?))
                      (when (= "}" curr-char)
                        (if newlisp-brace-locations
                            (pop newlisp-brace-locations)
-                         (issue-warning "--%s-- `%s': Warning: Attempt to close a non-existent string\n"
-                                        (list (current_time) fname)
-                                        *warn* *exit* fname))
+                         (push (list "Attempt to close a non-existent newLISP string"
+                                     line-number offset) message-stack))
                        (-- in-newlisp-string?))))
-                 (when (and (= curr-char "[") (= *dialect* "newLISP") (zero? in-newlisp-string?) (not in-string?))
-                    ;; Deal with newLISP's tag strings here
+                 (when (and (= curr-char "[") (= (opts [dialect]) "newlisp") (zero? in-newlisp-string?) (not in-string?))
+                   ;; Deal with newLISP's tag strings here
                    (when (regex "\\[text\\]" (slice curr-line offset 7))
                      (set 'in-newlisp-tag-string? true)
                      (if (not first-tag-string) ;; Keep track of the first [text] tag
@@ -616,10 +722,10 @@ indent level and the zero level"
                    (let ((real-position (- (+ (- offset zero-level) ((regex "^[ \t]*" line) 2))
                                            indent-level)))
                      (when (and (find curr-char '("(" "[" "{"))
-                                (not (and (find curr-char '("[" "{")) (find *dialect* '("newLISP" "Common Lisp")))))
-                        ;; The very long test condition prevents counting
-                        ;; square and curly brackets in Common Lisp and newLISP
-                        ;; as the start of lists.
+                                (not (and (find curr-char '("[" "{")) (find (opts [dialect]) '("newlisp" "lisp")))))
+                       ;; The very long test condition prevents counting
+                       ;; square and curly brackets in lisp and newLISP
+                       ;; as the start of lists.
                        (letn ((arg-pos (find-first-arg-pos offset curr-line))
                               (first-arg-pos (first arg-pos))
                               (leading-spaces (arg-pos 1))
@@ -635,33 +741,52 @@ indent level and the zero level"
                          (when (find func-name '("define-macro" "defmacro"))
                            (letn ((end-of-space ((regex "^[ \t]*" substr) 2))
                                   (substr (slice substr end-of-space))
-                                  (substr (strip (slice substr (or ((regex "[ \t]*" substr) 1) -1)) " \n\r\t"))
+                                  (substr (strip
+                                           (slice substr
+                                                  (or ((regex "[ \t]*" substr) 1) -1)) " \n\r\t"))
                                   (macro-name (slice substr 0 (or (find " " substr) -1))))
                              (if (not (empty? macro-name))
-                                 (push macro-name *two-space-indenters*))))
-                         (set 'first-item (+ offset 1 ((regex "[ \t]*" (slice curr-line (+ 1 offset))) 2)))
+                                 (push macro-name (keywords 0)))))
+                         (set 'first-item (+ offset 1
+                                             ((regex "[ \t]*"
+                                                     (slice curr-line (+ 1 offset))) 2)))
                          (set 'bracket-locations
-                              (push-to-list bracket-locations func-name curr-char line-number offset first-arg-pos first-item
-                                            in-list-literal? leading-spaces))))
+                              (push-to-list bracket-locations func-name curr-char
+                                            line-number offset first-arg-pos
+                                            first-item
+                                            in-list-literal? leading-spaces
+                                            options))))
                      (when (and (find curr-char '("]" ")" "}"))
-                                (not (and (find curr-char '("}" "]")) (find *dialect* '("newLISP" "Common Lisp")))))
-                       (set 'bracket-locations (pop-from-list curr-char bracket-locations fname line-number real-position offset)))
-                     (when (and bracket-locations (find curr-char '(" " "\t")) (find ((first bracket-locations) *func-name*) *if-like*))
-                       (when (or (not (find prev-char '(" " "\t" ""))) (not (regex "^[ \t]*(;|#\\||$|\r)" curr-line)))
-                         (++ ((first bracket-locations) *spaces*)))
-                       (when (= 2 ((first bracket-locations) *spaces*))
-                         (unless *uniform*
-                           (-- ((first bracket-locations) *indent-level*))
-                           (-- ((first bracket-locations) *indent-level*))
-                           (setf ((first bracket-locations) *spaces*) 999)))))))))
+                                (not (and (find curr-char '("}" "]"))
+                                          (find (opts [dialect]) '("newlisp" "lisp")))))
+                       (letn ((popped-lst (pop-from-list
+                                           curr-char bracket-locations
+                                           fname line-number real-position offset
+                                           options message-stack)))
+                         (set 'bracket-locations (first popped-lst))
+                         (set 'message-stack (last popped-lst))))
+                     (when (and bracket-locations (find curr-char '(" " "\t"))
+                                (find ((first bracket-locations) [func-name])
+                                      (keywords 1)))
+                       (when (or (not (find prev-char '(" " "\t" "")))
+                                 (not (regex "^[ \t]*(;|#\\||$|\r)" curr-line)))
+                         (++ ((first bracket-locations) [spaces])))
+                       (when (= 2 ((first bracket-locations) [spaces]))
+                         (unless (opts [uniform])
+                           (-- ((first bracket-locations) [indent-level]))
+                           (-- ((first bracket-locations) [indent-level]))
+                           (setf ((first bracket-locations) [spaces]) 999)))))))))
            (++ offset))))
       (++ line-number))
-    (list newlisp-brace-locations in-string? in-comment? in-symbol-with-space? bracket-locations last-quote-location
-          fpath original-code indented-code last-symbol-location comment-locations in-newlisp-tag-string? first-tag-string)))
+    (list newlisp-brace-locations in-string? in-comment? in-symbol-with-space?
+          bracket-locations last-quote-location fpath original-code indented-code
+          last-symbol-location comment-locations in-newlisp-tag-string?
+          first-tag-string message-stack)))
 
 
-(define (after-indentation indentation-state)
-  (letn ((newlisp-brace-locations (first indentation-state))
+(define (after-indentation indentation-state fpath options)
+  (letn ((opts (parse-args options))
+         (newlisp-brace-locations (first indentation-state))
          (in-string? (indentation-state 1))
          (in-comment? (indentation-state 2))
          (in-symbol-with-space? (indentation-state 3))
@@ -674,60 +799,68 @@ indent level and the zero level"
          (comment-locations (reverse (indentation-state 10)))
          (in-newlisp-tag-string? (indentation-state 11))
          (first-tag-string (indentation-state 12))
+         (message-stack (indentation-state 13))
          (fname (filename-from-path fpath)))
+
+    (dolist (message message-stack)
+      (warning "%s:%d:%d: %s" (push fname message) opts))
+
     (when bracket-locations
       (dolist (bracket (reverse bracket-locations))
         (let ((y (bracket 1))
               (x (bracket 2))
               (character (first bracket)))
-          (issue-warning "\n--%s-- `%s': Warning : Unmatched `%s' near (%d, %d). "
-                         (list (current-time) fname character y x)
-                         *warn* *exit* fname))))
+          (warning "\n%s:%d:%d: Unmatched `%s'"
+                   (list fname y x character) opts))))
 
     (when newlisp-brace-locations
       (dolist (brace (reverse newlisp-brace-locations))
-        (issue-warning "\n--%s-- `%s': Warning: You have an unclosed newLISP string starting from (%d, %d)"
-                       (list (current-time) fname (first brace) (brace 1)) *warn* *exit* fname)))
+        (warning "\n%s:%d:%d: You have an unclosed newLISP string"
+                 (list  fname (first brace) (brace 1)) opts)))
 
     (when in-string?
-      (issue-warning "\n--%s-- `%s': Warning: The string starting from (%d, %d) extends to end-of-file. "
-                     (push (current-time) last-quote-location) *warn* *exit* fname))
+      (warning "\n%s:%d:%d String extends to end-of-file"
+               (push  fname  last-quote-location) opts))
+
     (when comment-locations
       (dolist (comment comment-locations)
-        (issue-warning "\n--%s-- `%s': Warning: Unclosed comment near (%d, %d)"
-                       (list (current-time) fname (first comment) (comment 1)) *warn* *exit* fname)))
+        (warning "\n%s:%d:%d: Unclosed comment"
+                 (list fname (first comment) (comment 1)) opts)))
 
     (when last-symbol-location
-      (issue-warning "\n--%s-- `%s': Warning: Unclosed symbol near (%d, %d). "
-                     (list (current-time) fname (first last-symbol-location) (last-symbol-location 1))
-                     *warn* *exit* fname))
+      (warning "\n%s:%d:%d: Unclosed symbol"
+               (list fname
+                     (first last-symbol-location) (last-symbol-location 1)) opts))
 
     (when in-newlisp-tag-string?
-      (issue-warning "\n--%s-- `%s': Warning: The tag string starting from (%d, %d) extends to end-of-file. "
-                     (append (list (current-time) fname) first-tag-string) *warn* *exit* fname))
+      (warning "\n%s:%d:%d: Tag string extends to end-of-file. "
+               (push fname first-tag-string) opts))
 
     (if (= indented-code original-code)
-        (issue-warning "\n--%s-- File `%s' has already been formatted. Leaving it unchanged. . .\n"
-                       (list (current-time) fname)
-                       *warn* nil fname)
+        (warning
+         "\n File `%s' has already been formatted. Leaving it unchanged. . .\n"
+         fname opts)
       (begin
-        (when *output*
+        (when (opts [output])
           (print indented-code))
-        (when *modify*
+        (when (opts [modify])
           (write-file fpath indented-code)
-          ;(write-file "temp.yasi" indented-code)
-          ;(delete-file fpath)
-          ;(rename-file "temp.yasi" fpath)
+          ; (write-file "temp.yasi" indented-code)
+          ; (delete-file fpath)
+          ; (rename-file "temp.yasi" fpath)
           )))))
 
 
-(define (indent-file fpath)
-  (letn ((fname (real-path fpath))
-         (code (read-file! (or fname (filename-from-path fpath))))
-         (indent-result (indent-code code fname))
-         (backup-dir (or (get-backup-directory (main-args) fname) (real-path "."))))
-    (after-indentation indent-result)
-    (when (and *backup* (not backup-dir))
-      (backup-source-file! fname backup-dir true))
-    (when (and backup-dir *backup*)
-      (backup-source-file! fname backup-dir true))))
+(define (indent-files arguments)
+  (letn ((opts (parse-args arguments)))
+    (dolist (fpath (opts [files]))
+      (unless (empty? fpath)
+        (letn ((fname (real-path fpath))
+               (code (read-file! (or fname (filename-from-path fpath))))
+               (indent-result (indent-code code "--dialect=lisp"))
+               (backup-dir (opts [backup-dir])))
+          (after-indentation indent-result fname)
+          (when (and (opts [backup]) (not backup-dir))
+            (backup-source-file! fname opts))
+          (when (and backup-dir (opts [backup]))
+            (backup-source-file! fname opts)))))))
