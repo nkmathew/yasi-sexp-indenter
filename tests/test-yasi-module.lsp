@@ -307,11 +307,15 @@
 
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ System Tests ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+(define [before] 0)
+(define [after] 1)
+(define [options] 2)
+
 (define system-tests
   '(("tests/cases/#3-multiple-value-bind.lisp"
      "tests/cases/#3-multiple-value-bind~.lisp"
      "--uniform --dialect=lisp")
-    ( "tests/cases/#2-multiple-value-bind.lisp"
+    ("tests/cases/#2-multiple-value-bind.lisp"
       "tests/cases/#2-multiple-value-bind~.lisp"
       "--dialect=lisp")
     ("tests/cases/#1-if-expression.lisp"
@@ -324,19 +328,19 @@
      "tests/cases/#5-looks-like-a-macro~.lisp"
      "--dialect=lisp")))
 
-  (define-test (test_system)
-   (dolist (test-case system-tests)
+(define-test (test_system)
+  (dolist (test-case system-tests)
     (letn ((project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
            (after-path (string project-dir *os-sep* (test-case [after]))))
-     (set 'before (read-file! before-path))
-     (set 'after (read-file! after-path))
-     (set 'indented-code ((indent-code before (test-case [options])) 8))
-     (unless (= indented-code after)
-      (println "\n>>> Test Failed: " (first test-case) "\n")
-      (println indented-code)
-      (println after))
-    )))
+      (set 'before (read-file! before-path))
+      (set 'after (read-file! after-path))
+      (set 'indented-code ((indent-code before (test-case [options])) 8))
+      (unless (= indented-code after)
+        (println "\n>>> Test Failed: " (first test-case) "\n")
+        (println indented-code)
+        (println after)))))
 
-  (UnitTest:run-all 'MAIN)
+(UnitTest:run-all 'MAIN)
+;; (test_system)
 (exit)
