@@ -173,8 +173,8 @@
 
 (define-test (test_trim_adjacent_function_and_argument_opening_bracket)
   (assert=
-   (string-trim! "(print(+ 1 1))")
-   "(print (+ 1 1))"))
+   "(print (+ 1 1))"
+   (string-trim! "(print(+ 1 1))")))
 
 (define-test (test_trim_space_between_succeeding_closing_brackets)
   (assert=
@@ -207,10 +207,10 @@
    12))
 
 (define-test (test_find_trim_limit_literal_double_quote)
- (let (code "(list #\\; #\\| #\\\")")
-  (assert=
-   (find-trim-limit code)
-   (length code))))
+  (let (code "(list #\\; #\\| #\\\")")
+    (assert=
+     (find-trim-limit code)
+     (length code))))
 
 (define-test (test_find_trim_limit_double_and_single_quote)
   (assert=
@@ -263,31 +263,80 @@
      " en este mundo\n")))
 
 (define-test (test_is_macro_name_newlisp_macros)
- (letn ((macro-list
-         '("define-test"
-           "define-macro")))
-  (dolist (func-name macro-list)
-   (assert= (is-macro-name? func-name "newLISP") true))))
+  (letn ((macro-list
+          '("define-test"
+            "define-macro")))
+    (dolist (func-name macro-list)
+      (assert= (is-macro-name? func-name "newlisp") true))))
 
 (define-test (test_is_macro_name_scheme_macros)
- (letn ((macro-list
-         '()))
-  (dolist (func-name macro-list)
-   (assert= (is-macro-name? func-name "Scheme") true))))
+  (letn ((macro-list
+          '()))
+    (dolist (func-name macro-list)
+      (assert= (is-macro-name? func-name "scheme") true))))
 
 (define-test (test_is_macro_name_clojure_macros)
- (letn ((macro-list
-         '("defmacro")))
-  (dolist (func-name macro-list)
-   (assert= (is-macro-name? func-name "Clojure") true))))
+  (letn ((macro-list
+          '("defmacro")))
+    (dolist (func-name macro-list)
+      (assert= (is-macro-name? func-name "clojure") true))))
 
 (define-test (test_is_macro_name_lisp_macros)
- (letn ((macro-list
-         '("defmacro"
-           "define-macro"
-           "defstruct")))
-  (dolist (func-name macro-list)
-   (assert= (is-macro-name? func-name "Common Lisp") true))))
+  (letn ((macro-list
+          '("defmacro"
+            "define-macro"
+            "defstruct")))
+    (dolist (func-name macro-list)
+      (assert= (is-macro-name? func-name "lisp") true))))
 
-(UnitTest:run-all 'MAIN)
+(define-test (test_parse_args)
+  (assert= (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")
+   '("backups-folder" 1 "newlisp" () true nil true true true true true)))
+
+(define-test (test_parse_args1)
+ (assert= (parse-args
+           (parse-args
+            (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")))
+   '("backups-folder" 1 "newlisp" () true nil true true true true true)))
+
+(define-test (test_parse_args2)
+  (assert= (parse-args
+            (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic"))
+   '("backups-folder" 1 "newlisp" () true nil true true true true true)))
+
+
+;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ System Tests ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(define system-tests
+  '(("tests/cases/#3-multiple-value-bind.lisp"
+     "tests/cases/#3-multiple-value-bind~.lisp"
+     "--uniform --dialect=lisp")
+    ( "tests/cases/#2-multiple-value-bind.lisp"
+      "tests/cases/#2-multiple-value-bind~.lisp"
+      "--dialect=lisp")
+    ("tests/cases/#1-if-expression.lisp"
+     "tests/cases/#1-if-expression~.lisp"
+     "--dialect=lisp")
+    ("tests/cases/#4-flet-indentation.lisp"
+     "tests/cases/#4-flet-indentation~.lisp"
+     "--dialect=lisp")
+    ("tests/cases/#5-looks-like-a-macro.lisp"
+     "tests/cases/#5-looks-like-a-macro~.lisp"
+     "--dialect=lisp")))
+
+  (define-test (test_system)
+   (dolist (test-case system-tests)
+    (letn ((project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
+           (before-path (string project-dir *os-sep* (test-case [before])))
+           (after-path (string project-dir *os-sep* (test-case [after]))))
+     (set 'before (read-file! before-path))
+     (set 'after (read-file! after-path))
+     (set 'indented-code ((indent-code before (test-case [options])) 8))
+     (unless (= indented-code after)
+      (println "\n>>> Test Failed: " (first test-case) "\n")
+      (println indented-code)
+      (println after))
+    )))
+
+  (UnitTest:run-all 'MAIN)
 (exit)
