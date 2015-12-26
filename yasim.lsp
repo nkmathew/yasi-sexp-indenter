@@ -29,7 +29,7 @@
   "
   (letn ((bool? (lambda (val)
                   (or (= nil val) (= true val))))
-         (to-integer
+         (to-int
           (lambda (str (default-num 1))
             (let (num (int str))
               (if (null? num)
@@ -126,8 +126,8 @@
                 (let ((lst (parse (dialect-pair 0) "=")))
                   (if (= 1 (length lst))
                       ;; No characters after the equal sign (no dialect specified)
-                      (setq (options [default-indent]) (to-integer (indent-pair 1) 1))
-                    (setq (options [default-indent]) (to-integer (join (rest lst)
+                      (setq (options [default-indent]) (to-int (indent-pair 1) 1))
+                    (setq (options [default-indent]) (to-int (join (rest lst)
                                                                        "=") 1)))))
               (when (not (empty? (dialect-pair 0)) (empty? (dialect-pair 1)))
                 (let ((lst (parse (dialect-pair 0) "=")))
