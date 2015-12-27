@@ -17,6 +17,7 @@
 (define [modify] 8)
 (define [output] 9)
 (define [uniform] 10)
+(define [output-file] 11)
 
 (define [message] 0)
 (define [line] 1)
@@ -38,6 +39,8 @@
          (option-arg?
           (lambda (arg)
             (or
+             (matches-opt? "-o" arg)
+             (matches-opt? "-output" arg)
              (matches-opt? "-dialect" arg)
              (matches-opt? "-bd" arg)
              (matches-opt? "-backup-dir" arg)
@@ -67,7 +70,7 @@
              (bool? (lst [compact]))
              (bool? (lst [warning]))
              (bool? (lst [modify])))))
-         (options (list (real-path) 1 "" '() nil nil true true true true nil))
+         (options (list (real-path) 1 "" '() nil nil true true true true nil ""))
          (matches-opt? (lambda (opt var)
                          (letn ((dashes (find "^-+" opt 0)))
                            (and (if dashes
@@ -98,12 +101,23 @@
               ;; formatted
               (unless (empty? curr)
                 (push curr (options [files])))
-            (let ((indent-pair
+            (let ((output-pair
+                   (if (or (and (not (matches-opt? "-output" prev))
+                                (matches-opt? "-output" curr))
+                           (and (not (matches-opt? "-o" prev))
+                                (matches-opt? "-o" curr)))
+                       ;; The "-backup-dir" string is at the end of the arg list
+                       (list curr "")
+                     (if (or (matches-opt? "-o" prev)
+                             (matches-opt? "-output" prev))
+                         (list prev curr)
+                       (list "" ""))))
+                  (indent-pair
                    (if (or (and (not (matches-opt? "-default-indent" prev))
                                 (matches-opt? "-default-indent" curr))
                            (and (not (matches-opt? "-di" prev))
                                 (matches-opt? "-di" curr)))
-                       ;; The "--backup-dir" string is at the end of the arg list
+                       ;; The "-backup-dir" string is at the end of the arg list
                        (list curr "")
                      (if (or (matches-opt? "-di" prev)
                              (matches-opt? "-default-indent" prev))
@@ -114,7 +128,7 @@
                                 (matches-opt? "-backup-dir" curr))
                            (and (not (matches-opt? "-bd" prev))
                                 (matches-opt? "-bd" curr)))
-                       ;; The "--backup-dir" string is at the end of the arg list
+                       ;; The "-backup-dir" string is at the end of the arg list
                        (list curr "")
                      (if (or (matches-opt? "-bd" prev)
                              (matches-opt? "-backup-dir" prev))
@@ -135,6 +149,15 @@
                       (setq (options [default-indent]) (to-int (indent-pair 1) 1))
                     (setq (options [default-indent]) (to-int
                                                       (join (rest lst) "=") 1)))))
+              (when (not (empty? (output-pair 0)) (empty? (output-pair 1)))
+                (let ((lst (parse (output-pair 0) "=")))
+                  (when (> (length (options [files])) 1)
+                    (println "error: Cannot use the -o flag when more than one file is specified")
+                    (exit))
+                  (if (= 1 (length lst))
+                      ;; No characters after the equal sign (no output file specified)
+                      (setq (options [output-file]) (output-pair 1))
+                    (setq (options [output-file]) (join (rest lst) "=")))))
               (when (not (empty? (dialect-pair 0)) (empty? (dialect-pair 1)))
                 (let ((lst (parse (dialect-pair 0) "=")))
                   (if (= 1 (length lst))
@@ -148,6 +171,8 @@
                       (setq (options [backup-dir]) (backup-dir-pair 1))
                     (setq (options [backup-dir]) (join (rest lst) "=")))))
               (cond
+               ((matches-opt? "-no" curr) (setq (options [compact]) nil))
+               ((matches-opt? "-no-output" curr) (setq (options [compact]) nil))
                ((matches-opt? "-nc" curr) (setq (options [compact]) nil))
                ((matches-opt? "-no-compact" curr) (setq (options [compact]) nil))
                ((matches-opt? "-nb" curr) (setq (options [backup]) nil))
@@ -867,16 +892,20 @@ optional arguments:
       (warning "\n%s:%d:%d: Tag string extends to end-of-file. "
                (push fname first-tag-string) opts))
 
-    (if (and (opts [files]) (= indented-code original-code))
-        (warning
-         "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
-         fname opts)
-      (begin
-        (when (opts [output])
-          (print indented-code))
-        (when (opts [modify])
-          (write-file fpath indented-code)
-          )))))
+    (letn ((output-file (opts [output-file])))
+      (when (empty? output-file) (set 'output-file fpath))
+      (if (and (opts [files]) (= indented-code original-code))
+          (begin
+            (warning
+             "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
+             fname opts)
+            (when (!= fpath output-file)
+              (write-file output-file indented-code)))
+        (begin
+          (when (opts [output])
+            (print indented-code))
+          (when (opts [modify])
+            (write-file output-file indented-code)))))))
 
 
 (define (indent-files arguments)
