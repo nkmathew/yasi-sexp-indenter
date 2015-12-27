@@ -24,3 +24,4 @@ Features:
   - **yasi.lsp**
     + Indentation from standard input
     + Indentation of multiple files specified in the command line
+    + Guesses dialect by file extension when the dialect flag is not supplied

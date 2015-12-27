@@ -894,8 +894,15 @@ optional arguments:
       (unless (empty? fpath)
         (letn ((fname (real-path fpath))
                (code (read-file! (or fname (filename-from-path fpath))))
-               (indent-result (indent-code code))
-               (backup-dir (opts [backup-dir])))
+               (backup-dir (opts [backup-dir]))
+               (dialect
+                (cond
+                 ((regex ".lisp$" fname) (setq (opts [dialect]) "lisp"))
+                 ((regex ".lsp$" fname) (setq (opts [dialect]) "newlisp"))
+                 ((regex ".clj$" fname) (setq (opts [dialect]) "clojure"))
+                 ((regex ".ss$" fname) (setq (opts [dialect]) "scheme"))
+                 ((regex ".scm$" fname) (setq (opts [dialect]) "scheme"))))
+               (indent-result (indent-code code opts)))
           (after-indentation indent-result fname)
           (when (and (opts [backup]) (not backup-dir))
             (backup-source-file! fname opts))
