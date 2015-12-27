@@ -1004,21 +1004,23 @@ def _after_indentation(indentation_state, options=None, fpath=''):
         if opts.warning:
             sys.stderr.write(message % tpl)
 
-    if md5sum(indented_code.encode('utf-8')) == md5sum(original_code.encode('utf-8'))\
-            and opts.files:
+    output_file = opts.output_file
+    if not output_file:
+        output_file = fpath
+
+    if indented_code == original_code and opts.files:
         message = "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
         sys.stderr.write(message % fname)
+        if output_file != fpath:
+            with open(output_file, 'wb') as indented_file:
+                indented_file.write(indented_code.encode('utf8'))
     else:
         if opts.output:
             print(indented_code, end='')
 
         if opts.modify:
             # write in binary mode to preserve the original line ending
-            if opts.output_file:
-                fpath = os.path.abspath(opts.output_file)
-
-            # if fpath
-            with open(fpath, 'wb') as indented_file:
+            with open(output_file, 'wb') as indented_file:
                 indented_file.write(indented_code.encode('utf8'))
 
 
