@@ -335,7 +335,7 @@
            (after-path (string project-dir *os-sep* (test-case [after]))))
       (set 'before (read-file! before-path))
       (set 'after (read-file! after-path))
-      (set 'indented-code ((indent-code before (test-case [options])) 8))
+      (set 'indented-code ((indent-code before (test-case [options])) 7))
       (unless (= indented-code after)
         (println "\n>>> Test Failed: " (first test-case) "\n")
         (println indented-code)
