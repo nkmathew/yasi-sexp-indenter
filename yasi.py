@@ -586,7 +586,6 @@ def _pop_from_list(bracket, lst, line, real_pos, offset, options, msg_stack):
     """
     # Try to spot a case when a square bracket is used to close a round bracket
     # block
-    opts = parse_options(options)
     if bracket == ']':
         correct_closer = '['
     elif bracket == ')':
