@@ -319,7 +319,7 @@ optional arguments:
   (if (file? filename)
       (read-file filename)
     (warning "--%s-- Exiting. Filename `%s' is not valid"
-                   ;; Exit if the filename is invalid
+             ;; Exit if the filename is invalid
              (list (current-time) filename))))
 
 
@@ -779,12 +779,12 @@ optional arguments:
            (++ offset))))
       (++ line-number))
     (list newlisp-brace-locations in-string? in-comment? in-symbol-with-space?
-          bracket-locations last-quote-location fpath original-code indented-code
+          bracket-locations last-quote-location original-code indented-code
           last-symbol-location comment-locations in-newlisp-tag-string?
           first-tag-string message-stack)))
 
 
-(define (after-indentation indentation-state fpath options)
+(define (after-indentation indentation-state (fpath "") options)
   (letn ((opts (parse-args options))
          (newlisp-brace-locations (first indentation-state))
          (in-string? (indentation-state 1))
@@ -792,14 +792,13 @@ optional arguments:
          (in-symbol-with-space? (indentation-state 3))
          (bracket-locations (indentation-state 4))
          (last-quote-location (indentation-state 5))
-         (fpath (indentation-state 6))
-         (original-code (indentation-state 7))
-         (indented-code (indentation-state 8))
-         (last-symbol-location (indentation-state 9))
-         (comment-locations (reverse (indentation-state 10)))
-         (in-newlisp-tag-string? (indentation-state 11))
-         (first-tag-string (indentation-state 12))
-         (message-stack (indentation-state 13))
+         (original-code (indentation-state 6))
+         (indented-code (indentation-state 7))
+         (last-symbol-location (indentation-state 8))
+         (comment-locations (reverse (indentation-state 9)))
+         (in-newlisp-tag-string? (indentation-state 10))
+         (first-tag-string (indentation-state 11))
+         (message-stack (indentation-state 12))
          (fname (filename-from-path fpath)))
 
     (dolist (message message-stack)
@@ -836,7 +835,7 @@ optional arguments:
       (warning "\n%s:%d:%d: Tag string extends to end-of-file. "
                (push fname first-tag-string) opts))
 
-    (if (= indented-code original-code)
+    (if (and (opts [files]) (= indented-code original-code))
         (warning
          "\n File `%s' has already been formatted. Leaving it unchanged. . .\n"
          fname opts)
@@ -845,19 +844,25 @@ optional arguments:
           (print indented-code))
         (when (opts [modify])
           (write-file fpath indented-code)
-          ; (write-file "temp.yasi" indented-code)
-          ; (delete-file fpath)
-          ; (rename-file "temp.yasi" fpath)
           )))))
 
 
 (define (indent-files arguments)
   (letn ((opts (parse-args arguments)))
+   (when (not (opts [files]))
+    ;; Indent from stdin
+    (letn ((line (read-line))
+           (code ""))
+     (while line
+      (setq code (append code (string line "\n")))
+      (setq line (read-line)))
+     (setq indented-code (indent-code code))
+     (after-indentation indented-code)))
     (dolist (fpath (opts [files]))
       (unless (empty? fpath)
         (letn ((fname (real-path fpath))
                (code (read-file! (or fname (filename-from-path fpath))))
-               (indent-result (indent-code code "--dialect=lisp"))
+               (indent-result (indent-code code))
                (backup-dir (opts [backup-dir])))
           (after-indentation indent-result fname)
           (when (and (opts [backup]) (not backup-dir))

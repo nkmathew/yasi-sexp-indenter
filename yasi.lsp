@@ -12,12 +12,5 @@
 
 (import-file "yasim.lsp")
 
-;; newlisp includes everything typed in the command line in $main-args
-;; ("newlisp" "yasi.lsp")
-(when (> (length $main-args) 3)
-  (indent-files))
-  (exit))
-
-(when (= (length $main-args) 2)
-  (print *help*)
-  (exit))
+(indent-files)
+(exit)
