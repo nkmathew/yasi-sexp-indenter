@@ -1,0 +1,317 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on https://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
+  <link rel="stylesheet" href="stylesheets/github-dark.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>Yasi-sexp-indenter</title>
+  <meta name="description" content="A dialect-aware s-expression indenter written in Python and newLISP">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Yasi-sexp-indenter</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">A dialect-aware s-expression indenter written in Python and newLISP</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/nkmathew/yasi-sexp-indenter/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/nkmathew/yasi-sexp-indenter" class="code">View Yasi-sexp-indenter on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <p><a href="https://travis-ci.org/nkmathew/yasi-sexp-indenter"><img src="https://travis-ci.org/nkmathew/yasi-sexp-indenter.svg?branch=master" alt="Build Status"></a></p>
+
+<h2>
+<a id="yasi--yet-another-s-expression-indenter" class="anchor" href="#yasi--yet-another-s-expression-indenter" aria-hidden="true"><span class="octicon octicon-link"></span></a>yasi- yet another s-expression indenter</h2>
+
+<p>yasi is a dialect-aware s-expression indenter that tries to improve<br>
+on <a href="http://ds26gte.github.io/scmindent/index.html">Dorai's indenter</a> and <em>Vim's</em> built in indenter. It can handle<br>
+<em>Common Lisp</em>, <em>Clojure</em>, <em>Scheme</em> and <em>newLISP</em> code and their<br>
+unique syntaxes.</p>
+
+<p>It's a batch mode indenter inspired by Dorai's <a href="https://github.com/ds26gte/scmindent/blob/master/lispindent.lisp">lispindent.lisp</a>
+that was written first in <em>Python</em> and later translated to <em>newLISP</em>.  </p>
+
+<p>Its style of indentation is  very close to that of <em>Dorai's</em> <em>lispindent.lisp</em><br>
+and tries to follow <em>Dorai's</em> <a href="http://ds26gte.github.io/scmindent/index.html">style guidelines</a> where reasonable.
+(Refer to file dorai-test.lisp)</p>
+
+<h3>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h3>
+
+<p><em>yasi's</em> indentation relies heavily on regular expressions that<br>
+give it an edge over its counterpart <em>lispindent.lisp</em>. Its<br>
+features include:  </p>
+
+<ul>
+<li><p>Ability to compact code that has extra whitespace between forms.<br>
+e.g. Code like <code>(if  (= lisp Clojure ) 'Yes 'No )</code> is compacted<br>
+to <code>(if (= lisp Clojure) 'Yes 'No)</code>  </p></li>
+<li><p>Supports 4 dialects of the <em>Lisp</em> family giving you the correct indentation<br>
+of a form according to the dialect's syntax. e.g. The <code>do</code> keyword that<br>
+is used for looping in <em>Lisp</em> and sequential execution in <em>Clojure</em>.<br>
+The keyword should look like this in the two dialects:  </p></li>
+</ul>
+
+<div class="highlight highlight-source-lisp"><pre><span class="pl-c">;; In Common Lisp</span>
+(<span class="pl-k">do</span> ((j <span class="pl-c1">0</span> (+ j <span class="pl-c1">1</span>)))
+    (<span class="pl-c1">nil</span>)                       <span class="pl-c">;Do forever.</span>
+  (<span class="pl-c1">format</span> <span class="pl-c1">t</span> <span class="pl-s"><span class="pl-pds">"</span>~%Input ~D:<span class="pl-pds">"</span></span> j)
+  (<span class="pl-k">let</span> ((item (read)))
+    (<span class="pl-k">if</span> (<span class="pl-c1">null</span> item) (return)   <span class="pl-c">;Process items until NIL seen.</span>
+      (<span class="pl-c1">format</span> <span class="pl-c1">t</span> <span class="pl-s"><span class="pl-pds">"</span>~&amp;Output ~D: ~S<span class="pl-pds">"</span></span> j item))))
+
+<span class="pl-c">;; In Clojure</span>
+(<span class="pl-k">do</span>
+ (println <span class="pl-s"><span class="pl-pds">"</span>LOG: Computing...<span class="pl-pds">"</span></span>)
+ (+ <span class="pl-c1">1</span> <span class="pl-c1">1</span>))</pre></div>
+
+<ul>
+<li><p><em>yasi</em> also issues warnings that would become syntax errors if you<br>
+ran the code. e.g. If you forgot to close a string or a comment.  </p></li>
+<li><p>Correct indentation of user defined macros. If the <code>defmacro</code> keyword is<br>
+found, the following macro name is added to the list of keywords with indentation<br>
+level of 2.  </p></li>
+</ul>
+
+<div class="highlight highlight-source-lisp"><pre><span class="pl-c">;; from quicklisp.lisp</span>
+(<span class="pl-k">defmacro</span> <span class="pl-en">with-connection</span> ((connection host port) &amp;body body)
+  `(call-with-connection ,host ,port (<span class="pl-c1">lambda</span> (,connection) ,@body)))
+
+(with-connection (connection (hostname connect-url) (port connect-url))
+  (<span class="pl-k">let</span> ((cbuf (make-instance 'cbuf :connection connection))
+        (request (request-buffer <span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span> url)))
+    (<span class="pl-c1">format</span> stream <span class="pl-s"><span class="pl-pds">"</span>; ~$KB~%<span class="pl-pds">"</span></span> (/ size <span class="pl-c1">1024</span>))
+    (<span class="pl-c1">format</span> stream <span class="pl-s"><span class="pl-pds">"</span>; Unknown size~%<span class="pl-pds">"</span></span>)))</pre></div>
+
+<ul>
+<li><p>It indents <code>flets</code> and <code>labels</code> the right way, using a hack here and there.  </p></li>
+<li><p>Overkill feature: You get to know the last time you indented the
+file.</p></li>
+</ul>
+
+<h3>
+<a id="command-line-arguments" class="anchor" href="#command-line-arguments" aria-hidden="true"><span class="octicon octicon-link"></span></a>Command Line Arguments</h3>
+
+<pre><code>usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
+            [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-di DEFAULT_INDENT]
+            [-ic] [-uni]
+            [files [files ...]]
+
+Dialect-aware s-expression indenter
+
+positional arguments:
+files                 List of files to be indented. Will indent from
+                        standard input if no files are specified
+
+optional arguments:
+-h, --help            show this help message and exit
+-nc, --no-compact     Don't compact the code, just indent
+-nb, --no-backup      Don't create a backup file even if --backup-dir is
+                        specified
+-nm, --no-modify      Don't modify the file
+-nw, --no-warning     Don't display warnings
+-no, --no-output      Suppress output of the indented code
+-ne, --no-exit        Instructs the program not to exit when a warning is
+                        raised.
+-o OUTPUT_FILE        Path/name of output file
+--dialect DIALECT     Use Scheme keywords
+-v, --version         Prints script version
+-bd BACKUP_DIR, --backup-dir BACKUP_DIR
+                        The directory where the backup file is to be written
+-di DEFAULT_INDENT, --default-indent DEFAULT_INDENT
+                        The indent level to be used in case a function's
+                        argument is in the next line. Vim uses 2, the most
+                        common being 1.
+-ic, --indent-comments
+                        If true, comment lines will be indented possibly
+                        messing with any deliberate comment layout
+-uni, --uniform       Dictates whether the if-clause and else-clause of an
+                        if-likeblock should have the same indent level.
+</code></pre>
+
+<h3>
+<a id="what-yasi-does-not-handle" class="anchor" href="#what-yasi-does-not-handle" aria-hidden="true"><span class="octicon octicon-link"></span></a>What yasi does not handle</h3>
+
+<p>There are some syntaxes used in some dialects of scheme that I didn't feel like<br>
+including because they are not that common. An example is <em>MzScheme</em> and<br>
+<em>Gauche's</em> use of <code>#//</code> or <code>#[]</code> for regular expressions. I just saw it as too<br>
+much an effort for something I would not use that often.</p>
+
+<h3>
+<a id="customization" class="anchor" href="#customization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Customization</h3>
+
+<p><em>yasi</em> is customized differently from of Dorai's indenter. Instead of you<br>
+storing extra keywords in a <em>.lispwords</em> file in your home directory, you are<br>
+advised  to edit the list of keywords in the source file so that you have only<br>
+one file. For example, if you find that <code>multiple-value-bind</code> should have all<br>
+of its subforms indented uniformly like so:  </p>
+
+<div class="highlight highlight-source-lisp"><pre>(multiple-value-bind (f r)
+  (floor <span class="pl-c1">130</span> <span class="pl-c1">11</span>)
+  (<span class="pl-c1">list</span> f r))</pre></div>
+
+<p>Instead of:  </p>
+
+<div class="highlight highlight-source-lisp"><pre>(multiple-value-bind (f r)
+    (floor <span class="pl-c1">130</span> <span class="pl-c1">11</span>)
+  (<span class="pl-c1">list</span> f r))</pre></div>
+
+<p>You go to <em>line 424(yasi.py)</em>:  </p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">if</span> DIALECT <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>Common Lisp<span class="pl-pds">'</span></span>: <span class="pl-c"># Lisp</span>
+    TWO_SPACE_INDENTERS <span class="pl-k">=</span> LISP_KEYWORDS
+    IF_LIKE <span class="pl-k">+=</span> [<span class="pl-s"><span class="pl-pds">'</span>multiple-value-bind<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>destructuring-bind<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>do<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>do*<span class="pl-pds">'</span></span>]</pre></div>
+
+<p>and simply remove <code>multiple-value-bind</code> from the list.</p>
+
+<h4>
+<a id="about-the-default-indent" class="anchor" href="#about-the-default-indent" aria-hidden="true"><span class="octicon octicon-link"></span></a>About the default indent</h4>
+
+<p>The <em>--default-indent</em> comes in in expressions whose subforms usually<br>
+start in the subsequent lines. Like a <code>cond</code> expression:  </p>
+
+<div class="highlight highlight-source-lisp"><pre>(<span class="pl-c1">cond</span>
+ ((&gt; this that) 'Yes)
+ ((= those these) 'No))</pre></div>
+
+<p>According to Dorai's <a href="http://ds26gte.github.io/scmindent/index.html">guidelines</a>
+the above indentation is correct. However,<br>
+some people may prefer the test expressions to be two spaces past the bracket,<br>
+like this:  </p>
+
+<div class="highlight highlight-source-lisp"><pre>(<span class="pl-c1">cond</span>
+  ((&gt; newLISP CL) 'Yes)
+  ((= Clojure Lisp) 'No))</pre></div>
+
+<p>This is <em>Vim's</em> default style of indentation.<br>
+That option enables you to specify the amount you want, for example to achieve<br>
+the style above, you pass the parameter like so:</p>
+
+<pre><code>yasi.py test.lisp --lisp --default-indent 2
+</code></pre>
+
+<hr>
+
+<h4>
+<a id="changes-made-to-dorais-indenter" class="anchor" href="#changes-made-to-dorais-indenter" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changes made to Dorai's Indenter</h4>
+
+<p>I made a couple of modifications to <em>lispindent.lisp</em> and renamed it to<br>
+<em>lispindent2.lisp</em>. It contains some of <em>yasi's</em> features. The changes<br>
+include:  </p>
+
+<ul>
+<li><p>Added comments for some sections of the program that took me time to grok.   </p></li>
+<li><p>It can now indent files from the command line without the need to redirect<br>
+file contents to the program.</p></li>
+<li><p><em>lispindent2.lisp</em> indents <em>Clojure's</em> <em>vectors</em> and <em>sets</em><br>
+better, i.e with an indentation level of 1, without affecting<br>
+<em>lisp</em> or <em>scheme's indentation</em>. It uses the file's extension to determine<br>
+if it's looking at <em>Clojure</em> code.
+e.g.</p></li>
+</ul>
+
+<div class="highlight highlight-source-lisp"><pre><span class="pl-c">;; lispindent2.lisp's indentation</span>
+(print {define <span class="pl-s"><span class="pl-pds">"</span>The keyword does not affect indentation<span class="pl-pds">"</span></span>
+    })
+
+<span class="pl-c">;; lispindent.lisp's indentation</span>
+(print {define <span class="pl-s"><span class="pl-pds">"</span>The keyword does not affect indentation<span class="pl-pds">"</span></span>
+   })</pre></div>
+
+<ul>
+<li><p><em>lispindent2.lisp</em> ignores any code in a multiline comment and won't<br>
+be affected by any unclosed brackets inside the comment like the original<br>
+version. Unfortunately, its method of detecting multiline comments is rather<br>
+naive and introduces a bug in the code. Refer to its issues below.  </p></li>
+<li><p><em>lispindent2.lisp</em> writes files using <em>LF</em> line endings be default. It's less<br>
+irritating than <em>CRLF</em> endings which usually light up in an annoying way in <em>Vim</em>.  </p></li>
+</ul>
+
+<h4>
+<a id="lispindent2lisps-issues" class="anchor" href="#lispindent2lisps-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>lispindent2.lisp's Issues</h4>
+
+<p>I inadvertently added a bug in an attempt to prevent it from evaluating<br>
+brackets inside multiline comments and symbols with whitespace. It uses the pipe<br>
+character(|) to switch between <code>multiline-commentp=T</code> and <code>multiline-commentp=NIL</code><br>
+which means that if your pipes are unbalanced, you'll get wrong indentation, e.g.:  </p>
+
+<div class="highlight highlight-source-lisp"><pre>#|<span class="pl-smi">*******************************************************************</span>|
+ |   This is a multiline comment that will trip the indenter         |
+ |   because the odd number of pipes will cause `multiline-commentp` |
+ |   to be true after this comment. It means the rest of the code    |
+ |   won'<span class="pl-c1">t</span> be indented because it thinks it's still in a comment.    |
+          Total pipes=<span class="pl-c1">11</span>(odd)
+ |#
+ (print (<span class="pl-c1">cons</span>
+    'Hello <span class="pl-c">;; This line and the one below won't change</span>
+    'World
+        ))</pre></div>
+
+<p>I don't find this to be a major issue because multiline comments are rare,<br>
+the common use case being to comment out some piece of code when debugging.  </p>
+
+<p><em>lispindent2.lisp</em> uses the <em>Lisp</em> reader function <code>read-from-string</code> to get<br>
+lisp forms and atoms from the read string. The downside of this is that<br>
+<code>read-from-string</code> will fail when the code in the string is 'malformed'.<br>
+For example, if it finds that the dot operator used for consing in <em>Common Lisp</em><br>
+comes after the opening bracket, it will raise a fatal error. This<br>
+means that any <em>Clojure</em> code that tries to use the dot operator to access a<br>
+class method will not be indented because of the error. An example is this code:  </p>
+
+<div class="highlight highlight-source-lisp"><pre>(<span class="pl-k">defmacro</span> <span class="pl-en">chain</span>
+  ([x form] `(. ~x ~form))
+  ([x form &amp; more] `(chain (. ~x ~form) ~@more)))</pre></div>
+
+<p><em>lispindent2.lisp</em> uses the <code>ignore-errors</code> macro as a workaround. Doing that means that it can't<br>
+run in <em>GNU Common Lisp</em> because it doesn't have the macro.</p>
+
+<h4>
+<a id="lispindent2lisps-command-line-options" class="anchor" href="#lispindent2lisps-command-line-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>lispindent2.lisp's command-line options</h4>
+
+<pre><code> ___________________________________________________________________________
+|   Usage:  lispindent2.lisp [[&lt;file&gt;] [--no-modify] [--no-output]]         |
+|           --no-output ;; Don't output the indented code, false by default |
+|           --no-modify ;; Don't modify the file, false by default          |
++---------------------------------------------------------------------------+
+</code></pre>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/nkmathew" class="avatar"><img src="https://avatars0.githubusercontent.com/u/5522822?v=3&amp;s=60" width="48" height="48"></a> <a href="https://github.com/nkmathew">nkmathew</a> maintains <a href="https://github.com/nkmathew/yasi-sexp-indenter">Yasi-sexp-indenter</a></p>
+
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/nkmathew/yasi-sexp-indenter/tarball/master" class="tar">tar</a><a href="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
