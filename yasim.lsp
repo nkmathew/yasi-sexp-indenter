@@ -129,7 +129,7 @@
                          (list prev curr)
                        (list "" "")))))
               (when (not (empty? (indent-pair 0)) (empty? (indent-pair 1)))
-                (let ((lst (parse (dialect-pair 0) "=")))
+                (let ((lst (parse (indent-pair 0) "=")))
                   (if (= 1 (length lst))
                       ;; No characters after the equal sign (no dialect specified)
                       (setq (options [default-indent]) (to-int (indent-pair 1) 1))
