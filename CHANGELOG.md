@@ -14,4 +14,5 @@ Features:
     + Tildes in backup folder path in Windows
 
   - **yasi.lsp**
-    +
+    + Indentation from standard input
+    + Indentation of multiple files specified in the command line
