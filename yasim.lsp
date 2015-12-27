@@ -479,12 +479,12 @@ optional arguments:
       ;; Include all whitespace before the semi colon as part of the comment
       (set 'comment-start (++ ((regex "[ \t]*;" str) 1))))
     (when (= (opts [dialect]) "newlisp")
-     (letn ((brace-string-start (or (find "{" str) -1)))
-      (if (= -1 comment-start)
-       (set 'comment-start brace-string-start)
-       (set 'comment-start (if (= -1 brace-string-start)
-                              comment-start
-                            (min comment-start brace-string-start))))))
+      (letn ((brace-string-start (or (find "{" str) -1)))
+        (if (= -1 comment-start)
+            (set 'comment-start brace-string-start)
+          (set 'comment-start (if (= -1 brace-string-start)
+                                  comment-start
+                                (min comment-start brace-string-start))))))
     (if (and (!= -1 comment-start) (!= -1 limit))
         ;; Both a semicolon and a quote have been found
         (when (< comment-start limit)
@@ -499,13 +499,15 @@ optional arguments:
     limit))
 
 
-(define (pad-leading-whitespace str zero-level compact? blist)
+(define (pad-leading-whitespace str zero-level blist options)
   " Indents the correct number of whitespace before the line using the current
   indent level and the zero level"
-  (let ((str
-         (if compact?
-             (letn ((trim-limit (if (regex "^[ \t]*;" str 0)
-                                    (length str)
+  (let ((opts (parse-args options))
+        (str
+         (if (opts [compact])
+             (letn ((comment-start (regex "^[ \t]*;" str 0))
+                    (trim-limit (if (and comment-start (opts [indent-comments]))
+                                    (comment-start 2)
                                   (find-trim-limit str)))
                     (substr-1 (slice str 0 trim-limit)) ;; split into two portions
                     (substr-2 (slice str trim-limit))
@@ -537,7 +539,7 @@ optional arguments:
         (list zero-level line 0)
       (if (and (not comment-line) (not (all-whitespace? line)))
           (push zero-level
-                (pad-leading-whitespace line zero-level (opts [compact]) bracket-list))
+                (pad-leading-whitespace line zero-level bracket-list opts))
         (list zero-level line 0)))))
 
 
@@ -831,11 +833,11 @@ optional arguments:
     (when newlisp-brace-locations
       (dolist (brace (reverse newlisp-brace-locations))
         (warning "\n%s:%d:%d: You have an unclosed newLISP string"
-                 (list  fname (first brace) (brace 1)) opts)))
+                 (list fname (first brace) (brace 1)) opts)))
 
     (when in-string?
       (warning "\n%s:%d:%d String extends to end-of-file"
-               (push  fname  last-quote-location) opts))
+               (push fname last-quote-location) opts))
 
     (when comment-locations
       (dolist (comment comment-locations)

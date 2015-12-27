@@ -345,7 +345,7 @@ def all_whitespace(string):
     return re.search('^[ \t]*(\r|\n|$)', string)
 
 
-def pad_leading_whitespace(string, zero_level, compact, blist, options=None):
+def pad_leading_whitespace(string, zero_level, blist, options=None):
     """ pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
 
     >>> pad_leading_whitespace("(print 'Yello)")
@@ -355,13 +355,13 @@ def pad_leading_whitespace(string, zero_level, compact, blist, options=None):
     and the zero level.
     """
     opts = parse_options(options)
-    if compact:
+    if opts.compact:
         # if compact mode is on, split the string into two, trim the first
         # position and merge the two portions.
         trim_limit = find_trim_limit(string, opts)
         comment_line = re.search('^[ \t]*;', string, re.M)
         if comment_line and opts.indent_comments:
-            trim_limit = -1
+            trim_limit = comment_line.end()
         substr1 = string[0:trim_limit]
         substr2 = string[trim_limit:]
         substr1 = trim(substr1)
@@ -416,7 +416,6 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
         # If the list is empty, then the current_level defaults
         # to zero
         curr_line, current_level = pad_leading_whitespace(line, zerolevel,
-                                                          opts.compact,
                                                           bracket_list, opts)
         return zerolevel, curr_line, current_level
     else:
