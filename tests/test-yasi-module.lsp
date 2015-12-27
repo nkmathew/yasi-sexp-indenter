@@ -312,18 +312,18 @@
 
 (define-test (test_parse_args)
   (assert= (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")
-   '("backups-folder" 1 "newlisp" () true nil true true true true true)))
+   '("backups-folder" 1 "newlisp" () true nil true true true true true "")))
 
 (define-test (test_parse_args1)
  (assert= (parse-args
            (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")))
-   '("backups-folder" 1 "newlisp" () true nil true true true true true)))
+   '("backups-folder" 1 "newlisp" () true nil true true true true true "")))
 
 (define-test (test_parse_args2)
   (assert= (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic"))
-   '("backups-folder" 1 "newlisp" () true nil true true true true true)))
+   '("backups-folder" 1 "newlisp" () true nil true true true true true "")))
 
 
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ System Tests ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
