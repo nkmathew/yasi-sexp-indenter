@@ -38,21 +38,21 @@
          (option-arg?
           (lambda (arg)
             (or
-             (zero? (find "--dialect" arg))
-             (zero? (find "-bd" arg))
-             (zero? (find "--backup-dir" arg))
-             (zero? (find "-nb" arg))
-             (zero? (find "--no-backup" arg))
-             (zero? (find "-nc" arg))
-             (zero? (find "--no-compact" arg))
-             (zero? (find "-no" arg))
-             (zero? (find "--no-output" arg))
-             (zero? (find "-nm" arg))
-             (zero? (find "--no-modify" arg))
-             (zero? (find "-uni" arg))
-             (zero? (find "--uniform" arg))
-             (zero? (find "-ic" arg))
-             (zero? (find "--indent-comments" arg)))))
+             (matches-opt? "-dialect" arg)
+             (matches-opt? "-bd" arg)
+             (matches-opt? "-backup-dir" arg)
+             (matches-opt? "-nb" arg)
+             (matches-opt? "-no-backup" arg)
+             (matches-opt? "-nc" arg)
+             (matches-opt? "-no-compact" arg)
+             (matches-opt? "-no" arg)
+             (matches-opt? "-no-output" arg)
+             (matches-opt? "-nm" arg)
+             (matches-opt? "-no-modify" arg)
+             (matches-opt? "-uni" arg)
+             (matches-opt? "-uniform" arg)
+             (matches-opt? "-ic" arg)
+             (matches-opt? "-indent-comments" arg))))
          (option-list?
           (lambda (lst)
             (and
@@ -68,8 +68,11 @@
              (bool? (lst [warning]))
              (bool? (lst [modify])))))
          (options (list (real-path) 1 "" '() nil nil true true true true nil))
-         (zero-or-one? (lambda (num) (or (zero? num) (= num 1))))
-         (matches-opt? (lambda (opt var) (zero-or-one? (find opt var))))
+         (matches-opt? (lambda (opt var)
+                        (letn ((dashes (find "^-+" opt 0)))
+                         (and (if dashes
+                               (or (= (length $0) 2) (= (length $0) 1))
+                               nil) (find opt var)))))
          (arguments
           (if (string? arguments)
               (parse arguments)
@@ -118,11 +121,11 @@
                          (list prev curr)
                        (list "" ""))))
                   (dialect-pair
-                   (if (and (null? (find "--dialect" prev))
-                            (zero? (find "--dialect" curr)))
-                       ;; The "--dialect" string is at the end of the arg list
+                   (if (and (not (matches-opt? "-dialect" prev))
+                            (matches-opt? "-dialect" curr))
+                       ;; The "-dialect" string is at the end of the arg list
                        (list curr "")
-                     (if (zero? (find "--dialect" prev))
+                     (if (matches-opt? "-dialect" prev)
                          (list prev curr)
                        (list "" "")))))
               (when (not (empty? (indent-pair 0)) (empty? (indent-pair 1)))
@@ -323,9 +326,9 @@ optional arguments:
   "Exits if the filename provided does not exist"
   (if (file? filename)
       (read-file filename)
-    (warning "--%s-- Exiting. Filename `%s' is not valid"
-             ;; Exit if the filename is invalid
-             (list (current-time) filename))))
+      (and (warning "--%s-- Exiting. Filename `%s' is not valid"
+           ;; Exit if the filename is invalid
+           (list (current-time) filename)) (exit))))
 
 
 (define (current-time)
