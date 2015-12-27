@@ -232,6 +232,13 @@
    (find-trim-limit [text](list 1123 ' " ); " 542)[/text])
    14))
 
+(define-test (test_find_trim_limit_comment_alone_in_newlisp)
+  (assert=
+   (find-trim-limit
+    {thhjh h               jgjh             ;;            hjbjh}
+    "--dialect=newlisp")
+   27))
+
 (define-test (test_find_trim_limit_newlisp_brace_string)
   (assert=
    (find-trim-limit

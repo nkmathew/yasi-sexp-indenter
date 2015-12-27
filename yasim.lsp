@@ -482,7 +482,9 @@ optional arguments:
      (letn ((brace-string-start (or (find "{" str) -1)))
       (if (= -1 comment-start)
        (set 'comment-start brace-string-start)
-       (set 'comment-start (min comment-start brace-string-start)))))
+       (set 'comment-start (if (= -1 brace-string-start)
+                              comment-start
+                            (min comment-start brace-string-start))))))
     (if (and (!= -1 comment-start) (!= -1 limit))
         ;; Both a semicolon and a quote have been found
         (when (< comment-start limit)

@@ -258,7 +258,8 @@ def find_trim_limit(string, options=None):
             # No semicolon found
             comment_start = brace_string_start
         else:
-            comment_start = min(comment_start, brace_string_start)
+            if brace_string_start != -1:
+                comment_start = min(comment_start, brace_string_start)
 
     if comment_start != -1 and limit != -1:
         if comment_start < limit:
