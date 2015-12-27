@@ -75,7 +75,8 @@
                 arguments
               (if (null? arguments)
                   (slice $main-args 2)
-                '())))))
+                '()))))
+         (print-help (lambda () (println *help*) (exit))))
     (if (option-list? arguments)
         arguments
       (let ((i 0) (option-arg-encountered nil))
@@ -127,8 +128,8 @@
                   (if (= 1 (length lst))
                       ;; No characters after the equal sign (no dialect specified)
                       (setq (options [default-indent]) (to-int (indent-pair 1) 1))
-                    (setq (options [default-indent]) (to-int (join (rest lst)
-                                                                       "=") 1)))))
+                    (setq (options [default-indent]) (to-int
+                                                      (join (rest lst) "=") 1)))))
               (when (not (empty? (dialect-pair 0)) (empty? (dialect-pair 1)))
                 (let ((lst (parse (dialect-pair 0) "=")))
                   (if (= 1 (length lst))
@@ -154,8 +155,11 @@
                 ("--indent-commens" (setq (options [indent-comments]) true))
                 ("--no-warning" (setq (options [warning]) nil))
                 ("--nw" (setq (options [warning]) nil))
-                ))))
-        options))))
+                ("--help" (print-help))
+                ("--h" (print-help))
+                ("-h" (print-help)))
+              )))
+      options))))
 
 (define (print-args arg)
   (let (arg-list (parse-args arg))
@@ -849,15 +853,15 @@ optional arguments:
 
 (define (indent-files arguments)
   (letn ((opts (parse-args arguments)))
-   (when (not (opts [files]))
-    ;; Indent from stdin
-    (letn ((line (read-line))
-           (code ""))
-     (while line
-      (setq code (append code (string line "\n")))
-      (setq line (read-line)))
-     (setq indented-code (indent-code code))
-     (after-indentation indented-code)))
+    (when (not (opts [files]))
+      ;; Indent from stdin
+      (letn ((line (read-line))
+             (code ""))
+        (while line
+          (setq code (append code (string line "\n")))
+          (setq line (read-line)))
+        (setq indented-code (indent-code code))
+        (after-indentation indented-code)))
     (dolist (fpath (opts [files]))
       (unless (empty? fpath)
         (letn ((fname (real-path fpath))
