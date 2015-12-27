@@ -70,7 +70,7 @@
              (bool? (lst [compact]))
              (bool? (lst [warning]))
              (bool? (lst [modify])))))
-         (options (list (real-path) 1 "" '() nil nil true true true true nil ""))
+         (options (list (real-path) 1 "newlisp" '() nil nil true true true true nil ""))
          (matches-opt? (lambda (opt var)
                          (letn ((dashes (find "^-+" opt 0)))
                            (and (if dashes
