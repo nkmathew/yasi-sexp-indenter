@@ -33,47 +33,47 @@ def create_args_parser():
                         'Will indent from standard input if no files are specified',
                         nargs='*')
     parser.add_argument(
-        '-nc', '--no-compact', dest='compact',
+        '-nc', '--no-compact', '--nc', dest='compact',
         help='Do not compact the code, just indent', action='store_false')
     parser.add_argument(
-        '-nb', '--no-backup', dest='backup', action='store_false',
+        '-nb', '--no-backup', '--nb', dest='backup', action='store_false',
         help='Do not create a backup file even if --backup-dir is specified ')
     parser.add_argument(
-        '-nm', '--no-modify', dest='modify',
+        '-nm', '--no-modify', '--nm', dest='modify',
         help='Do not modify the file', action='store_false')
     parser.add_argument(
-        '-nw', '--no-warning', dest='warning',
+        '-nw', '--no-warning', '--nw', dest='warning',
         help='Do not display warnings', action='store_false')
     parser.add_argument(
-        '-no', '--no-output', dest='output',
+        '-no', '--no-output', '--no', dest='output',
         help='Suppress output of the indented code', action='store_false')
     parser.add_argument(
-        '-ne', '--no-exit', dest='exit', action='store_false',
+        '-ne', '--no-exit', '--ne', dest='exit', action='store_false',
         help='Instructs the program not to exit when a warning is raised.')
     parser.add_argument(
         '-o', dest='output_file',
         help='Path/name of output file', type=str, default='')
     parser.add_argument(
-        '--dialect',
+        '--dialect', '-dialect',
         help='Use Scheme keywords', type=str, default='')
     parser.add_argument(
         '-v', '--version', action='version',
         help='Prints script version', version='yasi v%s' % __version__)
     parser.add_argument(
-        '-bd', '--backup-dir',
+        '-bd', '--backup-dir', '--bd', '-backup-dir',
         help='The directory where the backup file is to be written',
         type=str, default=os.getcwd())
     parser.add_argument(
-        '-di', '--default-indent',
+        '-di', '--default-indent', '--di',
         help='The indent level to be used in case a ' +
         "function's argument is in the next line. Vim uses 2, the most common being 1.",
         type=int, default=1)
     parser.add_argument(
-        '-ic', '--indent-comments',
+        '-ic', '--indent-comments', '--ic',
         help='If true, comment lines will be indented possibly ' +
         'messing with any deliberate comment layout', action='store_true')
     parser.add_argument(
-        '-uni', '--uniform',
+        '-uni', '--uniform', '-uniform', '--uni',
         help='Dictates whether the if-clause and else-clause of an if-like' +
         'block should have the same indent level.',
         action='store_true')
