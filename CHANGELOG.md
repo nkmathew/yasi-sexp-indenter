@@ -4,9 +4,13 @@ Bugfixes:
 
   - **yasi.py**
     + Newlisp brace strings being trimmed
+    + **--indent-comments** now indents comments without trimming whitespace
+    + Newlisp tag strings being trimmed
 
   - **yasi.lsp**
     + Newlisp brace strings being trimmed
+    + **--indent-comments** now indents comments without trimming whitespace
+    + Newlisp tag strings being trimmed
 
 Features:
 

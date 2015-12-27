@@ -251,15 +251,14 @@ def find_trim_limit(string, options=None):
         # any aligned comments
         comment_start = re.search('[ \t]*;', string).start() + 1
 
-    # Prevents trimming of newlisp brace strings
     if opts.dialect == 'newlisp':
+        # Find out which string type comes first(normal, tag or brace strings)
         brace_string_start = string.find('{')
-        if comment_start == -1:
-            # No semicolon found
-            comment_start = brace_string_start
-        else:
-            if brace_string_start != -1:
-                comment_start = min(comment_start, brace_string_start)
+        tag_string_start = string.find('[text]')
+        pos_lst = [limit, brace_string_start, tag_string_start]
+        pos_lst = [x for x in pos_lst if x != -1]
+        if pos_lst:
+            limit = min(pos_lst)
 
     if comment_start != -1 and limit != -1:
         if comment_start < limit:

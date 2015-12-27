@@ -474,17 +474,24 @@ optional arguments:
                           -1))
          (limit (if string-start ;; store -1 if no double quote is found
                   (+ (string-start 2) (string-start 1))
-                  -1)))
+                  -1))
+         (minimum (lambda (lst)
+                   (let (smallest (first lst))
+                    (dolist (arg lst)
+                     (set 'smallest (if (< arg smallest) arg smallest)))))))
     (unless (= -1 comment-start)
       ;; Include all whitespace before the semi colon as part of the comment
       (set 'comment-start (++ ((regex "[ \t]*;" str) 1))))
     (when (= (opts [dialect]) "newlisp")
-      (letn ((brace-string-start (or (find "{" str) -1)))
-        (if (= -1 comment-start)
-            (set 'comment-start brace-string-start)
-          (set 'comment-start (if (= -1 brace-string-start)
-                                  comment-start
-                                (min comment-start brace-string-start))))))
+     (letn ((brace-start (find "{" str))
+            (tag-start (find "[text]" str))
+            (str-positions (list limit (or brace-start -1) (or tag-start -1)))
+            (pos-lst '()))
+      (dolist (arg str-positions)
+       (when (!= -1 arg)
+        (push arg pos-lst)))
+      (unless (empty? pos-lst)
+       (set 'limit (minimum pos-lst)))))
     (if (and (!= -1 comment-start) (!= -1 limit))
         ;; Both a semicolon and a quote have been found
         (when (< comment-start limit)
@@ -855,7 +862,7 @@ optional arguments:
 
     (if (and (opts [files]) (= indented-code original-code))
         (warning
-         "\n File `%s' has already been formatted. Leaving it unchanged. . .\n"
+         "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
          fname opts)
       (begin
         (when (opts [output])
