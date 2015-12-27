@@ -2,7 +2,11 @@
 
 Bugfixes:
 
-  - Newlisp brace strings being trimmed - **yasi.py**
+  - **yasi.py**
+    + Newlisp brace strings being trimmed
+
+  - **yasi.lsp**
+    + Newlisp brace strings being trimmed
 
 Features:
 

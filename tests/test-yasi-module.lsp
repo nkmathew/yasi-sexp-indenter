@@ -232,6 +232,20 @@
    (find-trim-limit [text](list 1123 ' " ); " 542)[/text])
    14))
 
+(define-test (test_find_trim_limit_newlisp_brace_string)
+  (assert=
+   (find-trim-limit
+    [text](string         {   Hello world                }    " message"))[/text]
+    "--dialect=newlisp")
+   16))
+
+(define-test (test_find_trim_limit_newlisp_brace_string_before_comment)
+  (assert=
+   (find-trim-limit
+    [text](println {            Hello     World                   }) ;; jjj[/text]
+    "--dialect=newlisp")
+   9))
+
 (define-test (test_split_preserve_empty_lines_at_EOF)
   (assert=
    (split-preserve "Tengo una pregunta\nSobre todo \n en este mundo\n\n\n\n\n" "\n")

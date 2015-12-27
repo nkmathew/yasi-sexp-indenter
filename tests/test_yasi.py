@@ -159,7 +159,11 @@ class UnitTests(unittest.TestCase):
         source = """(list 1123 ' " ); " 542)"""
         self.assertEqual(14, yasi.find_trim_limit(source))
 
-    def test_find_trim_limit_newlisp_tag_string(self):
+    def test_find_trim_limit_newlisp_brace_string_before_comment(self):
+        source = '(println {            Hello     World                   }) ;; jjj'
+        self.assertEqual(9, yasi.find_trim_limit(source, '--dialect=newlisp'))
+
+    def test_find_trim_limit_newlisp_brace_string(self):
         source = '(string         {   Hello world                }    " message"))'
         self.assertEqual(16, yasi.find_trim_limit(source, '--dialect=newlisp'))
 

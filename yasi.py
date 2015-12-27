@@ -242,21 +242,23 @@ def find_trim_limit(string, options=None):
     # Find position of the first unescaped semi colon
     comment_start = re.search(r'([^\\];)|(^;)', string)
     # Find position of the first unescaped double quote
-    limit = re.search(r'([^\\]")|(^")', string)
+    string_start = re.search(r'([^\\]")|(^")', string)
     # Assign -1 if there's no match
-    limit = limit.end() if limit else -1
+    limit = string_start.end() if string_start else -1
     comment_start = comment_start.end() if comment_start else -1
     if comment_start != -1:
         # If a semi colon is found, include all the whitespace before it to preserve
         # any aligned comments
         comment_start = re.search('[ \t]*;', string).start() + 1
 
-    # Prevents trimming of newlisp tag strings
+    # Prevents trimming of newlisp brace strings
     if opts.dialect == 'newlisp':
-        tag_string_start = string.find('{')
+        brace_string_start = string.find('{')
         if comment_start == -1:
             # No semicolon found
-            comment_start = tag_string_start
+            comment_start = brace_string_start
+        else:
+            comment_start = min(comment_start, brace_string_start)
 
     if comment_start != -1 and limit != -1:
         if comment_start < limit:

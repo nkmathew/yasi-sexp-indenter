@@ -463,20 +463,26 @@ optional arguments:
   (and (regex "^[ \t]*(\r|\n|$)" str 0) true))
 
 
-(define (find-trim-limit str)
+(define (find-trim-limit str options)
   " Returns the maximum index to stop trimming at so that we don't alter the structure
   of strings ot comments that might have been layed out in some manner"
-  (letn ((comment-start (regex {([^\\];)|(^;)} str 0)) ;; find first semicolon
-         (limit (regex {([^\\]")|(^")} str 0)) ;; find first double quote
+  (letn ((opts (parse-args options))
+         (comment-start (regex {([^\\];)|(^;)} str 0)) ;; find first semicolon
+         (string-start (regex {([^\\]")|(^")} str 0)) ;; find first double quote
          (comment-start (if comment-start ;; store -1 if no semicolon is found
                           (+ (comment-start 2) (comment-start 1))
                           -1))
-         (limit (if limit ;; store -1 if no double quote is found
-                  (+ (limit 2) (limit 1))
+         (limit (if string-start ;; store -1 if no double quote is found
+                  (+ (string-start 2) (string-start 1))
                   -1)))
     (unless (= -1 comment-start)
       ;; Include all whitespace before the semi colon as part of the comment
       (set 'comment-start (++ ((regex "[ \t]*;" str) 1))))
+    (when (= (opts [dialect]) "newlisp")
+     (letn ((brace-string-start (or (find "{" str) -1)))
+      (if (= -1 comment-start)
+       (set 'comment-start brace-string-start)
+       (set 'comment-start (min comment-start brace-string-start)))))
     (if (and (!= -1 comment-start) (!= -1 limit))
         ;; Both a semicolon and a quote have been found
         (when (< comment-start limit)
