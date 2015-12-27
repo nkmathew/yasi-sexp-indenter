@@ -3,32 +3,32 @@ PYTHON?=python
 all:
 	@echo "Usage:"
 	@echo "    make test"
-.PHONY : check
+.PHONY : all
 
 python-test:
 	@${PYTHON} tests/test_yasi.py
-.PHONY : check
+.PHONY : python-test
 
 newlisp-test:
 	@newlisp tests/test-yasi-module.lsp
-.PHONY : check
+.PHONY : newlisp-test
 
 test: python-test newlisp-test
-.PHONY : check
+.PHONY : test
 
 tags: yasi.py
 	ctags yasi.py
-.PHONY : check
+.PHONY : tags
 
 checks:
 	pep8 yasi.py tests/test_yasi.py
 	@printf "\n-------------------\n"
 	pylint yasi.py tests/test_yasi.py
-.PHONY : check
+.PHONY : checks
 
 clean:
 	rm -rf __pycache__ tags *.pyc
-.PHONY : check
+.PHONY : clean
 
 help:
 	@echo "Valid targets:"
