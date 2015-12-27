@@ -576,7 +576,7 @@ def find_first_arg_pos(bracket_offset, curr_line, options=None):
     return [arg_pos, spaces_before_func]
 
 
-def _pop_from_list(bracket, lst, line, real_pos, offset, options, msg_stack):
+def _pop_from_list(bracket, lst, line, real_pos, offset, msg_stack):
     """ _pop_from_list(char : str, lst : [str], line : str,
                         real_pos : int, offset : int)
 
@@ -901,7 +901,7 @@ def indent_code(original_code, options=None):
 
                 bracket_locations = _pop_from_list(curr_char, bracket_locations[:],
                                                    line_number, real_position,
-                                                   offset, opts, message_stack)
+                                                   offset, message_stack)
 
             if bracket_locations and curr_char in [' ', '\t'] and \
                     bracket_locations[-1]['func_name'] in keywords[1]:
