@@ -69,10 +69,10 @@
              (bool? (lst [modify])))))
          (options (list (real-path) 1 "" '() nil nil true true true true nil))
          (matches-opt? (lambda (opt var)
-                        (letn ((dashes (find "^-+" opt 0)))
-                         (and (if dashes
-                               (or (= (length $0) 2) (= (length $0) 1))
-                               nil) (find opt var)))))
+                         (letn ((dashes (find "^-+" opt 0)))
+                           (and (if dashes
+                                    (or (= (length $0) 2) (= (length $0) 1))
+                                  nil) (find opt var)))))
          (arguments
           (if (string? arguments)
               (parse arguments)
@@ -148,22 +148,22 @@
                       (setq (options [backup-dir]) (backup-dir-pair 1))
                     (setq (options [backup-dir]) (join (rest lst) "=")))))
               (cond
-                ((matches-opt? "-nc" curr) (setq (options [compact]) nil))
-                ((matches-opt? "-no-compact" curr) (setq (options [compact]) nil))
-                ((matches-opt? "-nb" curr) (setq (options [backup]) nil))
-                ((matches-opt? "-no-backup" curr) (setq (options [backup]) nil))
-                ((matches-opt? "-nm" curr) (setq (options [modify]) nil))
-                ((matches-opt? "-no-modify" curr) (setq (options [modify]) nil))
-                ((matches-opt? "-uni" curr) (setq (options [uniform]) true))
-                ((matches-opt? "-uniform" curr) (setq (options [uniform]) true))
-                ((matches-opt? "-ic" curr) (setq (options [indent-comments]) true))
-                ((matches-opt? "-indent-commens" curr) (setq (options [indent-comments]) true))
-                ((matches-opt? "-no-warning" curr) (setq (options [warning]) nil))
-                ((matches-opt? "-nw" curr) (setq (options [warning]) nil))
-                ((matches-opt? "-help" curr) (print-help))
-                ((matches-opt? "-h" curr) (print-help)))
+               ((matches-opt? "-nc" curr) (setq (options [compact]) nil))
+               ((matches-opt? "-no-compact" curr) (setq (options [compact]) nil))
+               ((matches-opt? "-nb" curr) (setq (options [backup]) nil))
+               ((matches-opt? "-no-backup" curr) (setq (options [backup]) nil))
+               ((matches-opt? "-nm" curr) (setq (options [modify]) nil))
+               ((matches-opt? "-no-modify" curr) (setq (options [modify]) nil))
+               ((matches-opt? "-uni" curr) (setq (options [uniform]) true))
+               ((matches-opt? "-uniform" curr) (setq (options [uniform]) true))
+               ((matches-opt? "-ic" curr) (setq (options [indent-comments]) true))
+               ((matches-opt? "-indent-commens" curr) (setq (options [indent-comments]) true))
+               ((matches-opt? "-no-warning" curr) (setq (options [warning]) nil))
+               ((matches-opt? "-nw" curr) (setq (options [warning]) nil))
+               ((matches-opt? "-help" curr) (print-help))
+               ((matches-opt? "-h" curr) (print-help)))
               )))
-      options))))
+        options))))
 
 (define (print-args arg)
   (let (arg-list (parse-args arg))
@@ -326,9 +326,9 @@ optional arguments:
   "Exits if the filename provided does not exist"
   (if (file? filename)
       (read-file filename)
-      (and (warning "--%s-- Exiting. Filename `%s' is not valid"
-           ;; Exit if the filename is invalid
-           (list (current-time) filename)) (exit))))
+    (and (warning "--%s-- Exiting. Filename `%s' is not valid"
+                  ;; Exit if the filename is invalid
+                  (list (current-time) filename)) (exit))))
 
 
 (define (current-time)
