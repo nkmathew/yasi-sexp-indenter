@@ -152,7 +152,7 @@
               (when (not (empty? (output-pair 0)) (empty? (output-pair 1)))
                 (let ((lst (parse (output-pair 0) "=")))
                   (when (> (length (options [files])) 1)
-                    (println "error: Cannot use the -o flag when more than one file is specified")
+                    (write *stderr* "error: Cannot use the -o flag when more than one file is specified")
                     (exit))
                   (if (= 1 (length lst))
                       ;; No characters after the equal sign (no output file specified)
@@ -188,6 +188,18 @@
                ((matches-opt? "-help" curr) (print-help))
                ((matches-opt? "-h" curr) (print-help)))
               )))
+        (unless (or (empty? (options [dialect]))
+                    (regex "^(lisp|scheme|newlisp|clojure|all)$"
+                           (options [dialect])))
+          (write *stderr*
+                 (format "`%s' is not a recognized dialect" (options [dialect])))
+          (exit))
+        (unless (real-path (options [backup-dir]))
+          (write *stderr*
+                 (format "Directory `%s' does not exist" (options [backup-dir])))
+          (exit))
+        (when (null? (options [files]))
+          (setq (options [backup]) false))
         options))))
 
 (define (print-args arg)
