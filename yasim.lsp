@@ -70,7 +70,7 @@
              (bool? (lst [compact]))
              (bool? (lst [warning]))
              (bool? (lst [modify])))))
-         (options (list (real-path) 1 "newlisp" '() nil nil true true true true nil ""))
+         (options (list (real-path) 1 "newlisp" '() nil true true true true true nil ""))
          (matches-opt? (lambda (opt var)
                          (letn ((dashes (find "^-+" opt 0)))
                            (and (if dashes
@@ -165,11 +165,16 @@
                       (setq (options [dialect]) (dialect-pair 1))
                     (setq (options [dialect]) (join (rest lst) "=")))))
               (when (not (empty? (backup-dir-pair 0)) (empty? (backup-dir-pair 1)))
-                (let ((lst (parse (backup-dir-pair 0) "=")))
-                  (if (= 1 (length lst))
-                      ;; No characters after the equal sign (no directory specified)
-                      (setq (options [backup-dir]) (backup-dir-pair 1))
-                    (setq (options [backup-dir]) (join (rest lst) "=")))))
+                (letn ((lst (parse (backup-dir-pair 0) "="))
+                       (backup-dir (if (= 1 (length lst))
+                                       (setq (options [backup-dir]) (backup-dir-pair 1))
+                                     (setq (options [backup-dir]) (join (rest lst) "="))))
+                       (backup-dir (if (= "~" backup-dir)
+                                       (env "HOME")
+                                     (or (replace
+                                          "^~/" backup-dir
+                                          (string (env "HOME") "/") 0) backup-dir))))
+                  (setq (options [backup-dir]) backup-dir)))
               (cond
                ((matches-opt? "-no" curr) (setq (options [compact]) nil))
                ((matches-opt? "-no-output" curr) (setq (options [compact]) nil))
@@ -194,12 +199,8 @@
           (write *stderr*
                  (format "`%s' is not a recognized dialect" (options [dialect])))
           (exit))
-        (unless (real-path (options [backup-dir]))
-          (write *stderr*
-                 (format "Directory `%s' does not exist" (options [backup-dir])))
-          (exit))
         (when (null? (options [files]))
-          (setq (options [backup]) false))
+          (setq (options [backup]) nil))
         options))))
 
 (define (print-args arg)
@@ -945,7 +946,6 @@ optional arguments:
                  ((regex ".scm$" fname) (setq (opts [dialect]) "scheme"))))
                (indent-result (indent-code code opts)))
           (after-indentation indent-result fname)
-          (when (and (opts [backup]) (not backup-dir))
+          (when (and (opts [backup]) (real-path backup-dir))
             (backup-source-file! fname opts))
-          (when (and backup-dir (opts [backup]))
-            (backup-source-file! fname opts)))))))
+          )))))
