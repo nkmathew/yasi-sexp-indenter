@@ -26,3 +26,4 @@ Features:
     + Indentation of multiple files specified in the command line
     + Guesses dialect by file extension when the dialect flag is not supplied
     + Able to specify output filename
+    + Tildes in backup folder path in Windows
