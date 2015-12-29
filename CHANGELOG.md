@@ -1,3 +1,13 @@
+### Unreleased
+
+Bugfixes:
+
+    - **yasi.py**
+        + Warnings being printed when script is used as a filter
+
+    - **yasi.lsp**
+        + Warnings being printed when script is used as a filter
+
 ### v0.2.0 - 29th December 2015
 
 Bugfixes:
