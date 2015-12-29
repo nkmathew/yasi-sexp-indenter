@@ -717,7 +717,6 @@ optional arguments:
                       (not (zero? val))))
          (in-symbol-region? (or in-newlisp-tag-string? in-string? (not-zero? in-comment?) in-symbol-with-space?
                                 (not-zero? in-newlisp-string?))))
-    (print-args opts)
     (dolist (line code-lines)
       (letn ((escaped? nil)
              (curr-line line)
@@ -806,7 +805,7 @@ optional arguments:
                        ;; The very long test condition prevents counting
                        ;; square and curly brackets in lisp and newLISP
                        ;; as the start of lists.
-                       (letn ((arg-pos (find-first-arg-pos offset curr-line))
+                       (letn ((arg-pos (find-first-arg-pos offset curr-line opts))
                               (first-arg-pos (first arg-pos))
                               (leading-spaces (arg-pos 1))
                               (func-name
