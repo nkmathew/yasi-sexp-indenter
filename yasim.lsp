@@ -4,7 +4,7 @@
 
 ;; Translated from the python version.
 
-(define __version__ "0.1.0")
+(define __version__ "0.2.0")
 
 (define [backup-dir] 0)
 (define [default-indent] 1)
@@ -28,7 +28,10 @@
     Commandline arguments will instead be read from if no arguments are passed in
     the function call
   "
-  (letn ((bool? (lambda (val)
+  (letn ((print-version (lambda ()
+                          (printf "yasi v%s" __version__)
+                          (exit)))
+         (bool? (lambda (val)
                   (or (= nil val) (= true val))))
          (to-int
           (lambda (str (default-num 1))
@@ -39,6 +42,8 @@
          (option-arg?
           (lambda (arg)
             (or
+             (matches-opt? "-version" arg)
+             (matches-opt? "-v" arg)
              (matches-opt? "-o" arg)
              (matches-opt? "-output" arg)
              (matches-opt? "-dialect" arg)
@@ -190,6 +195,8 @@
                ((matches-opt? "-indent-commens" curr) (setq (options [indent-comments]) true))
                ((matches-opt? "-no-warning" curr) (setq (options [warning]) nil))
                ((matches-opt? "-nw" curr) (setq (options [warning]) nil))
+               ((matches-opt? "-v" curr) (print-version))
+               ((matches-opt? "-version" curr) (print-version))
                ((matches-opt? "-help" curr) (print-help))
                ((matches-opt? "-h" curr) (print-help)))
               )))

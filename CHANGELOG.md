@@ -1,4 +1,4 @@
-### Next release
+### v0.2.0 - 29th December 2015
 
 Bugfixes:
 
