@@ -347,20 +347,27 @@
      "--dialect=lisp")
     ("tests/cases/#5-looks-like-a-macro.lisp"
      "tests/cases/#5-looks-like-a-macro~.lisp"
-     "--dialect=lisp")))
+     "--dialect=lisp")
+    ("tests/cases/#6-default-indent.lisp"
+     "tests/cases/#6-default-indent~.lisp"
+     "--dialect=lisp --default-indent 2")))
 
 (define-test (test_system)
-  (dolist (test-case system-tests)
-    (letn ((project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
+  (for (case-number 0 5)
+    (letn ((test-case (system-tests case-number))
+           (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
            (after-path (string project-dir *os-sep* (test-case [after]))))
       (set 'before (read-file! before-path))
       (set 'after (read-file! after-path))
-      (set 'indented-code ((indent-code before (test-case [options])) 7))
-      (unless (= indented-code after)
-        (println "\n>>> Test Failed: " (first test-case) "\n")
-        (println indented-code)
-        (println after)))))
+      (set 'indent-result (indent-code before (test-case [options])))
+      (set 'indented-code (indent-result 7))
+      (assert= indented-code after)
+      ;; (unless (= indented-code after)
+      ;;   (println "\n>>> Test Failed: " (first test-case) "\n")
+      ;;   (println "Returned: \n" indented-code)
+      ;;   (println "Expected: \n" after))
+      )))
 
 (UnitTest:run-all 'MAIN)
 ;; (test_system)
