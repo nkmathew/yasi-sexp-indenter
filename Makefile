@@ -27,7 +27,7 @@ checks:
 .PHONY : checks
 
 clean:
-	rm -rf __pycache__ tags *.pyc
+	rm -rf __pycache__ tags *.pyc *.bak~ tests/cases/*.bak~
 .PHONY : clean
 
 help:
