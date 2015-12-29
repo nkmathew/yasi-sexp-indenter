@@ -263,5 +263,5 @@ run in *GNU Common Lisp* because it doesn't have the macro.
     |           --no-modify ;; Don't modify the file, false by default          |
     +---------------------------------------------------------------------------+
 
-[0]: http://ds26gte.github.io/scmindent/index.html
+[0]: https://github.com/ds26gte/scmindent
 [1]: https://github.com/ds26gte/scmindent/blob/master/lispindent.lisp
