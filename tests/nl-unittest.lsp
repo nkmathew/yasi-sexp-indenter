@@ -70,8 +70,8 @@
             (colorize 'fg-purple
                       ;; "--> Expression: " (string (expression 2))
                       "--> " (string expression)
-                      "\n => Expected: " (string (eval (expression 1)))
-                      "\n -> Received: " (string (eval (expression 2))) ".")))
+                      "\n => Expected: \n" (string (eval (expression 1)))
+                      "\n -> Received: \n" (string (eval (expression 2))) ".")))
     (if *report-failed*
         (println report)))
   nil)
