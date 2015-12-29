@@ -5,13 +5,13 @@ all:
 	@echo "    make test"
 .PHONY : all
 
-python-test:
+py-test:
 	@${PYTHON} tests/test_yasi.py
-.PHONY : python-test
+.PHONY : py-test
 
-newlisp-test:
+new-test:
 	@newlisp tests/test-yasi-module.lsp
-.PHONY : newlisp-test
+.PHONY : new-test
 
 test: python-test newlisp-test
 .PHONY : test
@@ -33,8 +33,8 @@ clean:
 help:
 	@echo "Valid targets:"
 	@echo " ... all(default target)"
-	@echo " ... python-test"
-	@echo " ... newlisp-test"
+	@echo " ... py-test"
+	@echo " ... new-test"
 	@echo " ... test"
 	@echo " ... checks"
 	@echo " ... clean"
