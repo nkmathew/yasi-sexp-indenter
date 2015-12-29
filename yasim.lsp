@@ -4,7 +4,7 @@
 
 ;; Translated from the python version.
 
-(define __version__ "0.2.0")
+(define __version__ "0.2.1")
 
 (define [backup-dir] 0)
 (define [default-indent] 1)

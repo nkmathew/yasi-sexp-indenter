@@ -22,7 +22,7 @@ import time
 # pylint: disable=unused-import
 from pprint import pprint
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 def create_args_parser():
