@@ -107,9 +107,11 @@ def parse_options(arguments=None):
         parser.error('Cannot use the -o flag when more than one file is specified')
 
     if not args.files:
+        # Indentation from standard input
         if args.modify and not args.output_file:
             args.modify = False
         args.backup = False
+        args.warning = False
 
     return args
 

@@ -207,6 +207,7 @@
                  (format "`%s' is not a recognized dialect" (options [dialect])))
           (exit))
         (when (null? (options [files]))
+          (setq (options [warning]) nil)
           (setq (options [backup]) nil))
         options))))
 
