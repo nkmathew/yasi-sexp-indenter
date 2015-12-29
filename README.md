@@ -205,6 +205,16 @@ include:
 * *lispindent2.lisp* writes files using *LF* line endings be default. It's less  
   irritating than *CRLF* endings which usually light up in an annoying way in *Vim*.  
 
+#### Use within Vim
+yasi's ability to format code from standard input makes it a suitable candidate for
+the `equalprg` setting in Vim. Add this in your **.vimrc** and you're good to go.
+
+```vim
+au filetype clojure,lisp,scheme,newlisp setlocal equalprg=yasi.py\ --indent-comments
+```
+You can then indent a function/block by providing the motion after the `=` sign
+e.g `=%`
+
 #### lispindent2.lisp's Issues
 
 I inadvertently added a bug in an attempt to prevent it from evaluating  
