@@ -13,7 +13,7 @@ new-test:
 	@newlisp tests/test-yasi-module.lsp
 .PHONY : new-test
 
-test: python-test newlisp-test
+test: py-test new-test
 .PHONY : test
 
 tags: yasi.py
