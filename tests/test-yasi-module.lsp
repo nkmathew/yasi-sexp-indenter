@@ -350,10 +350,13 @@
      "--dialect=lisp")
     ("tests/cases/#6-default-indent.lisp"
      "tests/cases/#6-default-indent~.lisp"
-     "--dialect=lisp --default-indent 2")))
+     "--dialect=lisp --default-indent 2")
+    ("tests/cases/#7-uniform-if-expression.lisp"
+     "tests/cases/#7-uniform-if-expression~.lisp"
+     "--dialect=lisp --uniform")))
 
 (define-test (test_system)
-  (for (case-number 0 5)
+  (for (case-number 0 6)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))

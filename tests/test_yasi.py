@@ -253,6 +253,10 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#5-looks-like-a-macro.lisp',
                 'after': 'tests/cases/#5-looks-like-a-macro~.lisp',
                 'options': '--dialect=lisp'
+            }, {
+                'before': 'tests/cases/#7-uniform-if-expression.lisp',
+                'after': 'tests/cases/#7-uniform-if-expression~.lisp',
+                'options': '--dialect=lisp --uniform'
             }
         ]
         for case in cases:
