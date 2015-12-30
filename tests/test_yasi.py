@@ -232,6 +232,7 @@ class UnitTests(unittest.TestCase):
 
 class SystemTests(unittest.TestCase):
     def test_all_case_files(self):
+        self.maxDiff = None
         cases = [
             {
                 'before': 'tests/cases/#1-if-expression.lisp',
@@ -261,6 +262,10 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#7-uniform-if-expression.lisp',
                 'after': 'tests/cases/#7-uniform-if-expression~.lisp',
                 'options': '--dialect=lisp --uniform'
+            }, {
+                'before': 'tests/cases/#8-macrolet-special-operator.lisp',
+                'after': 'tests/cases/#8-macrolet-special-operator~.lisp',
+                'options': '--dialect=lisp --indent-comments'
             }
         ]
         for case in cases:
