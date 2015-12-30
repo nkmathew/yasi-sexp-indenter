@@ -75,20 +75,20 @@
              (bool? (lst [compact]))
              (bool? (lst [warning]))
              (bool? (lst [modify])))))
-             (options (list
-                       (real-path) ;; Backup directory
-                       1           ;; Default indent
-                       "newlisp"   ;; Dialect
-                       '()         ;; Input files
-                       nil         ;; Indent comments
-                       true        ;; Backup
-                       true        ;; Compact
-                       true        ;; Warning
-                       true        ;; Modify
-                       true        ;; Output
-                       nil         ;; Uniform
-                       ""          ;; Output filename
-                       ))
+         (options (list
+                   (real-path) ;; Backup directory
+                   1           ;; Default indent
+                   "newlisp"   ;; Dialect
+                   '()         ;; Input files
+                   nil         ;; Indent comments
+                   true        ;; Backup
+                   true        ;; Compact
+                   true        ;; Warning
+                   true        ;; Modify
+                   true        ;; Output
+                   nil         ;; Uniform
+                   ""          ;; Output filename
+                   ))
          (matches-opt? (lambda (opt var)
                          (letn ((dashes (find "^-+" opt 0)))
                            (and (if dashes
