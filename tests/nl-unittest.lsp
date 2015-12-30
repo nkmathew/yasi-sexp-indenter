@@ -71,7 +71,7 @@
                       ;; "--> Expression: " (string (expression 2))
                       "--> " (string expression)
                       "\n => Expected: \n" (string (eval (expression 1)))
-                      "\n -> Received: \n" (string (eval (expression 2))) ".")))
+                      "\n -> Received: \n" (string (eval (expression 2))))))
     (if *report-failed*
         (println report)))
   nil)
