@@ -353,10 +353,13 @@
      "--dialect=lisp --default-indent 2")
     ("tests/cases/#7-uniform-if-expression.lisp"
      "tests/cases/#7-uniform-if-expression~.lisp"
-     "--dialect=lisp --uniform")))
+     "--dialect=lisp --uniform")
+    ("tests/cases/#8-macrolet-special-operator.lisp"
+     "tests/cases/#8-macrolet-special-operator~.lisp"
+     "--dialect=lisp --indent-comments")))
 
 (define-test (test_system)
-  (for (case-number 0 6)
+  (for (case-number 0 7)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
@@ -365,7 +368,7 @@
       (set 'after (read-file! after-path))
       (set 'indent-result (indent-code before (test-case [options])))
       (set 'indented-code (indent-result 7))
-      (assert= indented-code after)
+      (assert= after indented-code)
       ;; (unless (= indented-code after)
       ;;   (println "\n>>> Test Failed: " (first test-case) "\n")
       ;;   (println "Returned: \n" indented-code)
