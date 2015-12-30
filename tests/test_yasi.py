@@ -254,6 +254,10 @@ class SystemTests(unittest.TestCase):
                 'after': 'tests/cases/#5-looks-like-a-macro~.lisp',
                 'options': '--dialect=lisp'
             }, {
+                'before': 'tests/cases/#6-default-indent.lisp',
+                'after': 'tests/cases/#6-default-indent~.lisp',
+                'options': '--dialect=lisp --default-indent 2'
+            }, {
                 'before': 'tests/cases/#7-uniform-if-expression.lisp',
                 'after': 'tests/cases/#7-uniform-if-expression~.lisp',
                 'options': '--dialect=lisp --uniform'

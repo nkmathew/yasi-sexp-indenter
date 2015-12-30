@@ -857,7 +857,8 @@ def indent_code(original_code, options=None):
                     offset += 1
                     continue
 
-                first_arg_pos, spaces_before_func = find_first_arg_pos(offset, curr_line)
+                first_arg_pos, spaces_before_func = \
+                    find_first_arg_pos(offset, curr_line, opts)
                 func_name = substr[0:first_arg_pos - 1].strip(')]\t\n\r ').lower()
                 in_list_literal = False
                 if re.search("('|`|#)([ \t]*\(|\[)($|\r)", curr_line[0:offset + 1]):
