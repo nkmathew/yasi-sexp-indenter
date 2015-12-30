@@ -333,15 +333,15 @@
 (define [options] 2)
 
 (define system-tests
-  '(("tests/cases/#3-multiple-value-bind.lisp"
-     "tests/cases/#3-multiple-value-bind~.lisp"
-     "--uniform --dialect=lisp")
-    ("tests/cases/#2-multiple-value-bind.lisp"
-      "tests/cases/#2-multiple-value-bind~.lisp"
-      "--dialect=lisp")
-    ("tests/cases/#1-if-expression.lisp"
+  '(("tests/cases/#1-if-expression.lisp"
      "tests/cases/#1-if-expression~.lisp"
      "--dialect=lisp")
+    ("tests/cases/#2-multiple-value-bind.lisp"
+     "tests/cases/#2-multiple-value-bind~.lisp"
+     "--dialect=lisp")
+    ("tests/cases/#3-multiple-value-bind.lisp"
+     "tests/cases/#3-multiple-value-bind~.lisp"
+     "--uniform --dialect=lisp")
     ("tests/cases/#4-flet-indentation.lisp"
      "tests/cases/#4-flet-indentation~.lisp"
      "--dialect=lisp")

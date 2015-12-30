@@ -234,17 +234,17 @@ class SystemTests(unittest.TestCase):
     def test_all_case_files(self):
         cases = [
             {
-                'before': 'tests/cases/#3-multiple-value-bind.lisp',
-                'after': 'tests/cases/#3-multiple-value-bind~.lisp',
-                'options': '--uniform --dialect=lisp'
+                'before': 'tests/cases/#1-if-expression.lisp',
+                'after': 'tests/cases/#1-if-expression~.lisp',
+                'options': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#2-multiple-value-bind.lisp',
                 'after': 'tests/cases/#2-multiple-value-bind~.lisp',
                 'options': '--dialect=lisp'
             }, {
-                'before': 'tests/cases/#1-if-expression.lisp',
-                'after': 'tests/cases/#1-if-expression~.lisp',
-                'options': '--dialect=lisp'
+                'before': 'tests/cases/#3-multiple-value-bind.lisp',
+                'after': 'tests/cases/#3-multiple-value-bind~.lisp',
+                'options': '--uniform --dialect=lisp'
             }, {
                 'before': 'tests/cases/#4-flet-indentation.lisp',
                 'after': 'tests/cases/#4-flet-indentation~.lisp',
