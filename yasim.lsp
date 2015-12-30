@@ -75,7 +75,20 @@
              (bool? (lst [compact]))
              (bool? (lst [warning]))
              (bool? (lst [modify])))))
-         (options (list (real-path) 1 "newlisp" '() nil true true true true true nil ""))
+             (options (list
+                       (real-path) ;; Backup directory
+                       1           ;; Default indent
+                       "newlisp"   ;; Dialect
+                       '()         ;; Input files
+                       nil         ;; Indent comments
+                       true        ;; Backup
+                       true        ;; Compact
+                       true        ;; Warning
+                       true        ;; Modify
+                       true        ;; Output
+                       nil         ;; Uniform
+                       ""          ;; Output filename
+                       ))
          (matches-opt? (lambda (opt var)
                          (letn ((dashes (find "^-+" opt 0)))
                            (and (if dashes
@@ -192,7 +205,7 @@
                ((matches-opt? "-uni" curr) (setq (options [uniform]) true))
                ((matches-opt? "-uniform" curr) (setq (options [uniform]) true))
                ((matches-opt? "-ic" curr) (setq (options [indent-comments]) true))
-               ((matches-opt? "-indent-commens" curr) (setq (options [indent-comments]) true))
+               ((matches-opt? "-indent-comments" curr) (setq (options [indent-comments]) true))
                ((matches-opt? "-no-warning" curr) (setq (options [warning]) nil))
                ((matches-opt? "-nw" curr) (setq (options [warning]) nil))
                ((matches-opt? "-v" curr) (print-version))
@@ -721,7 +734,7 @@ optional arguments:
       (letn ((escaped? nil)
              (curr-line line)
              (indent-result (indent-line zero-level bracket-locations line in-comment?
-                                         in-symbol-region?))
+                                         in-symbol-region? opts))
              (curr-line (indent-result 1))
              (indent-level (indent-result 2))
              (offset 0))
