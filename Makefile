@@ -35,7 +35,7 @@ help:
 	@echo " ... all(default target)"
 	@echo " ... py-test"
 	@echo " ... new-test"
-	@echo " ... test"
+	@echo " ... test(runs all tests)"
 	@echo " ... checks"
 	@echo " ... clean"
 .PHONY : help
