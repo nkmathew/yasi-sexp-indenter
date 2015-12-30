@@ -19,8 +19,9 @@
 
 
 (defun define-with-lisp-indent-number (n syms)
-  "Adds the keyword and its indent level to *lisp-keywords* only if the keyword
- is not already there. e.g (('LOOP' . 0) ('HANDLER-BIND' . 0) ('BLOCK' . 0)) "
+  " Associates the keywords in the supplied list with the number in the first
+  argument and stores them in the global *lisp-keywords* variable for later
+  reference e.g (('LOOP' . 0) ('HANDLER-BIND' . 0) ('BLOCK' . 0)) "
   (dolist (sym syms)
     (let* ((x (symbol-name sym))
            (c (assoc x *lisp-keywords* :test #'string-equal)))
@@ -103,7 +104,7 @@
 
 (defun lisp-indent-number (str &optional (possible-keyword-p t))
   " Returns the indentation number for the keyword if it is *lisp-keywords*. If it
- starts with 'def', it's indent value is 0. if it has a semi-colon preceding it, the
+ starts with 'def', it's indent value is 0. if it has a colon preceding it, the
  rest of the string is tested recursively to see whether it is a keyword."
   (or (cdr (assoc str *lisp-keywords* :test #'string-equal))
       (if (zerop (or (search "def" str :test #'char-equal) -1))
