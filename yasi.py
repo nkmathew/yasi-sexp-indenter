@@ -480,9 +480,6 @@ NEWLISP_KEYWORDS = \
      'do-while', 'for-all', 'find-all', 'for'
      ]
 
-# Keywords that indent by one space
-ONE_SPACE_INDENTERS = ['call-with-port']
-
 # The 'if' and 'else' part of an if block should have different indent levels so
 # that they can stand out since there's no else Keyword in Lisp/Scheme to make
 # this explicit.  list IF_LIKE helps us track these keywords.
@@ -658,9 +655,6 @@ def _push_to_list(lst, func_name, char, line, offset,
         pos_hash['indent_level'] = lead_spaces + ((offset + opts.indent_size * 2)
                                                   if not opts.uniform
                                                   else (offset + opts.indent_size))
-
-    elif func_name in ONE_SPACE_INDENTERS and func_name != '':
-        pos_hash['indent_level'] = lead_spaces + offset + 1
 
     elif two_spacer and func_name != '':
         pos_hash['indent_level'] = lead_spaces + offset + opts.indent_size

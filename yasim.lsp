@@ -377,9 +377,6 @@ optional arguments:
     ))
 
 
-;; Keywords that indent by one space
-(define *one-space-indenters* '("call-with-port"))
-
 ;; The 'if' and 'else' part of an if block should have different indent levels so
 ;; that they can stand out since there's no else Keyword in Lisp/Scheme to make
 ;; this explicit. list IF_LIKE helps us track these keywords.
@@ -721,8 +718,6 @@ optional arguments:
             (+ leading-spaces (if (opts [uniform])
                                   (+ offset (opts [indent-size]))
                                 (+ offset (* 2 (opts [indent-size])))))))
-     ((and (find func-name *one-space-indenters*)
-           (not (empty? func-name))) (+ 1 leading-spaces offset))
      ((and two-spacer (not (empty? func-name)))
       (setf (position-list [indent-level]) (+ (opts [indent-size])
                                               leading-spaces offset))))
