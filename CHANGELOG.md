@@ -1,3 +1,14 @@
+### Unreleased
+
+Features:
+
+
+  - **yasi.py**
+    + New commandline parameter **--indent-size** for changing indent size
+
+  - **yasi.lsp**
+    + New commandline parameter **--indent-size** for changing indent size
+
 ### v0.2.1 - 29th December 2015
 
 Bugfixes:
