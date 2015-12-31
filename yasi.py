@@ -64,6 +64,10 @@ def create_args_parser():
         help='The directory where the backup file is to be written',
         type=str, default=os.getcwd())
     parser.add_argument(
+        '-is', '--indent-size', '--is',
+        help='The number of spaces per indent',
+        type=int, default=2)
+    parser.add_argument(
         '-di', '--default-indent', '--di',
         help='The indent level to be used in case a ' +
         "function's argument is in the next line. Vim uses 2, the most common being 1.",
@@ -651,15 +655,15 @@ def _push_to_list(lst, func_name, char, line, offset,
 
     elif func_name in keywords[1]:
         # We only make the if-clause stand out if not in uniform mode
-        pos_hash['indent_level'] = lead_spaces + ((offset + 4)
+        pos_hash['indent_level'] = lead_spaces + ((offset + opts.indent_size * 2)
                                                   if not opts.uniform
-                                                  else (offset + 2))
+                                                  else (offset + opts.indent_size))
 
     elif func_name in ONE_SPACE_INDENTERS and func_name != '':
         pos_hash['indent_level'] = lead_spaces + offset + 1
 
     elif two_spacer and func_name != '':
-        pos_hash['indent_level'] = lead_spaces + offset + 2
+        pos_hash['indent_level'] = lead_spaces + offset + opts.indent_size
 
     lst.append(pos_hash)
     try:
@@ -668,7 +672,7 @@ def _push_to_list(lst, func_name, char, line, offset,
         # perfect.
         parent_func = lst[-3]['func_name']
         if parent_func in ['flet', 'labels', 'macrolet']:
-            lst[-1]['indent_level'] = offset + 2
+            lst[-1]['indent_level'] = offset + opts.indent_size
     except IndexError:
         pass
     return lst
@@ -924,7 +928,8 @@ def indent_code(original_code, options=None):
                     # line. The regex above takes care of that.
                     bracket_locations[-1]['spaces'] += 1
                 if bracket_locations[-1]['spaces'] == 2:
-                    bracket_locations[-1]['indent_level'] -= 0 if opts.uniform else 2
+                    bracket_locations[-1]['indent_level'] -= \
+                        0 if opts.uniform else opts.indent_size
                     # some dummy value to prevent control from reaching here again
                     bracket_locations[-1]['spaces'] = 999
 

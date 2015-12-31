@@ -18,6 +18,7 @@
 (define [output] 9)
 (define [uniform] 10)
 (define [output-file] 11)
+(define [indent-size] 12)
 
 (define [message] 0)
 (define [line] 1)
@@ -42,6 +43,8 @@
          (option-arg?
           (lambda (arg)
             (or
+             (matches-opt? "-indent-size" arg)
+             (matches-opt? "-is" arg)
              (matches-opt? "-version" arg)
              (matches-opt? "-v" arg)
              (matches-opt? "-o" arg)
@@ -88,12 +91,14 @@
                    true        ;; Output
                    nil         ;; Uniform
                    ""          ;; Output filename
+                   2           ;; Indent level
                    ))
+         (zero-or-one? (lambda (num) (or (zero? num) (= 1 num))))
          (matches-opt? (lambda (opt var)
                          (letn ((dashes (find "^-+" opt 0)))
                            (and (if dashes
                                     (or (= (length $0) 2) (= (length $0) 1))
-                                  nil) (find opt var)))))
+                                  nil) (zero-or-one? (find opt var))))))
          (arguments
           (if (string? arguments)
               (parse arguments)
@@ -130,12 +135,23 @@
                              (matches-opt? "-output" prev))
                          (list prev curr)
                        (list "" ""))))
+                  (indent-size-pair
+                   (if (or (and (not (matches-opt? "-indent-size" prev))
+                                (matches-opt? "-indent-size" curr))
+                           (and (not (matches-opt? "-is" prev))
+                                (matches-opt? "-is" curr)))
+                       ;; The "-indent-size" string is at the end of the arg list
+                       (list curr "")
+                     (if (or (matches-opt? "-indent-size" prev)
+                             (matches-opt? "-is" prev))
+                         (list prev curr)
+                       (list "" ""))))
                   (indent-pair
                    (if (or (and (not (matches-opt? "-default-indent" prev))
                                 (matches-opt? "-default-indent" curr))
                            (and (not (matches-opt? "-di" prev))
                                 (matches-opt? "-di" curr)))
-                       ;; The "-backup-dir" string is at the end of the arg list
+                       ;; The "-default-indent" string is at the end of the arg list
                        (list curr "")
                      (if (or (matches-opt? "-di" prev)
                              (matches-opt? "-default-indent" prev))
@@ -160,10 +176,17 @@
                      (if (matches-opt? "-dialect" prev)
                          (list prev curr)
                        (list "" "")))))
+              (when (not (empty? (indent-size-pair 0)) (empty? (indent-size-pair 1)))
+                (let ((lst (parse (indent-size-pair 0) "=")))
+                  (if (= 1 (length lst))
+                      ;; No characters after the equal sign
+                      (setq (options [indent-size]) (to-int (indent-pair 1) 2))
+                    (setq (options [indent-size]) (to-int
+                                                   (join (rest lst) "=") 2)))))
               (when (not (empty? (indent-pair 0)) (empty? (indent-pair 1)))
                 (let ((lst (parse (indent-pair 0) "=")))
                   (if (= 1 (length lst))
-                      ;; No characters after the equal sign (no dialect specified)
+                      ;; No characters after the equal sign
                       (setq (options [default-indent]) (to-int (indent-pair 1) 1))
                     (setq (options [default-indent]) (to-int
                                                       (join (rest lst) "=") 1)))))
@@ -238,6 +261,7 @@
     (println "output          : "  (arg-list [output]))
     (println "uniform         : "  (arg-list [uniform]))
     (println "output file     : "  (arg-list [output-file]))
+    (println "Indent Size     : "  (arg-list [indent-size]))
     (println "")))
 
 
@@ -247,8 +271,8 @@
 ;; ****************************************************************************************
 (define *help* (string [text]
 usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
-            [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-di DEFAULT_INDENT]
-            [-ic] [-uni]
+            [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-is INDENT_SIZE]
+            [-di DEFAULT_INDENT] [-ic] [-uni]
             [files [files ...]]
 
 Dialect-aware s-expression indenter
@@ -278,6 +302,8 @@ optional arguments:
   -v, --version         Prints script version
   -bd BACKUP_DIR, --backup-dir BACKUP_DIR, --bd BACKUP_DIR, -backup-dir BACKUP_DIR
                         The directory where the backup file is to be written
+  -is INDENT_SIZE, --indent-size INDENT_SIZE, --is INDENT_SIZE
+                        The number of spaces per indent
   -di DEFAULT_INDENT, --default-indent DEFAULT_INDENT, --di DEFAULT_INDENT
                         The indent level to be used in case a function's
                         argument is in the next line. Vim uses 2, the most
@@ -691,18 +717,20 @@ optional arguments:
           (and (= (opts [dialect]) "clojure") (= bracket "[")))
       (setf (position-list [indent-level]) (+ 0 first-item)))
      ((find func-name (keywords 1))
-      (setf (position-list [indent-level]) (+ leading-spaces (if (opts [uniform])
-                                                                 (+ offset 2)
-                                                               (+ offset 4)))))
+      (setf (position-list [indent-level])
+            (+ leading-spaces (if (opts [uniform])
+                                  (+ offset (opts [indent-size]))
+                                (+ offset (* 2 (opts [indent-size])))))))
      ((and (find func-name *one-space-indenters*)
            (not (empty? func-name))) (+ 1 leading-spaces offset))
      ((and two-spacer (not (empty? func-name)))
-      (setf (position-list [indent-level]) (+ 2 leading-spaces offset))))
+      (setf (position-list [indent-level]) (+ (opts [indent-size])
+                                              leading-spaces offset))))
     (push position-list lst)
     (when (>= (length lst) 3)
       (let (parent-func ((lst 2) [func-name]))
         (when (find parent-func '("flet" "labels" "macrolet"))
-          (setf ((first lst) [indent-level]) (+ 2 offset)))))
+          (setf ((first lst) [indent-level]) (+ (opts [indent-size]) offset)))))
     lst))
 
 
@@ -865,8 +893,8 @@ optional arguments:
                          (++ ((first bracket-locations) [spaces])))
                        (when (= 2 ((first bracket-locations) [spaces]))
                          (unless (opts [uniform])
-                           (-- ((first bracket-locations) [indent-level]))
-                           (-- ((first bracket-locations) [indent-level]))
+                           (dec ((first bracket-locations) [indent-level])
+                                (opts [indent-size]))
                            (setf ((first bracket-locations) [spaces]) 999)))))))))
            (++ offset))))
       (++ line-number))
