@@ -81,7 +81,7 @@
          (options (list
                    (real-path) ;; Backup directory
                    1           ;; Default indent
-                   "newlisp"   ;; Dialect
+                   "all"       ;; Dialect
                    '()         ;; Input files
                    nil         ;; Indent comments
                    true        ;; Backup

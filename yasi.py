@@ -55,7 +55,7 @@ def create_args_parser():
         help='Path/name of output file', type=str, default='')
     parser.add_argument(
         '--dialect', '-dialect',
-        help='Use Scheme keywords', type=str, default='newlisp')
+        help='Use Scheme keywords', type=str, default='all')
     parser.add_argument(
         '-v', '--version', action='version',
         help='Prints script version', version='yasi v%s' % __version__)
