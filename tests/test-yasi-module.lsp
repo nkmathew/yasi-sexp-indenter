@@ -356,10 +356,13 @@
      "--dialect=lisp --uniform")
     ("tests/cases/#8-macrolet-special-operator.lisp"
      "tests/cases/#8-macrolet-special-operator~.lisp"
-     "--dialect=lisp --indent-comments")))
+     "--dialect=lisp --indent-comments")
+    ("tests/cases/#9-standard-emacs-form-indentation.lisp"
+     "tests/cases/#9-standard-emacs-form-indentation~.lisp"
+     "--dialect=all")))
 
 (define-test (test_system)
-  (for (case-number 0 7)
+  (for (case-number 0 8)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))

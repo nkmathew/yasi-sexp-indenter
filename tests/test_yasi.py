@@ -266,6 +266,10 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#8-macrolet-special-operator.lisp',
                 'after': 'tests/cases/#8-macrolet-special-operator~.lisp',
                 'options': '--dialect=lisp --indent-comments'
+            }, {
+                'before': 'tests/cases/#9-standard-emacs-form-indentation.lisp',
+                'after': 'tests/cases/#9-standard-emacs-form-indentation~.lisp',
+                'options': '--dialect=all'
             }
         ]
         for case in cases:
