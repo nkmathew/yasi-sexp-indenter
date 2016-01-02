@@ -481,7 +481,7 @@ LISP_KEYWORDS = \
 
 NEWLISP_KEYWORDS = \
     ['while', 'if', 'case', 'dotimes', 'define', 'dolist', 'catch',
-     'throw', 'lambda', 'lambda-macro', 'when', 'unless', 'letex', 'letn', 'begin',
+     'throw', 'lambda', 'lambda-macro', 'when', 'unless', 'letex', 'begin',
      'dostring', 'let', 'letn', 'doargs', 'define-macro', 'until', 'do-until',
      'do-while', 'for-all', 'find-all', 'for'
      ]
