@@ -411,7 +411,7 @@ optional arguments:
   (letn ((assoc-list (or assoc-list '())))
     (dolist (arg lst)
       (if (assoc arg assoc-list)
-          (setf (assoc arg assoc-list) (list arg lnum))
+          (setf (assoc arg assoc-list) (list arg inum))
         (push (list arg inum) assoc-list)))))
 
 
