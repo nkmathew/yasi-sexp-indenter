@@ -272,7 +272,8 @@ class SystemTests(unittest.TestCase):
                 'options': '--dialect=all'
             }
         ]
-        for case in cases:
+        for i in range(0, 8):
+            case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])
             before = yasi.read_file(before_path)
