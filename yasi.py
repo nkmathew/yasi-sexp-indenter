@@ -18,6 +18,7 @@ import re
 import shutil
 import sys
 import time
+import collections
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -426,12 +427,17 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
     else:
         return zerolevel, line, 0
 
-# ****************************************************************************************
+# ---------------------------------------------------------------------------------
 # GLOBAL CONSTANTS::
 
 CR   = '\r'
 LF   = '\n'
 CRLF = CR + LF
+
+KEYWORD0 = 0 # Non-keyword
+KEYWORD1 = 1 # Indents uniformly by 1 unit
+KEYWORD2 = 2 # Distinguishes subforms
+KEYWORD3 = 3 # Indens uniformly by 2 units
 
 # Keywords that indent by two spaces
 SCHEME_KEYWORDS = \
@@ -486,36 +492,41 @@ NEWLISP_KEYWORDS = \
 IF_LIKE = ['if']
 
 
+def assign_indent_numbers(lst, inum, dic=collections.defaultdict(int)):
+    for i in lst:
+        dic[i] = inum
+    return dic
+
+
 def add_keywords(dialect):
     """ add_keywords(dialect : str) -> [str, str]
 
     Takens a lisp dialect name and returns a list of keywords that increase
     indentation by two spaces and those that can be one-armed like 'if'
     """
-    if dialect == 'lisp':  # Lisp
+    keywords = collections.defaultdict(int)
+    two_spacers = []
+    two_armed = IF_LIKE
+    if dialect == 'lisp': # Lisp
         two_spacers = LISP_KEYWORDS
-        one_armed = ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
-        return [two_spacers, IF_LIKE + one_armed]
-    elif dialect == 'scheme':  # Scheme
+        two_armed += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
+    elif dialect == 'scheme': # Scheme
         two_spacers = SCHEME_KEYWORDS
-        one_armed = ['with-slots', 'do', 'do*']
-        return [two_spacers, IF_LIKE + one_armed]
-    elif dialect == 'clojure':  # Clojure
+        two_armed += ['with-slots', 'do', 'do*']
+    elif dialect == 'clojure': # Clojure
         two_spacers = CLOJURE_KEYWORDS
-        one_armed = []
-        return [two_spacers, IF_LIKE + one_armed]
-    elif dialect == 'newlisp':  # newLISP
+        two_armed += []
+    elif dialect == 'newlisp': # newLISP
         two_spacers = NEWLISP_KEYWORDS
-        one_armed = []
-        return [two_spacers, IF_LIKE + one_armed]
+        two_armed += []
     elif dialect == 'all':
-        two_spacers = LISP_KEYWORDS + SCHEME_KEYWORDS + \
-            CLOJURE_KEYWORDS + NEWLISP_KEYWORDS
-        return [two_spacers, IF_LIKE]
-    else:
-        return [[], []]
+        two_spacers = LISP_KEYWORDS + SCHEME_KEYWORDS + CLOJURE_KEYWORDS + \
+            NEWLISP_KEYWORDS
+    keywords = assign_indent_numbers(two_spacers, KEYWORD1, keywords)
+    keywords = assign_indent_numbers(two_armed, KEYWORD2, keywords)
+    return keywords
 
-# ************************************************************************************* #
+# ---------------------------------------------------------------------------------
 
 
 def find_first_arg_pos(bracket_offset, curr_line, options=None):
@@ -644,13 +655,14 @@ def _push_to_list(lst, func_name, char, line, offset,
                 'func_name': func_name,
                 'spaces': 0}
 
-    two_spacer = func_name in keywords[0] or is_macro_name(func_name, opts.dialect)
+    is_macro = is_macro_name(func_name, opts.dialect)
+    two_spacer = is_macro or keywords[func_name] == KEYWORD1
 
     if in_list_literal or char == '{' or (char == '[' and opts.dialect == 'clojure'):
         # found quoted list or clojure hashmap/vector
         pos_hash['indent_level'] = first_item
 
-    elif func_name in keywords[1]:
+    elif keywords[func_name] == KEYWORD2:
         # We only make the if-clause stand out if not in uniform mode
         pos_hash['indent_level'] = lead_spaces + ((offset + opts.indent_size * 2)
                                                   if not opts.uniform
@@ -865,12 +877,12 @@ def indent_code(original_code, options=None):
                 if re.search('^[^ \t]+[ \t]*($|\r)', substr):
                     # The function is the last symbol/form in the line
                     func_name = substr.strip(')]\t\n\r ').lower()
-                if func_name == '' or in_list_literal:
+                if in_list_literal:
                     # an empty string is always in a non-empty string, we don't want
                     # this. We set False as the func_name because it's not a string
                     # in_list_literal prevents an keyword in a list literal from
                     # affecting the indentation
-                    func_name = False
+                    func_name = ''
 
                 if func_name in ['define-macro', 'defmacro']:
                     # Macro names are part of two space indenters.
@@ -881,7 +893,7 @@ def indent_code(original_code, options=None):
                     substr = substr[re.search('[ \t]*', substr).start():].strip()
                     macro_name = substr[:substr.find(' ')]  # macro name is delimeted by whitespace
                     if macro_name != '':
-                        keywords[0].append(macro_name)
+                        keywords[macro_name] = KEYWORD1
 
                 # first_item stores the position of the first item in the literal list
                 # it's necessary so that we don't assume that the first item is always
@@ -905,7 +917,7 @@ def indent_code(original_code, options=None):
                                                    offset, message_stack)
 
             if bracket_locations and curr_char in [' ', '\t'] and \
-                    bracket_locations[-1]['func_name'] in keywords[1]:
+                    keywords[bracket_locations[-1]['func_name']] == KEYWORD2:
                 # This part changes the indentation level of a then clause so that
                 # we can achieve something like:
                 #         (if (= this that)

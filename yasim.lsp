@@ -91,7 +91,7 @@
                    true        ;; Output
                    nil         ;; Uniform
                    ""          ;; Output filename
-                   2           ;; Indent level
+                   2           ;; Indent size
                    ))
          (zero-or-one? (lambda (num) (or (zero? num) (= 1 num))))
          (matches-opt? (lambda (opt var)
@@ -268,6 +268,29 @@
 (define (printf)
   (println (format (args 0) (rest (args)))))
 
+(define KEYWORD0 0)
+(define KEYWORD1 1)
+(define KEYWORD2 2)
+(define KEYWORD3 3)
+
+(define (lookup0 keyword lst)
+  (letn ((keyword (or keyword ""))
+         (lst (or lst '()))
+         (result (lookup keyword lst)))
+    (or result 0)))
+
+(define (keyword0? keyword assoc-lst)
+  (= KEYWORD0 (lookup0 keyword assoc-lst)))
+
+(define (keyword1? keyword assoc-lst)
+  (= KEYWORD1 (lookup0 keyword assoc-lst)))
+
+(define (keyword2? keyword assoc-lst)
+  (= KEYWORD2 (lookup0 keyword assoc-lst)))
+
+(define (keyword3? keyword assoc-lst)
+  (= KEYWORD3 (lookup0 keyword assoc-lst)))
+
 ;; ****************************************************************************************
 (define *help* (string [text]
 usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
@@ -384,25 +407,38 @@ optional arguments:
   '("if"))
 
 
+(define (assign-indent-numbers lst inum assoc-list)
+  (letn (assoc-list (or assoc-list '()))
+    (dolist (arg lst)
+      (push (list arg inum) assoc-list))))
+
+
 (define (add-keywords dialect)
+  (set 'two-spacers '())
+  (set 'two-armed *if-like*)
+  (set 'keywords '())
   (cond
    ((= "lisp" dialect)
-    (set 'lisp-if-like
-         (append
-          '("multiple-value-bind" "destructuring-bind" "do" "do*") *if-like*))
-    (list *lisp-keywords* lisp-if-like))
+    (set 'two-armed
+         (append *if-like*
+                 '("multiple-value-bind" "destructuring-bind" "do" "do*")))
+    (set 'two-spacers *lisp-keywords*))
    ((= dialect "scheme")
     (set 'scheme-if-like (append '("with-slots" "do" "do*")  *if-like*))
-    (list *scheme-keywords* scheme-if-like))
+    (set 'two-spacers *scheme-keywords*)
+    (set 'two-armed *scheme-if-like*))
    ((= dialect "clojure")
-    (list *clojure-keywords* *if-like*))
+    (set 'two-spacers *clojure-keywords*)
+    (set 'two-armed (append *if-like*)))
    ((= dialect "newlisp")
-    (list *newlisp-keywords* *if-like*))
+    (set 'two-spacers *newlisp-keywords*)
+    (set 'two-armed (append *if-like*)))
    ((= dialect "all")
-    (list
-     (append *lisp-keywords* *scheme-keywords*
-             *clojure-keywords* *newlisp-keywords*) *if-like*))
-   (true '(() ()))))
+    (set 'two-spacers
+         (append *lisp-keywords* *scheme-keywords*
+                 *clojure-keywords* *newlisp-keywords*))))
+  (set 'keywords (assign-indent-numbers two-spacers KEYWORD1 keywords))
+  (set 'keywords (assign-indent-numbers two-armed KEYWORD2 keywords)))
 
 ;; ---------------------------------------------------------------------------------------
 
@@ -708,12 +744,12 @@ optional arguments:
         (opts (parse-args options))
         (keywords (add-keywords (opts [dialect])))
         (two-spacer (or (is-macro-name? func-name (opts [dialect]))
-                        (find func-name (keywords 0)))))
+                        (keyword1? func-name keywords))))
     (cond
      ((or in-list-literal? (= bracket "{")
           (and (= (opts [dialect]) "clojure") (= bracket "[")))
       (setf (position-list [indent-level]) (+ 0 first-item)))
-     ((find func-name (keywords 1))
+     ((keyword2? func-name keywords)
       (setf (position-list [indent-level])
             (+ leading-spaces (if (opts [uniform])
                                   (+ offset (opts [indent-size]))
@@ -861,7 +897,7 @@ optional arguments:
                                                   (or ((regex "[ \t]*" substr) 1) -1)) " \n\r\t"))
                                   (macro-name (slice substr 0 (or (find " " substr) -1))))
                              (if (not (empty? macro-name))
-                                 (push macro-name (keywords 0)))))
+                                 (push (list macro-name KEYWORD1) keywords))))
                          (set 'first-item (+ offset 1
                                              ((regex "[ \t]*"
                                                      (slice curr-line (+ 1 offset))) 2)))
@@ -881,8 +917,8 @@ optional arguments:
                          (set 'bracket-locations (first popped-lst))
                          (set 'message-stack (last popped-lst))))
                      (when (and bracket-locations (find curr-char '(" " "\t"))
-                                (find ((first bracket-locations) [func-name])
-                                      (keywords 1)))
+                                (keyword2? ((first bracket-locations) [func-name])
+                                           keywords))
                        (when (or (not (find prev-char '(" " "\t" "")))
                                  (not (regex "^[ \t]*(;|#\\||$|\r)" curr-line)))
                          (++ ((first bracket-locations) [spaces])))
