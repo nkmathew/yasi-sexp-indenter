@@ -395,7 +395,7 @@ optional arguments:
 
 (define *newlisp-keywords*
   '("while" "if" "case" "dotimes" "define" "dolist" "catch" "throw" "lambda"
-    "lambda-macro" "when" "unless" "letex" "letn" "begin" "dostring" "let" "letn"
+    "lambda-macro" "when" "unless" "letex" "begin" "dostring" "let" "letn"
     "doargs" "define-macro" "until" "do-until" "do-while" "for-all" "for"
     ))
 
@@ -408,9 +408,11 @@ optional arguments:
 
 
 (define (assign-indent-numbers lst inum assoc-list)
-  (letn (assoc-list (or assoc-list '()))
+  (letn ((assoc-list (or assoc-list '())))
     (dolist (arg lst)
-      (push (list arg inum) assoc-list))))
+      (if (assoc arg assoc-list)
+          (setf (assoc arg assoc-list) (list arg lnum))
+        (push (list arg inum) assoc-list)))))
 
 
 (define (add-keywords dialect)
