@@ -19,6 +19,7 @@ import shutil
 import sys
 import time
 import collections
+import json
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -434,10 +435,10 @@ CR   = '\r'
 LF   = '\n'
 CRLF = CR + LF
 
-KEYWORD0 = 0 # Non-keyword
-KEYWORD1 = 1 # Indents uniformly by 1 unit
-KEYWORD2 = 2 # Distinguishes subforms
-KEYWORD3 = 3 # Indens uniformly by 2 units
+KEYWORD0 = 0  # Non-keyword
+KEYWORD1 = 1  # Indents uniformly by 1 unit
+KEYWORD2 = 2  # Distinguishes subforms
+KEYWORD3 = 3  # Indens uniformly by 2 units
 
 # Keywords that indent by two spaces
 SCHEME_KEYWORDS = \
@@ -492,7 +493,26 @@ NEWLISP_KEYWORDS = \
 IF_LIKE = ['if']
 
 
+def parse_rc_json():
+    """ Reads the json configuration file(yasirc.json), parses it and returns the
+    dictionary
+    """
+    fname = 'yasirc.json'
+    path = os.path.expanduser('~/' + fname)
+    if os.path.exists(fname):
+        path = os.path.abspath(fname)
+    content = ''
+    with open(path) as f:
+        content = f.read()
+    if content:
+        return json.loads(content)
+    else:
+        return {}
+
+
 def assign_indent_numbers(lst, inum, dic=collections.defaultdict(int)):
+    """ Associate keywords with their respective indentation numbers
+    """
     for i in lst:
         dic[i] = inum
     return dic
@@ -507,16 +527,16 @@ def add_keywords(dialect):
     keywords = collections.defaultdict(int)
     two_spacers = []
     two_armed = IF_LIKE
-    if dialect == 'lisp': # Lisp
+    if dialect == 'lisp':  # Lisp
         two_spacers = LISP_KEYWORDS
         two_armed += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
-    elif dialect == 'scheme': # Scheme
+    elif dialect == 'scheme':  # Scheme
         two_spacers = SCHEME_KEYWORDS
         two_armed += ['with-slots', 'do', 'do*']
-    elif dialect == 'clojure': # Clojure
+    elif dialect == 'clojure':  # Clojure
         two_spacers = CLOJURE_KEYWORDS
         two_armed += []
-    elif dialect == 'newlisp': # newLISP
+    elif dialect == 'newlisp':  # newLISP
         two_spacers = NEWLISP_KEYWORDS
         two_armed += []
     elif dialect == 'all':
@@ -524,6 +544,8 @@ def add_keywords(dialect):
             NEWLISP_KEYWORDS
     keywords = assign_indent_numbers(two_spacers, KEYWORD1, keywords)
     keywords = assign_indent_numbers(two_armed, KEYWORD2, keywords)
+    rc_keywords = parse_rc_json()
+    keywords.update(rc_keywords[dialect])
     return keywords
 
 # ---------------------------------------------------------------------------------

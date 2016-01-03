@@ -406,19 +406,36 @@ optional arguments:
 (define *if-like*
   '("if"))
 
+(define (parse-rc-json)
+  (letn ((fname "yasirc.json")
+         (home (env "HOME"))
+         (path (or (real-path (string home *os-sep* fname))
+                   (real-path fname) ""))
+         (contents (or (read-file path) "")))
+  (or (json-parse contents) '())))
 
-(define (assign-indent-numbers lst inum assoc-list)
-  (letn ((assoc-list (or assoc-list '())))
+(define (assign-indent-numbers lst assoc-list inum)
+  " Builds an associative list with keys as keywords and values as their indentation
+  numbers. It also merges two associative lists with the values in the second
+  associative list overridding those in the first
+  "
+  (letn ((assoc-list (or assoc-list '()))
+         (lst (or lst '()))
+         (inum (or inum KEYWORD0)))
     (dolist (arg lst)
-      (if (assoc arg assoc-list)
-          (setf (assoc arg assoc-list) (list arg inum))
-        (push (list arg inum) assoc-list)))))
+      (letn ((info (if (and (list? arg) (= 2 (length arg)))
+                       arg
+                     (list arg inum))))
+        (if (assoc (first info) assoc-list)
+            (setf (assoc (first info) assoc-list) info)
+          (push info assoc-list))))
+    assoc-list))
 
 
 (define (add-keywords dialect)
   (set 'two-spacers '())
   (set 'two-armed *if-like*)
-  (set 'keywords '())
+  (set 'keyword-list '())
   (cond
    ((= "lisp" dialect)
     (set 'two-armed
@@ -439,8 +456,11 @@ optional arguments:
     (set 'two-spacers
          (append *lisp-keywords* *scheme-keywords*
                  *clojure-keywords* *newlisp-keywords*))))
-  (set 'keywords (assign-indent-numbers two-spacers KEYWORD1 keywords))
-  (set 'keywords (assign-indent-numbers two-armed KEYWORD2 keywords)))
+  (set 'keyword-list (assign-indent-numbers two-spacers keyword-list KEYWORD1))
+  (set 'keyword-list (assign-indent-numbers two-armed keyword-list KEYWORD2))
+  (set 'rc-keywords (assign-indent-numbers
+                     (lookup dialect (parse-rc-json)) keyword-list nil))
+  rc-keywords)
 
 ;; ---------------------------------------------------------------------------------------
 
@@ -741,17 +761,17 @@ optional arguments:
 
 (define (push-to-list lst func-name bracket line offset first-arg-pos first-item
                       in-list-literal? leading-spaces options)
-  (let ((position-list (list bracket line offset
+  (letn ((position-list (list bracket line offset
                              (+ first-arg-pos offset) func-name 0))
         (opts (parse-args options))
-        (keywords (add-keywords (opts [dialect])))
+        (kwd-list (add-keywords (opts [dialect])))
         (two-spacer (or (is-macro-name? func-name (opts [dialect]))
-                        (keyword1? func-name keywords))))
+                        (keyword1? func-name kwd-list))))
     (cond
      ((or in-list-literal? (= bracket "{")
           (and (= (opts [dialect]) "clojure") (= bracket "[")))
       (setf (position-list [indent-level]) (+ 0 first-item)))
-     ((keyword2? func-name keywords)
+     ((keyword2? func-name kwd-list)
       (setf (position-list [indent-level])
             (+ leading-spaces (if (opts [uniform])
                                   (+ offset (opts [indent-size]))
@@ -769,7 +789,7 @@ optional arguments:
 
 (define (indent-code original-code options)
   (letn ((opts (parse-args options))
-         (keywords (add-keywords (opts [dialect])))
+         (keyword-lst (add-keywords (opts [dialect])))
          (in-comment? 0) ;; Multiline comment
          (in-newlisp-string? 0)
          (in-newlisp-tag-string? nil)
@@ -899,7 +919,7 @@ optional arguments:
                                                   (or ((regex "[ \t]*" substr) 1) -1)) " \n\r\t"))
                                   (macro-name (slice substr 0 (or (find " " substr) -1))))
                              (if (not (empty? macro-name))
-                                 (push (list macro-name KEYWORD1) keywords))))
+                                 (push (list macro-name KEYWORD1) keyword-lst))))
                          (set 'first-item (+ offset 1
                                              ((regex "[ \t]*"
                                                      (slice curr-line (+ 1 offset))) 2)))
@@ -920,7 +940,7 @@ optional arguments:
                          (set 'message-stack (last popped-lst))))
                      (when (and bracket-locations (find curr-char '(" " "\t"))
                                 (keyword2? ((first bracket-locations) [func-name])
-                                           keywords))
+                                           keyword-lst))
                        (when (or (not (find prev-char '(" " "\t" "")))
                                  (not (regex "^[ \t]*(;|#\\||$|\r)" curr-line)))
                          (++ ((first bracket-locations) [spaces])))
