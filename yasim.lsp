@@ -300,7 +300,7 @@
 
 ;; ****************************************************************************************
 (define *help* (string [text]
-usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
+usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-nr] [-no] [-ne] [-o OUTPUT_FILE]
             [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-is INDENT_SIZE]
             [-di DEFAULT_INDENT] [-ic] [-uni]
             [files [files ...]]
@@ -322,6 +322,7 @@ optional arguments:
                         Do not modify the file
   -nw, --no-warning, --nw
                         Do not display warnings
+  -nr, --no-rc, --nr    Ignore any rc files in the current or home folder
   -no, --no-output, --no
                         Suppress output of the indented code
   -ne, --no-exit, --ne  Instructs the program not to exit when a warning is
