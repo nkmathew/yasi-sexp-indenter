@@ -47,6 +47,10 @@ def create_args_parser():
         '-nw', '--no-warning', '--nw', dest='warning',
         help='Do not display warnings', action='store_false')
     parser.add_argument(
+        '-nr', '--no-rc', '--nr', dest='read_rc',
+        help='Ignore any rc files in the current or home folder',
+        action='store_false')
+    parser.add_argument(
         '-no', '--no-output', '--no', dest='output',
         help='Suppress output of the indented code', action='store_false')
     parser.add_argument(
@@ -521,12 +525,13 @@ def assign_indent_numbers(lst, inum, dic=collections.defaultdict(int)):
     return dic
 
 
-def add_keywords(dialect):
+def add_keywords(opts):
     """ add_keywords(dialect : str) -> [str, str]
 
     Takens a lisp dialect name and returns a list of keywords that increase
     indentation by two spaces and those that can be one-armed like 'if'
     """
+    dialect = opts.dialect
     keywords = collections.defaultdict(int)
     two_spacers = []
     two_armed = IF_LIKE
@@ -547,8 +552,9 @@ def add_keywords(dialect):
             NEWLISP_KEYWORDS
     keywords = assign_indent_numbers(two_spacers, KEYWORD1, keywords)
     keywords = assign_indent_numbers(two_armed, KEYWORD2, keywords)
-    rc_keywords = parse_rc_json()
-    keywords.update(rc_keywords[dialect])
+    if opts.read_rc:
+        rc_keywords = parse_rc_json()
+        keywords.update(rc_keywords[dialect])
     return keywords
 
 # ---------------------------------------------------------------------------------
@@ -672,7 +678,7 @@ def _push_to_list(lst, func_name, char, line, offset,
     the list and the list returned.
     """
     opts = parse_options(options)
-    keywords = add_keywords(opts.dialect)
+    keywords = add_keywords(opts)
     pos_hash = {'character': char,
                 'line_number': line,
                 'bracket_pos': offset,
@@ -737,7 +743,7 @@ def indent_code(original_code, options=None):
     """
 
     opts = parse_options(options)
-    keywords = add_keywords(opts.dialect)
+    keywords = add_keywords(opts)
 
     # Safeguards against processing brackets inside strings
     in_string = False
