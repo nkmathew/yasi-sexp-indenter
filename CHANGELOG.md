@@ -5,6 +5,7 @@ Features:
   - **yasi.py**
     + New commandline parameter **--indent-size** for changing indent size
     + Support for additional keywords through a configuration file(yasirc.json)
+    + Can output unified diff of the initial and final result
 
   - **yasi.lsp**
     + New commandline parameter **--indent-size** for changing indent size

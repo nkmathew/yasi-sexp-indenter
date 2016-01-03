@@ -61,11 +61,13 @@ over its counterpart *lispindent.lisp*. Its features include:
 
 + Indentation from standard input
 
++ The python version can output a unified diff between the initial and indented code
+
 ### Command Line Arguments
 
-    usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
-                [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-is INDENT_SIZE]
-                [-di DEFAULT_INDENT] [-ic] [-uni]
+    usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [-no] [-ne]
+                [-o OUTPUT_FILE] [--dialect DIALECT] [-v] [-bd BACKUP_DIR]
+                [-is INDENT_SIZE] [-di DEFAULT_INDENT] [-ic] [-uni]
                 [files [files ...]]
 
     Dialect-aware s-expression indenter
@@ -83,8 +85,10 @@ over its counterpart *lispindent.lisp*. Its features include:
                             specified
       -nm, --no-modify, --nm
                             Do not modify the file
+      --diff, -diff         Prints unified diff of the initial and final result
       -nw, --no-warning, --nw
                             Do not display warnings
+      -nr, --no-rc, --nr    Ignore any rc files in the current or home folder
       -no, --no-output, --no
                             Suppress output of the indented code
       -ne, --no-exit, --ne  Instructs the program not to exit when a warning is
@@ -107,9 +111,6 @@ over its counterpart *lispindent.lisp*. Its features include:
       -uni, --uniform, -uniform, --uni
                             Dictates whether the if-clause and else-clause of an
                             if-likeblock should have the same indent level.
-                    [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-di DEFAULT_INDENT]
-                    [-ic] [-uni]
-                    [files [files ...]]
 
 **NB:** Pass **--no-compact** when running the script to get a hanging indent the
 same way lispindent does by default.
