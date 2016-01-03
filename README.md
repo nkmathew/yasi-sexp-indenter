@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/nkmathew/yasi-sexp-indenter.svg?branch=master)](https://travis-ci.org/nkmathew/yasi-sexp-indenter)
+[![Latest tag](https://img.shields.io/github/tag/nkmathew/yasi-sexp-indenter.svg)](https://github.com/haya14busa/vim-operator-flashy/issues)
+
 
 ## yasi- yet another s-expression indenter
 yasi is a dialect-aware s-expression indenter that tries to improve on [Dorai's
