@@ -501,9 +501,12 @@ def parse_rc_json():
     path = os.path.expanduser('~/' + fname)
     if os.path.exists(fname):
         path = os.path.abspath(fname)
+    elif not os.path.exists(path):
+        path = ''
     content = ''
-    with open(path) as f:
-        content = f.read()
+    if path:
+        with open(path) as f:
+            content = f.read()
     ret = {}
     if content:
         ret = json.loads(content)
