@@ -312,18 +312,18 @@
 
 (define-test (test_parse_args)
   (assert= (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")
-   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2)))
+   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true)))
 
 (define-test (test_parse_args1)
  (assert= (parse-args
            (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")))
-   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2)))
+   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true)))
 
 (define-test (test_parse_args2)
   (assert= (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic"))
-   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2)))
+   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true)))
 
 
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ System Tests ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -366,10 +366,11 @@
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
-           (after-path (string project-dir *os-sep* (test-case [after]))))
+           (after-path (string project-dir *os-sep* (test-case [after])))
+           (options (string "--no-rc " (test-case [options]))))
       (set 'before (read-file! before-path))
       (set 'after (read-file! after-path))
-      (set 'indent-result (indent-code before (test-case [options])))
+      (set 'indent-result (indent-code before options))
       (set 'indented-code (indent-result 7))
       (assert= after indented-code)
       ;; (unless (= indented-code after)
