@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/nkmathew/yasi-sexp-indenter.svg?branch=master)](https://travis-ci.org/nkmathew/yasi-sexp-indenter)
-[![Latest tag](https://img.shields.io/github/tag/nkmathew/yasi-sexp-indenter.svg)](https://github.com/haya14busa/vim-operator-flashy/issues)
+[![Latest tag](https://img.shields.io/github/tag/nkmathew/yasi-sexp-indenter.svg)](https://github.com/nkmathew/yasi-sexp-indenter/releases)
 
 
 ## yasi- yet another s-expression indenter
