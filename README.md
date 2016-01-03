@@ -116,7 +116,7 @@ same way lispindent does by default.
 Customization is done similarly to the way it's done in lispindent - keywords are
 associated with numbers that determine the next line's indentation level.
 
-The additional keywords are defined in a **yasirc.json** file placed in the current
+The additional keywords are defined in a **.yasirc.json** file placed in the current
 working directory of in the home folder. Should there be configuration files in both
 directories the one in the current working directory will be preferred.
 

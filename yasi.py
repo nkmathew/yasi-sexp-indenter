@@ -494,10 +494,10 @@ IF_LIKE = ['if']
 
 
 def parse_rc_json():
-    """ Reads the json configuration file(yasirc.json), parses it and returns the
+    """ Reads the json configuration file(.yasirc.json), parses it and returns the
     dictionary
     """
-    fname = 'yasirc.json'
+    fname = '.yasirc.json'
     path = os.path.expanduser('~/' + fname)
     if os.path.exists(fname):
         path = os.path.abspath(fname)

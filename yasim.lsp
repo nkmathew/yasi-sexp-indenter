@@ -340,7 +340,7 @@ optional arguments:
 [/text]))
 
 
-;; ****************************************************************************************
+;; ---------------------------------------------------------------------------------
 ;; GLOBAL CONSTANTS::
 
 (define *stderr* 2)
@@ -407,7 +407,7 @@ optional arguments:
   '("if"))
 
 (define (parse-rc-json)
-  (letn ((fname "yasirc.json")
+  (letn ((fname ".yasirc.json")
          (home (env "HOME"))
          (path (or (real-path (string home *os-sep* fname))
                    (real-path fname) ""))
@@ -462,7 +462,7 @@ optional arguments:
                      (lookup dialect (parse-rc-json)) keyword-list nil))
   rc-keywords)
 
-;; ---------------------------------------------------------------------------------------
+;; ---------------------------------------------------------------------------------
 
 (define (warning warning-message message-format options)
   (letn ((opts (parse-args options)))
