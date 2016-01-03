@@ -761,7 +761,8 @@ optional arguments:
 
 (define (push-to-list lst func-name bracket line offset first-arg-pos first-item
                       in-list-literal? leading-spaces options)
-  (letn ((position-list (list bracket line offset
+  (letn ((func-name (or func-name ""))
+         (position-list (list bracket line offset
                               (+ first-arg-pos offset) func-name 0))
          (opts (parse-args options))
          (kwd-list (add-keywords (opts [dialect])))
