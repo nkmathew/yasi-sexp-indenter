@@ -409,8 +409,8 @@ optional arguments:
 (define (parse-rc-json)
   (letn ((fname ".yasirc.json")
          (home (env "HOME"))
-         (path (or (real-path (string home *os-sep* fname))
-                   (real-path fname) ""))
+         (path (or (real-path fname)
+                   (real-path (string home *os-sep* fname))""))
          (contents (or (read-file path) "")))
   (or (json-parse contents) '())))
 
