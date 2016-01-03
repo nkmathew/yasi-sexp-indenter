@@ -20,6 +20,7 @@ import sys
 import time
 import collections
 import json
+import difflib
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -43,6 +44,10 @@ def create_args_parser():
     parser.add_argument(
         '-nm', '--no-modify', '--nm', dest='modify',
         help='Do not modify the file', action='store_false')
+    parser.add_argument(
+        '--diff', '-diff', dest='output_diff',
+        help='Prints unified diff of the initial and final result',
+        action='store_true')
     parser.add_argument(
         '-nw', '--no-warning', '--nw', dest='warning',
         help='Do not display warnings', action='store_false')
@@ -122,6 +127,11 @@ def parse_options(arguments=None):
             args.modify = False
         args.backup = False
         args.warning = False
+
+    if args.output_diff:
+        # If someone requests a diff we assume he/she doesn't want the file to be
+        # modified
+        args.modify = False
 
     return args
 
@@ -781,7 +791,7 @@ def indent_code(original_code, options=None):
     line_ending = find_line_ending(original_code)
     code_lines = split_preserve(original_code, line_ending)
 
-    indented_code = ""
+    indented_code = []
 
     bracket_locations = []
 
@@ -798,7 +808,7 @@ def indent_code(original_code, options=None):
                                                           line, in_comment,
                                                           in_symbol_region, opts)
         # Build up the indented string.
-        indented_code += curr_line
+        indented_code.append(curr_line)
         offset = 0
         for curr_char in curr_line:
             next_char = curr_line[offset + 1:offset + 2]
@@ -978,7 +988,7 @@ def indent_code(original_code, options=None):
     return [message_stack, first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations,
             newlisp_brace_locations, in_string, in_comment,
             in_symbol_with_space, bracket_locations,
-            last_quote_location, original_code, indented_code]
+            last_quote_location, code_lines, indented_code]
 
 
 def _after_indentation(indentation_state, options=None, fpath=''):
@@ -1055,20 +1065,24 @@ def _after_indentation(indentation_state, options=None, fpath=''):
     if not output_file:
         output_file = fpath
 
+    indent_result = ''.join(indented_code)
     if indented_code == original_code and opts.files:
         message = "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
         sys.stderr.write(message % fname)
         if output_file != fpath:
             with open(output_file, 'wb') as indented_file:
-                indented_file.write(indented_code.encode('utf8'))
+                indented_file.write(indent_result.encode('utf8'))
     else:
-        if opts.output:
-            print(indented_code, end='')
+        if opts.output_diff:
+            diff = difflib.unified_diff(indented_code, original_code)
+            print(''.join(list(diff)))
+        elif opts.output:
+            print(indent_result, end='')
 
         if opts.modify:
             # write in binary mode to preserve the original line ending
             with open(output_file, 'wb') as indented_file:
-                indented_file.write(indented_code.encode('utf8'))
+                indented_file.write(indent_result.encode('utf8'))
 
 
 def indent_files(arguments=sys.argv[1:]):
