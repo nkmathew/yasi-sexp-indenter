@@ -5,4 +5,4 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-script: make python-test
+script: make py-test
