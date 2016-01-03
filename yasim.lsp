@@ -762,11 +762,11 @@ optional arguments:
 (define (push-to-list lst func-name bracket line offset first-arg-pos first-item
                       in-list-literal? leading-spaces options)
   (letn ((position-list (list bracket line offset
-                             (+ first-arg-pos offset) func-name 0))
-        (opts (parse-args options))
-        (kwd-list (add-keywords (opts [dialect])))
-        (two-spacer (or (is-macro-name? func-name (opts [dialect]))
-                        (keyword1? func-name kwd-list))))
+                              (+ first-arg-pos offset) func-name 0))
+         (opts (parse-args options))
+         (kwd-list (add-keywords (opts [dialect])))
+         (two-spacer (or (is-macro-name? func-name (opts [dialect]))
+                         (keyword1? func-name kwd-list))))
     (cond
      ((or in-list-literal? (= bracket "{")
           (and (= (opts [dialect]) "clojure") (= bracket "[")))
@@ -776,9 +776,13 @@ optional arguments:
             (+ leading-spaces (if (opts [uniform])
                                   (+ offset (opts [indent-size]))
                                 (+ offset (* 2 (opts [indent-size])))))))
-     ((and two-spacer (not (empty? func-name)))
-      (setf (position-list [indent-level]) (+ (opts [indent-size])
-                                              leading-spaces offset))))
+     ((not (empty? func-name))
+      (cond
+       (two-spacer (setf (position-list [indent-level]) (+ (opts [indent-size])
+                                                           leading-spaces offset)))
+       ((keyword3? func-name kwd-list)
+        (setf (position-list [indent-level]) (+ (* 2 (opts [indent-size]))
+                                                leading-spaces offset))))))
     (push position-list lst)
     (when (>= (length lst) 3)
       (let (parent-func ((lst 2) [func-name]))

@@ -504,10 +504,10 @@ def parse_rc_json():
     content = ''
     with open(path) as f:
         content = f.read()
+    ret = {}
     if content:
-        return json.loads(content)
-    else:
-        return {}
+        ret = json.loads(content)
+    return collections.defaultdict(dict, ret)
 
 
 def assign_indent_numbers(lst, inum, dic=collections.defaultdict(int)):
@@ -690,8 +690,11 @@ def _push_to_list(lst, func_name, char, line, offset,
                                                   if not opts.uniform
                                                   else (offset + opts.indent_size))
 
-    elif two_spacer and func_name != '':
-        pos_hash['indent_level'] = lead_spaces + offset + opts.indent_size
+    elif func_name != '':
+        if two_spacer:
+            pos_hash['indent_level'] = lead_spaces + offset + opts.indent_size
+        elif keywords[func_name] == KEYWORD3:
+            pos_hash['indent_level'] = lead_spaces + offset + (2 * opts.indent_size)
 
     lst.append(pos_hash)
     try:
