@@ -3,7 +3,7 @@ PYTHON?=python
 all: help
 .PHONY : all
 
-egg:
+egg: rst
 	${PYTHON} setup.py sdist
 .PHONY : egg
 
@@ -11,6 +11,12 @@ dist: egg
 	${PYTHON} setup.py register
 	${PYTHON} setup.py upload
 .PHONY : dist
+
+README.rst: README.md
+	pandoc --from markdown --to rst --output README.rst README.md
+
+rst: README.rst
+.PHONY : rst
 
 py-test:
 	@${PYTHON} tests/test_yasi.py
