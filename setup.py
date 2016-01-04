@@ -3,9 +3,9 @@
 
 """ Setup for yasi """
 
-import yasi
 import io
 import sys
+import ast
 import setuptools
 
 README = ''
@@ -14,11 +14,19 @@ with io.open('README.rst') as f:
 
 DEPS = ['colorama'] + (['argparse'] if sys.version_info < (2, 7) else [])
 
+def version():
+    """Return version string."""
+    with io.open('yasi.py') as input_file:
+        for line in input_file:
+            if line.startswith('__version__'):
+                return ast.parse(line).body[0].value.s
+
+
 setuptools.setup(
     name='yasi',
-    version=yasi.__version__,
+    version='1.1.1',
     description='A dialect aware s-expression indenter',
-    long_description=README,
+    long_description=version(),
     author="Mathew Ng'etich",
     author_email='kipkoechmathew@gmail.com',
     download_url="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master",
