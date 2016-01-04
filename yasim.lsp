@@ -19,6 +19,7 @@
 (define [uniform] 10)
 (define [output-file] 11)
 (define [indent-size] 12)
+(define [read-rc] 13)
 
 (define [message] 0)
 (define [line] 1)
@@ -43,6 +44,8 @@
          (option-arg?
           (lambda (arg)
             (or
+             (matches-opt? "-no-rc" arg)
+             (matches-opt? "-nr" arg)
              (matches-opt? "-indent-size" arg)
              (matches-opt? "-is" arg)
              (matches-opt? "-version" arg)
@@ -67,7 +70,7 @@
          (option-list?
           (lambda (lst)
             (and
-             (> (length lst) 8) ;; There are at least 8 options right now
+             (> (length lst) 10) ;; There are at least 10 options right now
              (list? lst)
              (string? (lst [backup-dir]))
              (number? (lst [default-indent]))
@@ -92,6 +95,7 @@
                    nil         ;; Uniform
                    ""          ;; Output filename
                    2           ;; Indent size
+                   true        ;; Read rc file
                    ))
          (zero-or-one? (lambda (num) (or (zero? num) (= 1 num))))
          (matches-opt? (lambda (opt var)
@@ -217,6 +221,8 @@
                                           (string (env "HOME") "/") 0) backup-dir))))
                   (setq (options [backup-dir]) backup-dir)))
               (cond
+               ((matches-opt? "-nr" curr) (setq (options [read-rc]) nil))
+               ((matches-opt? "-no-rc" curr) (setq (options [read-rc]) nil))
                ((matches-opt? "-no" curr) (setq (options [compact]) nil))
                ((matches-opt? "-no-output" curr) (setq (options [compact]) nil))
                ((matches-opt? "-nc" curr) (setq (options [compact]) nil))
@@ -262,6 +268,7 @@
     (println "uniform         : "  (arg-list [uniform]))
     (println "output file     : "  (arg-list [output-file]))
     (println "Indent Size     : "  (arg-list [indent-size]))
+    (println "Read rc         : "  (arg-list [read-rc]))
     (println "")))
 
 
@@ -293,7 +300,7 @@
 
 ;; ****************************************************************************************
 (define *help* (string [text]
-usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-no] [-ne] [-o OUTPUT_FILE]
+usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-nr] [-no] [-ne] [-o OUTPUT_FILE]
             [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-is INDENT_SIZE]
             [-di DEFAULT_INDENT] [-ic] [-uni]
             [files [files ...]]
@@ -315,6 +322,7 @@ optional arguments:
                         Do not modify the file
   -nw, --no-warning, --nw
                         Do not display warnings
+  -nr, --no-rc, --nr    Ignore any rc files in the current or home folder
   -no, --no-output, --no
                         Suppress output of the indented code
   -ne, --no-exit, --ne  Instructs the program not to exit when a warning is
@@ -432,7 +440,8 @@ optional arguments:
     assoc-list))
 
 
-(define (add-keywords dialect)
+(define (add-keywords opts)
+  (set 'dialect (opts [dialect]))
   (set 'two-spacers '())
   (set 'two-armed *if-like*)
   (set 'keyword-list '())
@@ -458,9 +467,10 @@ optional arguments:
                  *clojure-keywords* *newlisp-keywords*))))
   (set 'keyword-list (assign-indent-numbers two-spacers keyword-list KEYWORD1))
   (set 'keyword-list (assign-indent-numbers two-armed keyword-list KEYWORD2))
-  (set 'rc-keywords (assign-indent-numbers
-                     (lookup dialect (parse-rc-json)) keyword-list nil))
-  rc-keywords)
+  (when (opts [read-rc])
+   (set 'keyword-list (assign-indent-numbers
+                       (lookup dialect (parse-rc-json)) keyword-list nil)))
+  keyword-list)
 
 ;; ---------------------------------------------------------------------------------
 
@@ -761,10 +771,11 @@ optional arguments:
 
 (define (push-to-list lst func-name bracket line offset first-arg-pos first-item
                       in-list-literal? leading-spaces options)
-  (letn ((position-list (list bracket line offset
+  (letn ((func-name (or func-name ""))
+         (position-list (list bracket line offset
                               (+ first-arg-pos offset) func-name 0))
          (opts (parse-args options))
-         (kwd-list (add-keywords (opts [dialect])))
+         (kwd-list (add-keywords opts))
          (two-spacer (or (is-macro-name? func-name (opts [dialect]))
                          (keyword1? func-name kwd-list))))
     (cond
@@ -793,7 +804,7 @@ optional arguments:
 
 (define (indent-code original-code options)
   (letn ((opts (parse-args options))
-         (keyword-lst (add-keywords (opts [dialect])))
+         (keyword-lst (add-keywords opts))
          (in-comment? 0) ;; Multiline comment
          (in-newlisp-string? 0)
          (in-newlisp-tag-string? nil)

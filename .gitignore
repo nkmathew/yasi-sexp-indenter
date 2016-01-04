@@ -2,3 +2,8 @@
 tags
 *.bak~
 *.json
+__pycache__/
+*.egg-info/
+dist/
+README.html
+build/

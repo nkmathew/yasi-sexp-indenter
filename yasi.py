@@ -20,6 +20,7 @@ import sys
 import time
 import collections
 import json
+import difflib
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -44,8 +45,16 @@ def create_args_parser():
         '-nm', '--no-modify', '--nm', dest='modify',
         help='Do not modify the file', action='store_false')
     parser.add_argument(
+        '--diff', '-diff', dest='output_diff',
+        help='Prints unified diff of the initial and final result',
+        action='store_true')
+    parser.add_argument(
         '-nw', '--no-warning', '--nw', dest='warning',
         help='Do not display warnings', action='store_false')
+    parser.add_argument(
+        '-nr', '--no-rc', '--nr', dest='read_rc',
+        help='Ignore any rc files in the current or home folder',
+        action='store_false')
     parser.add_argument(
         '-no', '--no-output', '--no', dest='output',
         help='Suppress output of the indented code', action='store_false')
@@ -118,6 +127,11 @@ def parse_options(arguments=None):
             args.modify = False
         args.backup = False
         args.warning = False
+
+    if args.output_diff:
+        # If someone requests a diff we assume he/she doesn't want the file to be
+        # modified
+        args.modify = False
 
     return args
 
@@ -521,12 +535,13 @@ def assign_indent_numbers(lst, inum, dic=collections.defaultdict(int)):
     return dic
 
 
-def add_keywords(dialect):
+def add_keywords(opts):
     """ add_keywords(dialect : str) -> [str, str]
 
     Takens a lisp dialect name and returns a list of keywords that increase
     indentation by two spaces and those that can be one-armed like 'if'
     """
+    dialect = opts.dialect
     keywords = collections.defaultdict(int)
     two_spacers = []
     two_armed = IF_LIKE
@@ -547,8 +562,9 @@ def add_keywords(dialect):
             NEWLISP_KEYWORDS
     keywords = assign_indent_numbers(two_spacers, KEYWORD1, keywords)
     keywords = assign_indent_numbers(two_armed, KEYWORD2, keywords)
-    rc_keywords = parse_rc_json()
-    keywords.update(rc_keywords[dialect])
+    if opts.read_rc:
+        rc_keywords = parse_rc_json()
+        keywords.update(rc_keywords[dialect])
     return keywords
 
 # ---------------------------------------------------------------------------------
@@ -672,7 +688,7 @@ def _push_to_list(lst, func_name, char, line, offset,
     the list and the list returned.
     """
     opts = parse_options(options)
-    keywords = add_keywords(opts.dialect)
+    keywords = add_keywords(opts)
     pos_hash = {'character': char,
                 'line_number': line,
                 'bracket_pos': offset,
@@ -737,7 +753,7 @@ def indent_code(original_code, options=None):
     """
 
     opts = parse_options(options)
-    keywords = add_keywords(opts.dialect)
+    keywords = add_keywords(opts)
 
     # Safeguards against processing brackets inside strings
     in_string = False
@@ -775,7 +791,7 @@ def indent_code(original_code, options=None):
     line_ending = find_line_ending(original_code)
     code_lines = split_preserve(original_code, line_ending)
 
-    indented_code = ""
+    indented_code = []
 
     bracket_locations = []
 
@@ -792,7 +808,7 @@ def indent_code(original_code, options=None):
                                                           line, in_comment,
                                                           in_symbol_region, opts)
         # Build up the indented string.
-        indented_code += curr_line
+        indented_code.append(curr_line)
         offset = 0
         for curr_char in curr_line:
             next_char = curr_line[offset + 1:offset + 2]
@@ -972,7 +988,7 @@ def indent_code(original_code, options=None):
     return [message_stack, first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations,
             newlisp_brace_locations, in_string, in_comment,
             in_symbol_with_space, bracket_locations,
-            last_quote_location, original_code, indented_code]
+            last_quote_location, code_lines, indented_code]
 
 
 def _after_indentation(indentation_state, options=None, fpath=''):
@@ -1049,20 +1065,24 @@ def _after_indentation(indentation_state, options=None, fpath=''):
     if not output_file:
         output_file = fpath
 
+    indent_result = ''.join(indented_code)
     if indented_code == original_code and opts.files:
         message = "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
         sys.stderr.write(message % fname)
         if output_file != fpath:
             with open(output_file, 'wb') as indented_file:
-                indented_file.write(indented_code.encode('utf8'))
+                indented_file.write(indent_result.encode('utf8'))
     else:
-        if opts.output:
-            print(indented_code, end='')
+        if opts.output_diff:
+            diff = difflib.unified_diff(indented_code, original_code)
+            print(''.join(list(diff)))
+        elif opts.output:
+            print(indent_result, end='')
 
         if opts.modify:
             # write in binary mode to preserve the original line ending
             with open(output_file, 'wb') as indented_file:
-                indented_file.write(indented_code.encode('utf8'))
+                indented_file.write(indent_result.encode('utf8'))
 
 
 def indent_files(arguments=sys.argv[1:]):
