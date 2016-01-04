@@ -19,6 +19,8 @@ setuptools.setup(
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
+        'License :: Public Domain',
+        'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
@@ -29,9 +31,11 @@ setuptools.setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Topic :: Software Development :: Quality Assurance',
     ],
     keywords='lisp, scheme, newlisp, indenter, formatter',
     test_suite='test.test_yasi',
     py_modules=['yasi'],
-    install_requires=['argparse'] if sys.version_info < (2, 7) else []
+    install_requires=['argparse'] if sys.version_info < (2, 7) else [],
+    entry_points={'console_scripts': ['yasi = yasi:main']}
 )
