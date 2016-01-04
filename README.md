@@ -72,7 +72,7 @@ over its counterpart *lispindent.lisp*. Its features include:
 
 ### Command Line Arguments
 
-    usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [-no] [-ne]
+    usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [-no] [-c] [-ne]
                 [-o OUTPUT_FILE] [--dialect DIALECT] [-v] [-bd BACKUP_DIR]
                 [-is INDENT_SIZE] [-di DEFAULT_INDENT] [-ic] [-uni]
                 [files [files ...]]
@@ -98,6 +98,7 @@ over its counterpart *lispindent.lisp*. Its features include:
       -nr, --no-rc, --nr    Ignore any rc files in the current or home folder
       -no, --no-output, --no
                             Suppress output of the indented code
+      -c, --color, -color   Display diff text in color
       -ne, --no-exit, --ne  Instructs the program not to exit when a warning is
                             raised.
       -o OUTPUT_FILE        Path/name of output file
