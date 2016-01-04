@@ -1101,7 +1101,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
                 indented_file.write(indent_result.encode('utf8'))
     else:
         if opts.output_diff:
-            diff = difflib.unified_diff(indented_code, original_code)
+            diff = difflib.unified_diff(original_code, indented_code)
             if opts.colour_diff:
                 colour_diff(diff)
             else:
