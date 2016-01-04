@@ -4,14 +4,20 @@
 """ Setup for yasi """
 
 import yasi
+import io
 import sys
 import setuptools
+
+readme = ''
+with io.open('README.rst') as f:
+    readme = f.read()
 
 setuptools.setup(
     name='yasi',
     version=yasi.__version__,
     description='A dialect aware s-expression indenter',
-    author='Mathew Ngetich',
+    long_description=readme,
+    author="Mathew Ng'etich",
     author_email='kipkoechmathew@gmail.com',
     download_url="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master",
     url='https://github.com/nkmathew/yasi-sexp-indenter',
