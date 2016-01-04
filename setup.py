@@ -24,9 +24,9 @@ def version():
 
 setuptools.setup(
     name='yasi',
-    version='1.1.1',
+    version=version(),
     description='A dialect aware s-expression indenter',
-    long_description=version(),
+    long_description=README,
     author="Mathew Ng'etich",
     author_email='kipkoechmathew@gmail.com',
     download_url="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master",
