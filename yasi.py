@@ -26,7 +26,7 @@ import colorama
 # pylint: disable=unused-import
 from pprint import pprint
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 
 def create_args_parser():

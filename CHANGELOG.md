@@ -1,3 +1,9 @@
+### v1.1.2 - 4th January 2016
+Fixes:
+
+  - **yasi.py**
+    + Circular imports causing failed pip installs
+
 ### v1.1.1 - 4th January 2016
 Fixes:
 
