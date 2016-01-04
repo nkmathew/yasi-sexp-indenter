@@ -25,7 +25,7 @@ import difflib
 # pylint: disable=unused-import
 from pprint import pprint
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 
 def create_args_parser():

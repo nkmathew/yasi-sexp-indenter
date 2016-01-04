@@ -1,3 +1,11 @@
+### v1.0.1 - 4th January 2016
+Fixes:
+
+  - Add License file
+  - Include testcases and newlisp scripts in pypi source distribution
+  - README.rst generated from README.md for pypi documentation using pandoc
+  - Long description for pypi
+
 ### v1.0.0 - 4th January 2016
 
 Features:
