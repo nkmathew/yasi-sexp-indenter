@@ -45,6 +45,6 @@ setuptools.setup(
     keywords='scheme, formatter, newlisp, beautifier, clojure, lisp, indenter',
     test_suite='test.test_yasi',
     py_modules=['yasi'],
-    install_requires=DEPS
+    install_requires=DEPS,
     entry_points={'console_scripts': ['yasi = yasi:main']}
 )
