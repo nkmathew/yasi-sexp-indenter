@@ -13,7 +13,7 @@ Features:
 
 ### v0.2.1 - 29th December 2015
 
-Bugfixes:
+Fixes:
 
   - **yasi.py**
     + Warnings being printed when script is used as a filter
@@ -23,7 +23,7 @@ Bugfixes:
 
 ### v0.2.0 - 29th December 2015
 
-Bugfixes:
+Fixes:
 
   - **yasi.py**
     + Newlisp brace strings being trimmed
