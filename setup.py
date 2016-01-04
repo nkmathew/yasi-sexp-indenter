@@ -40,7 +40,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Quality Assurance',
     ],
-    keywords='lisp, scheme, newlisp, indenter, formatter',
+    keywords='scheme, formatter, newlisp, beautifier, clojure, lisp, indenter',
     test_suite='test.test_yasi',
     py_modules=['yasi'],
     install_requires=['argparse'] if sys.version_info < (2, 7) else [],
