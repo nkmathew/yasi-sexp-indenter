@@ -1,9 +1,16 @@
 PYTHON?=python
 
-all:
-	@echo "Usage:"
-	@echo "    make test"
+all: help
 .PHONY : all
+
+egg:
+	${PYTHON} setup.py sdist
+.PHONY : egg
+
+dist: egg
+	${PYTHON} setup.py register
+	${PYTHON} setup.py upload
+.PHONY : dist
 
 py-test:
 	@${PYTHON} tests/test_yasi.py
@@ -18,7 +25,6 @@ test: py-test new-test
 
 tags: yasi.py
 	ctags yasi.py
-.PHONY : tags
 
 checks:
 	pep8 yasi.py tests/test_yasi.py
@@ -31,11 +37,11 @@ clean:
 .PHONY : clean
 
 help:
-	@echo "Valid targets:"
-	@echo " ... all(default target)"
-	@echo " ... py-test"
-	@echo " ... new-test"
-	@echo " ... test(runs all tests)"
-	@echo " ... checks"
-	@echo " ... clean"
+	@echo "Targets:"
+	@echo " > test(new-test, py-test)"
+	@echo " > checks"
+	@echo " > clean"
+	@echo " > egg"
+	@echo " > dist"
+	@echo " > tags"
 .PHONY : help
