@@ -7,9 +7,8 @@ egg: rst
 	${PYTHON} setup.py sdist
 .PHONY : egg
 
-dist: egg
-	${PYTHON} setup.py register
-	${PYTHON} setup.py upload
+dist:
+	${PYTHON} setup.py sdist upload
 .PHONY : dist
 
 README.rst: README.md
