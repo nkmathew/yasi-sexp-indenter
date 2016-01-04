@@ -1,8 +1,9 @@
-### Unreleased
+### v1.1.1 - 4th January 2016
 Fixes:
 
   - **yasi.py**
     + Coloured diff not showing context lines
+    + Syntax error due to ommitted comma in setup.py argument list
 
 ### v1.1.0 - 4th January 2016
 
