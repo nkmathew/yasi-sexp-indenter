@@ -1,3 +1,16 @@
+### v1.1.0 - 4th January 2016
+
+Feature:
+
+  - **yasi.py**
+    + New **--color** option for displaying coloured diff output
+
+Fixes:
+
+  - **yasi.py**
+    + **--diff** creates reversed diff due to wrong argument order in call to
+      `difflib.unified_diff`
+
 ### v1.0.1 - 4th January 2016
 Fixes:
 
