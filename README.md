@@ -22,6 +22,11 @@ the box.
 I made this because there weren't any good enough tools out there that could indent
 the code I would copy/paste and run from tutorials when I was starting out with Lisp.
 
+### Installation
+From pypi:
+
+  pip install --user --upgrade yasi
+
 ### Features
 *yasi's* indentation relies heavily on regular expressions that give it an edge
 over its counterpart *lispindent.lisp*. Its features include:
