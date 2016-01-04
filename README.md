@@ -25,7 +25,7 @@ the code I would copy/paste and run from tutorials when I was starting out with 
 ### Installation
 From pypi:
 
-  pip install --user --upgrade yasi
+    pip install --user --upgrade yasi
 
 ### Features
 *yasi's* indentation relies heavily on regular expressions that give it an edge
