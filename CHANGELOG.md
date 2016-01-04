@@ -1,3 +1,9 @@
+### Unreleased
+Fixes:
+
+  - **yasi.py**
+    + Coloured diff not showing context lines
+
 ### v1.1.0 - 4th January 2016
 
 Feature:
