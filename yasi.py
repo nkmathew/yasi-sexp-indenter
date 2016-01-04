@@ -21,6 +21,7 @@ import time
 import collections
 import json
 import difflib
+import colorama
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -56,8 +57,8 @@ def create_args_parser():
         help='Ignore any rc files in the current or home folder',
         action='store_false')
     parser.add_argument(
-        '-no', '--no-output', '--no', dest='output',
-        help='Suppress output of the indented code', action='store_false')
+        '-c', '--color', '-color', dest='colour_diff',
+        help='Display diff text in color', action='store_true')
     parser.add_argument(
         '-ne', '--no-exit', '--ne', dest='exit', action='store_false',
         help='Instructs the program not to exit when a warning is raised.')
@@ -991,6 +992,29 @@ def indent_code(original_code, options=None):
             last_quote_location, code_lines, indented_code]
 
 
+def colour_diff(diff_lines):
+    """ colour_diff(diff_lines : lst)
+
+    Print diff text to terminal in color
+    """
+    colorama.init()
+    def p_green(text):
+        print(colorama.Fore.GREEN + text + colorama.Fore.WHITE, end='')
+
+    def p_yellow(text):
+        print(colorama.Fore.YELLOW + text + colorama.Fore.WHITE, end='')
+
+    def p_red(text):
+        print(colorama.Fore.RED + text + colorama.Fore.WHITE, end='')
+    section = re.compile('@@\s+-\d\d,\d\d\s\+\d\d,\d\d\s+@@')
+    for line in diff_lines:
+        if line.startswith('-'):
+            p_red(line)
+        elif line.startswith('+'):
+            p_green(line)
+        elif section.search(line):
+            p_yellow(line)
+
 def _after_indentation(indentation_state, options=None, fpath=''):
     """ _after_indentation(indentation_state : lst):
 
@@ -1075,7 +1099,10 @@ def _after_indentation(indentation_state, options=None, fpath=''):
     else:
         if opts.output_diff:
             diff = difflib.unified_diff(indented_code, original_code)
-            print(''.join(list(diff)))
+            if opts.colour_diff:
+                colour_diff(diff)
+            else:
+                print(''.join(list(diff)))
         elif opts.output:
             print(indent_result, end='')
 

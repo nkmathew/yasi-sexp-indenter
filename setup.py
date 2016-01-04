@@ -8,15 +8,17 @@ import io
 import sys
 import setuptools
 
-readme = ''
+README = ''
 with io.open('README.rst') as f:
-    readme = f.read()
+    README = f.read()
+
+DEPS = ['colorama'] + (['argparse'] if sys.version_info < (2, 7) else [])
 
 setuptools.setup(
     name='yasi',
     version=yasi.__version__,
     description='A dialect aware s-expression indenter',
-    long_description=readme,
+    long_description=README,
     author="Mathew Ng'etich",
     author_email='kipkoechmathew@gmail.com',
     download_url="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master",
@@ -43,6 +45,6 @@ setuptools.setup(
     keywords='scheme, formatter, newlisp, beautifier, clojure, lisp, indenter',
     test_suite='test.test_yasi',
     py_modules=['yasi'],
-    install_requires=['argparse'] if sys.version_info < (2, 7) else [],
+    install_requires=DEPS
     entry_points={'console_scripts': ['yasi = yasi:main']}
 )
