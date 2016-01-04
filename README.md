@@ -265,7 +265,7 @@ inside multiline comments in Common Lisp and symbols with whitespace in Scheme.
 
 It uses the pipe character(|) to track whether the comment it's still in a multiline
 comment meaning an odd number of pipes in a multiline comment will yield a wrong
-indentation .g.:
+indentation e.g.:
 
 ```lisp
 #|*******************************************************************|
