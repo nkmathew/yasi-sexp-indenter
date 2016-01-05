@@ -57,7 +57,7 @@ def create_args_parser():
         help='Ignore any rc files in the current or home folder',
         action='store_false')
     parser.add_argument(
-        '-no', '--no-output', '--no', dest='output',
+        '--no-output', '-no-output', dest='output',
         help='Suppress output of the indented code', action='store_false')
     parser.add_argument(
         '-c', '--color', '-color', dest='colour_diff',

@@ -72,10 +72,10 @@ over its counterpart *lispindent.lisp*. Its features include:
 
 ### Command Line Arguments
 
-    usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [-no] [-c] [-ne]
-                [-o OUTPUT_FILE] [--dialect DIALECT] [-v] [-suffix BACKUP_SUFFIX]
-                [-bd BACKUP_DIR] [-is INDENT_SIZE] [-di DEFAULT_INDENT] [-ic]
-                [-uni]
+    usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [--no-output] [-c]
+                [-ne] [-o OUTPUT_FILE] [--dialect DIALECT] [-v]
+                [-suffix BACKUP_SUFFIX] [-bd BACKUP_DIR] [-is INDENT_SIZE]
+                [-di DEFAULT_INDENT] [-ic] [-uni]
                 [files [files ...]]
 
     Dialect-aware s-expression indenter
@@ -97,7 +97,7 @@ over its counterpart *lispindent.lisp*. Its features include:
       -nw, --no-warning, --nw
                             Do not display warnings
       -nr, --no-rc, --nr    Ignore any rc files in the current or home folder
-      -no, --no-output, --no
+      --no-output, -no-output
                             Suppress output of the indented code
       -c, --color, -color   Display diff text in color
       -ne, --no-exit, --ne  Instructs the program not to exit when a warning is
