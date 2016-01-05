@@ -75,6 +75,9 @@ def create_args_parser():
         '-v', '--version', action='version',
         help='Prints script version', version='yasi v%s' % __version__)
     parser.add_argument(
+        '-suffix', '--suffix', dest='backup_suffix', help='Backup file suffix',
+        type=str, default='.yasi.bak~')
+    parser.add_argument(
         '-bd', '--backup-dir', '--bd', '-backup-dir',
         help='The directory where the backup file is to be written',
         type=str, default=os.getcwd())
@@ -181,7 +184,7 @@ def backup_source_file(fname, options=None):
         ("\n--%s-- Warning: File `%s' does not exist. . ." % (current_time(), fname))
     assert os.path.exists(os.path.abspath(backup_dir)), \
         ("\n--%s-- Warning: Directory `%s' does not exist. . ." % (current_time(), fname))
-    backup_name = backup_dir + os.sep + os.path.split(fname)[1] + '.yasi.bak~'
+    backup_name = backup_dir + os.sep + os.path.split(fname)[1] + opts.backup_suffix
     try:
         shutil.copyfile(fname, backup_name)
     except IOError:
@@ -1146,11 +1149,12 @@ def indent_files(arguments=sys.argv[1:]):
             elif fname.endswith('.ss') or fname.endswith('.scm'):
                 opts.dialect = 'scheme'
         indent_result = indent_code(code, opts)
-        _after_indentation(indent_result, fpath=fname)
 
         if opts.backup:
             # Create a backup file in the directory specified
             backup_source_file(fname, opts)
+
+        _after_indentation(indent_result, fpath=fname)
 
 
 def main():

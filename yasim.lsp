@@ -20,6 +20,7 @@
 (define [output-file] 11)
 (define [indent-size] 12)
 (define [read-rc] 13)
+(define [backup-suffix] 14)
 
 (define [message] 0)
 (define [line] 1)
@@ -44,6 +45,7 @@
          (option-arg?
           (lambda (arg)
             (or
+             (matches-opt? "-suffix" arg)
              (matches-opt? "-no-rc" arg)
              (matches-opt? "-nr" arg)
              (matches-opt? "-indent-size" arg)
@@ -82,20 +84,21 @@
              (bool? (lst [warning]))
              (bool? (lst [modify])))))
          (options (list
-                   (real-path) ;; Backup directory
-                   1           ;; Default indent
-                   "all"       ;; Dialect
-                   '()         ;; Input files
-                   nil         ;; Indent comments
-                   true        ;; Backup
-                   true        ;; Compact
-                   true        ;; Warning
-                   true        ;; Modify
-                   true        ;; Output
-                   nil         ;; Uniform
-                   ""          ;; Output filename
-                   2           ;; Indent size
-                   true        ;; Read rc file
+                   (real-path)  ;; Backup directory
+                   1            ;; Default indent
+                   "all"        ;; Dialect
+                   '()          ;; Input files
+                   nil          ;; Indent comments
+                   true         ;; Backup
+                   true         ;; Compact
+                   true         ;; Warning
+                   true         ;; Modify
+                   true         ;; Output
+                   nil          ;; Uniform
+                   ""           ;; Output filename
+                   2            ;; Indent size
+                   true         ;; Read rc file
+                   ".yasi.bak~" ;; Backup file suffix
                    ))
          (zero-or-one? (lambda (num) (or (zero? num) (= 1 num))))
          (matches-opt? (lambda (opt var)
@@ -179,6 +182,14 @@
                        (list curr "")
                      (if (matches-opt? "-dialect" prev)
                          (list prev curr)
+                       (list "" ""))))
+                  (suffix-pair
+                   (if (and (not (matches-opt? "-suffix" prev))
+                            (matches-opt? "-suffix" curr))
+                       ;; The "-suffix" string is at the end of the arg list
+                       (list curr "")
+                     (if (matches-opt? "-suffix" prev)
+                         (list prev curr)
                        (list "" "")))))
               (when (not (empty? (indent-size-pair 0)) (empty? (indent-size-pair 1)))
                 (let ((lst (parse (indent-size-pair 0) "=")))
@@ -203,6 +214,12 @@
                       ;; No characters after the equal sign (no output file specified)
                       (setq (options [output-file]) (output-pair 1))
                     (setq (options [output-file]) (join (rest lst) "=")))))
+              (when (not (empty? (suffix-pair 0)) (empty? (suffix-pair 1)))
+                (let ((lst (parse (suffix-pair 0) "=")))
+                  (if (= 1 (length lst))
+                      ;; No characters after the equal sign (no suffix specified)
+                      (setq (options [backup-suffix]) (suffix-pair 1))
+                    (setq (options [backup-suffix]) (join (rest lst) "=")))))
               (when (not (empty? (dialect-pair 0)) (empty? (dialect-pair 1)))
                 (let ((lst (parse (dialect-pair 0) "=")))
                   (if (= 1 (length lst))
@@ -269,6 +286,7 @@
     (println "output file     : "  (arg-list [output-file]))
     (println "Indent Size     : "  (arg-list [indent-size]))
     (println "Read rc         : "  (arg-list [read-rc]))
+    (println "Backup suffix   : "  (arg-list [backup-suffix]))
     (println "")))
 
 
@@ -521,7 +539,7 @@ optional arguments:
              (list (current-time) filename backup-dir) (opts [warning]) true filename))
   (let (backup-name (string backup-dir "\\" ;; Change to forward slash in Unix
                             ;; Build the backup file name
-                            (filename-from-path filename) ".yasi.bak~"))
+                            (filename-from-path filename) (opts [backup-suffix])))
     (copy-file filename backup-name)))
 
 
@@ -1063,7 +1081,6 @@ optional arguments:
                  ((regex ".ss$" fname) (setq (opts [dialect]) "scheme"))
                  ((regex ".scm$" fname) (setq (opts [dialect]) "scheme"))))
                (indent-result (indent-code code opts)))
-          (after-indentation indent-result fname)
           (when (and (opts [backup]) (real-path backup-dir))
             (backup-source-file! fname opts))
-          )))))
+          (after-indentation indent-result fname))))))
