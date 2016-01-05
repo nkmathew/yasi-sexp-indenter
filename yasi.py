@@ -1100,9 +1100,11 @@ def _after_indentation(indentation_state, options=None, fpath=''):
     if not output_file:
         output_file = fpath
 
+    print('')
+
     indent_result = ''.join(indented_code)
     if indented_code == original_code and opts.files:
-        message = "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
+        message = "\nFile `%s' has already been formatted. Leaving it unchanged. . ."
         sys.stderr.write(message % fname)
         if output_file != fpath:
             with open(output_file, 'wb') as indented_file:
