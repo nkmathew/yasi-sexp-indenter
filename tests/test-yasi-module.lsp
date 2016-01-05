@@ -362,10 +362,13 @@
      "--dialect=lisp --indent-comments")
     ("tests/cases/#9-standard-emacs-form-indentation.lisp"
      "tests/cases/#9-standard-emacs-form-indentation~.lisp"
-     "--dialect=all")))
+     "--dialect=all")
+    ("tests/cases/#10-newlisp-hash-comment.lsp"
+     "tests/cases/#10-newlisp-hash-comment~.lsp"
+     "--dialect=newlisp")))
 
 (define-test (test_system)
-  (for (case-number 0 8)
+  (for (case-number 0 10)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))

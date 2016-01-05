@@ -877,7 +877,9 @@ optional arguments:
                             (zero? in-newlisp-string?))
                    ;; The backslash only escapes when not in raw strings
                    (set 'escaped? true))
-                 (when (and (= curr-char ";") (not in-symbol-region?)
+                 (when (and (or (and (= (opts [dialect]) "newlisp")
+                                     (= curr-char "#"))
+                                (= curr-char ";")) (not in-symbol-region?)
                             (not (and (= "#" prev-char)
                                       (= (opts [dialect]) "scheme"))))
                    (throw)) ;; Skip to the next line

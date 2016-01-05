@@ -835,7 +835,8 @@ def indent_code(original_code, options=None):
                 # the next character has been escaped
                 escaped = True
 
-            if curr_char == ';' and not in_symbol_region and not \
+            if (curr_char == ';' or (curr_char == '#' and opts.dialect == 'newlisp'))\
+                    and not in_symbol_region and not \
                     (prev_char == '#' and opts.dialect == 'scheme'):
                 # a comment has been found, go to the next line
                 # A sharp sign(#) before a semi-colon in Scheme is used to

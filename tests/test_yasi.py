@@ -270,9 +270,13 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#9-standard-emacs-form-indentation.lisp',
                 'after': 'tests/cases/#9-standard-emacs-form-indentation~.lisp',
                 'options': '--dialect=all'
+            }, {
+                'before': 'tests/cases/#10-newlisp-hash-comment.lsp',
+                'after': 'tests/cases/#10-newlisp-hash-comment~.lsp',
+                'options': '--dialect=newlisp'
             }
         ]
-        for i in range(0, 8):
+        for i in range(0, 10):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])
