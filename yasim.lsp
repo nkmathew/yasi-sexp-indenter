@@ -319,8 +319,8 @@
 ;; ****************************************************************************************
 (define *help* (string [text]
 usage: yasi [-h] [-nc] [-nb] [-nm] [-nw] [-nr] [-no] [-ne] [-o OUTPUT_FILE]
-            [--dialect DIALECT] [-v] [-bd BACKUP_DIR] [-is INDENT_SIZE]
-            [-di DEFAULT_INDENT] [-ic] [-uni]
+            [--dialect DIALECT] [-v] [-suffix BACKUP_SUFFIX] [-bd BACKUP_DIR]
+            [-is INDENT_SIZE] [-di DEFAULT_INDENT] [-ic] [-uni]
             [files [files ...]]
 
 Dialect-aware s-expression indenter
@@ -349,6 +349,8 @@ optional arguments:
   --dialect DIALECT, -dialect DIALECT
                         Use Scheme keywords
   -v, --version         Prints script version
+  -suffix BACKUP_SUFFIX, --suffix BACKUP_SUFFIX
+                        Backup file suffix
   -bd BACKUP_DIR, --backup-dir BACKUP_DIR, --bd BACKUP_DIR, -backup-dir BACKUP_DIR
                         The directory where the backup file is to be written
   -is INDENT_SIZE, --indent-size INDENT_SIZE, --is INDENT_SIZE

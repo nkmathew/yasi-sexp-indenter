@@ -73,8 +73,9 @@ over its counterpart *lispindent.lisp*. Its features include:
 ### Command Line Arguments
 
     usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [-no] [-c] [-ne]
-                [-o OUTPUT_FILE] [--dialect DIALECT] [-v] [-bd BACKUP_DIR]
-                [-is INDENT_SIZE] [-di DEFAULT_INDENT] [-ic] [-uni]
+                [-o OUTPUT_FILE] [--dialect DIALECT] [-v] [-suffix BACKUP_SUFFIX]
+                [-bd BACKUP_DIR] [-is INDENT_SIZE] [-di DEFAULT_INDENT] [-ic]
+                [-uni]
                 [files [files ...]]
 
     Dialect-aware s-expression indenter
@@ -105,6 +106,8 @@ over its counterpart *lispindent.lisp*. Its features include:
       --dialect DIALECT, -dialect DIALECT
                             Use Scheme keywords
       -v, --version         Prints script version
+      -suffix BACKUP_SUFFIX, --suffix BACKUP_SUFFIX
+                            Backup file suffix
       -bd BACKUP_DIR, --backup-dir BACKUP_DIR, --bd BACKUP_DIR, -backup-dir BACKUP_DIR
                             The directory where the backup file is to be written
       -is INDENT_SIZE, --indent-size INDENT_SIZE, --is INDENT_SIZE
