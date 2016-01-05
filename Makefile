@@ -21,6 +21,10 @@ py-test:
 	@${PYTHON} tests/test_yasi.py
 .PHONY : py-test
 
+deps:
+	pip install colorama argparse
+.PHONY : deps
+
 new-test:
 	@newlisp tests/test-yasi-module.lsp
 .PHONY : new-test

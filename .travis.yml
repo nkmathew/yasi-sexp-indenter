@@ -8,7 +8,7 @@ python:
     - "3.5"
 
 install:
-    - pip install colorama argparse
+    - make deps
 
 script:
     - make py-test
