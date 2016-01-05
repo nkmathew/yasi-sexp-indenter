@@ -109,15 +109,15 @@ class UnitTests(unittest.TestCase):
 
     def test_trim_space_between_succeeding_opening_brackets(self):
         source = '( ( ( '
-        self.assertEqual('((( ', yasi.trim(source))
+        self.assertEqual('(((', yasi.trim(source))
 
     def test_trim_adjacent_function_and_argument_opening_bracket(self):
         source = '(print(+ 1 1))'
         self.assertEqual('(print (+ 1 1))', yasi.trim(source))
 
     def test_trim_space_between_succeeding_closing_brackets(self):
-        source = ') ) ) '
-        self.assertEqual('))) ', yasi.trim(source))
+        source = ') ) )'
+        self.assertEqual(')))', yasi.trim(source))
 
     def test_trim_spaces_before_closing_brackets(self):
         source = '(print 12    )'

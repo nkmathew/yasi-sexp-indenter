@@ -227,6 +227,8 @@ def trim(string):
     Uses every usefull hack to try and reduce extra whitespace without
     messing with character literals
     """
+    # Trailing whitespace
+    string = re.sub('[ \t]*$', '', string)
     # turn '(print(+ 1 1))' to '(print (+ 1 1))'
     string = re.sub(r'''([^\\(\[, {@~`'#^])(\(|\[|{)''', r'\1 \2', string, re.X)
     # turn  ')(' to ') ('

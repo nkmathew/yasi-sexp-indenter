@@ -168,7 +168,7 @@
 
 (define-test (test_trim_space_between_succeeding_opening_brackets)
   (assert=
-   (string-trim! "( ( (")
+   (string-trim! "( ( ( ")
    "((("))
 
 (define-test (test_trim_adjacent_function_and_argument_opening_bracket)
@@ -312,18 +312,21 @@
 
 (define-test (test_parse_args)
   (assert= (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")
-   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true)))
+   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true
+     ".yasi.bak~")))
 
 (define-test (test_parse_args1)
  (assert= (parse-args
            (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")))
-   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true)))
+   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true
+     ".yasi.bak~")))
 
 (define-test (test_parse_args2)
   (assert= (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic"))
-   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true)))
+   '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true
+     ".yasi.bak~")))
 
 
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ System Tests ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

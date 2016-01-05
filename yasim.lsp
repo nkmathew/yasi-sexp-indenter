@@ -547,6 +547,8 @@ optional arguments:
 
 (define (string-trim! str)
   " Trim the string making sure there's no whitespace where it's not necessary"
+  ;; Trailing whitespace
+  (set 'str (replace "[ \t]*$" str "" 0))
   ;; "(print(++ 1))" ==> "(print (++ 1))"
   (set 'str (replace [text]([^\\(\[,{@~`'^#])(\(|\[|{)[/text] str (string $1 " " $2) 0))
   ;; "(print (++ 1)(-- 1))" ==> "(print (++ 1) (-- 1))"
