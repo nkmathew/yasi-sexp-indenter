@@ -1047,14 +1047,12 @@ optional arguments:
       (warning "\n%s:%d:%d: Tag string extends to end-of-file. "
                (push fname first-tag-string) opts))
 
-    (print "\n")
-
     (letn ((output-file (opts [output-file])))
       (when (empty? output-file) (set 'output-file fpath))
       (if (and (opts [files]) (= indented-code original-code))
           (begin
             (warning
-             "File `%s' has already been formatted. Leaving it unchanged. . .\n"
+             "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
              fname opts)
             (when (!= fpath output-file)
               (write-file output-file indented-code)))
