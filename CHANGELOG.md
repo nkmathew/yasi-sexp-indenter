@@ -16,6 +16,7 @@ Fixes:
   - **yasi.lsp**
     + Backup being ran on the already modified file
     + Newlisp comments starting with hash(`#`) being evaluated
+    + **--no-output** option not being parsed properly, affecting compact setting
 
 
 ### v1.1.2 - 4th January 2016
