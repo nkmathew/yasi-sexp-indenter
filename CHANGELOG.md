@@ -1,3 +1,20 @@
+### Unreleased
+
+Freatures:
+  - **yasi.py**
+    + **--suffix** option for specifying backup file suffix
+
+  - **yasi.lsp**
+    + **--suffix** option for specifying backup file suffix
+
+Fixes:
+
+  - **yasi.lsp**
+    + Backup being ran on the already modified file
+
+  - **yasi.lsp**
+    + Backup being ran on the already modified file
+
 ### v1.1.2 - 4th January 2016
 Fixes:
 
@@ -13,7 +30,7 @@ Fixes:
 
 ### v1.1.0 - 4th January 2016
 
-Feature:
+Features:
 
   - **yasi.py**
     + New **--color** option for displaying coloured diff output
