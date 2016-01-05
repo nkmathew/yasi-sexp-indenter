@@ -61,7 +61,6 @@
              (matches-opt? "-no-backup" arg)
              (matches-opt? "-nc" arg)
              (matches-opt? "-no-compact" arg)
-             (matches-opt? "-no" arg)
              (matches-opt? "-no-output" arg)
              (matches-opt? "-nm" arg)
              (matches-opt? "-no-modify" arg)
@@ -100,12 +99,8 @@
                    true         ;; Read rc file
                    ".yasi.bak~" ;; Backup file suffix
                    ))
-         (zero-or-one? (lambda (num) (or (zero? num) (= 1 num))))
          (matches-opt? (lambda (opt var)
-                         (letn ((dashes (find "^-+" opt 0)))
-                           (and (if dashes
-                                    (or (= (length $0) 2) (= (length $0) 1))
-                                  nil) (zero-or-one? (find opt var))))))
+                         (regex (string "^[-]*" opt) var)))
          (arguments
           (if (string? arguments)
               (parse arguments)
@@ -240,8 +235,7 @@
               (cond
                ((matches-opt? "-nr" curr) (setq (options [read-rc]) nil))
                ((matches-opt? "-no-rc" curr) (setq (options [read-rc]) nil))
-               ((matches-opt? "-no" curr) (setq (options [compact]) nil))
-               ((matches-opt? "-no-output" curr) (setq (options [compact]) nil))
+               ((matches-opt? "-no-output" curr) (setq (options [output]) nil))
                ((matches-opt? "-nc" curr) (setq (options [compact]) nil))
                ((matches-opt? "-no-compact" curr) (setq (options [compact]) nil))
                ((matches-opt? "-nb" curr) (setq (options [backup]) nil))
