@@ -149,7 +149,7 @@ class UnitTests(unittest.TestCase):
 
     def test_find_trim_limit_double_quote_after_semi_colon(self):
         source = """(list 1123 ; " )" ";" 542)"""
-        self.assertEqual(11, yasi.find_trim_limit(source))
+        self.assertEqual(10, yasi.find_trim_limit(source))
 
     def test_find_trim_limit_double_quote_after_comment_block(self):
         source = """(list 1123 '  #|  " ); "  |# 542) """
@@ -165,7 +165,7 @@ class UnitTests(unittest.TestCase):
 
     def test_find_trim_limit_comment_alone_in_newlisp(self):
         source = 'thhjh h               jgjh             ;;            hjbjh'
-        self.assertEqual(27, yasi.find_trim_limit(source, '--dialect=newlisp'))
+        self.assertEqual(26, yasi.find_trim_limit(source, '--dialect=newlisp'))
 
     def test_find_trim_limit_newlisp_brace_string(self):
         source = '(string         {   Hello world                }    " message"))'
@@ -274,9 +274,13 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#10-newlisp-hash-comment.lsp',
                 'after': 'tests/cases/#10-newlisp-hash-comment~.lsp',
                 'options': '--dialect=newlisp'
+            }, {
+                'before': 'tests/cases/#11-gradual-space-reduction-reindentation.lsp',
+                'after': 'tests/cases/#11-gradual-space-reduction-reindentation~.lsp',
+                'options': '--dialect=newlisp'
             }
         ]
-        for i in range(0, 10):
+        for i in range(0, 11):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])

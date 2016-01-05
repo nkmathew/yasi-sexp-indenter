@@ -12,10 +12,12 @@ Fixes:
   - **yasi.lsp**
     + Backup being ran on the already modified file
     + Newlisp comments starting with hash(`#`) being evaluated
+    + Space before comment decreasing by a single character on re-indentation
 
   - **yasi.lsp**
     + Backup being ran on the already modified file
     + Newlisp comments starting with hash(`#`) being evaluated
+    + Space before comment decreasing by a single character on re-indentation
     + **--no-output** option not being parsed properly, affecting compact setting
 
 

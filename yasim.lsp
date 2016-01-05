@@ -656,7 +656,7 @@ optional arguments:
                         (set 'smallest (if (< arg smallest) arg smallest)))))))
     (unless (= -1 comment-start)
       ;; Include all whitespace before the semi colon as part of the comment
-      (set 'comment-start (++ ((regex "[ \t]*;" str) 1))))
+      (set 'comment-start ((regex "[ \t]*;" str) 1)))
     (when (= (opts [dialect]) "newlisp")
       (letn ((brace-start (find "{" str))
              (tag-start (find "[text]" str))

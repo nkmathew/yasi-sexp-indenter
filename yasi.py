@@ -280,7 +280,7 @@ def find_trim_limit(string, options=None):
     if comment_start != -1:
         # If a semi colon is found, include all the whitespace before it to preserve
         # any aligned comments
-        comment_start = re.search('[ \t]*;', string).start() + 1
+        comment_start = re.search('[ \t]*;', string).start()
 
     if opts.dialect == 'newlisp':
         # Find out which string type comes first(normal, tag or brace strings)

@@ -220,7 +220,7 @@
 (define-test (test_find_trim_limit_double_quote_after_semi_colon)
   (assert=
    (find-trim-limit [text](list 1123 ;     " )" ";" 542)[/text])
-   11))
+   10))
 
 (define-test (test_find_trim_limit_double_quote_after_comment_block)
   (assert=
@@ -237,7 +237,7 @@
    (find-trim-limit
     {thhjh h               jgjh             ;;            hjbjh}
     "--dialect=newlisp")
-   27))
+   26))
 
 (define-test (test_find_trim_limit_newlisp_brace_string)
   (assert=
@@ -365,10 +365,13 @@
      "--dialect=all")
     ("tests/cases/#10-newlisp-hash-comment.lsp"
      "tests/cases/#10-newlisp-hash-comment~.lsp"
+     "--dialect=newlisp")
+    ("tests/cases/#11-gradual-space-reduction-reindentation.lsp"
+     "tests/cases/#11-gradual-space-reduction-reindentation~.lsp"
      "--dialect=newlisp")))
 
 (define-test (test_system)
-  (for (case-number 0 10)
+  (for (case-number 0 11)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
