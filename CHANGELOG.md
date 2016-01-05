@@ -11,9 +11,12 @@ Fixes:
 
   - **yasi.lsp**
     + Backup being ran on the already modified file
+    + Newlisp comments starting with hash(`#`) being evaluated
 
   - **yasi.lsp**
     + Backup being ran on the already modified file
+    + Newlisp comments starting with hash(`#`) being evaluated
+
 
 ### v1.1.2 - 4th January 2016
 Fixes:
