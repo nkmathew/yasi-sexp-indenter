@@ -8,3 +8,4 @@ dist/
 README.html
 README.rst
 build/
+.tox/
