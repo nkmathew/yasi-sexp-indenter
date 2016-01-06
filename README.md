@@ -3,8 +3,21 @@
 [![pypi version](https://img.shields.io/pypi/v/yasi.svg)](https://pypi.python.org/pypi/yasi)
 [![pypi downloads](https://img.shields.io/pypi/dm/yasi.svg)](https://pypi.python.org/pypi/yasi)
 
+## yasi - yet another s-expression indenter
 
-## yasi- yet another s-expression indenter
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Features](#features)
+- [Command Line Arguments](#command-line-arguments)
+- [Customization](#customization)
+- [About the default indent](#about-the-default-indent)
+- [What yasi does not handle](#what-yasi-does-not-handle)
+- [Modifications to lispindent](#modifications-to-lispindent)
+- [Use within Vim](#use-within-vim)
+- [Lispindent2 Issues](#lispindent2-issues)
+- [lispindent2 Commandline Options](#lispindent2-command-line-options)
+
+### Introduction
 yasi is a dialect-aware s-expression indenter that tries to improve on [Dorai's
 indenter][0] and *Vim's* built in indenter. It can handle *Common Lisp*, *Clojure*,
 *Scheme* and *newLISP* code and their unique syntaxes.
@@ -221,7 +234,7 @@ There are some syntaxes used in some dialects of Scheme that didn't seem worth t
 effort implementing. An example is *MzScheme* and *Gauche's* use of `#//` or `#[]`
 for regular expressions.
 
-#### Changes made to Dorai's Indenter
+#### Modifications to lispindent
 I made a couple of modifications to *lispindent.lisp* and renamed it to
 *lispindent2.lisp*. The changes include:
 
@@ -267,7 +280,7 @@ au filetype clojure,lisp,scheme,newlisp setlocal equalprg=yasi.py\ --indent-comm
 You can then indent a function/block by providing the motion after the `=` sign
 e.g `=%`
 
-#### lispindent2.lisp's Issues
+#### lispindent2 Issues
 
 I inadvertently added a bug in an attempt to prevent it from evaluating brackets
 inside multiline comments in Common Lisp and symbols with whitespace in Scheme.
@@ -312,7 +325,7 @@ code:
 *lispindent2.lisp* uses the `ignore-errors` macro as a workaround. Doing that means
 that it can't run in *GNU Common Lisp* because it doesn't have the macro.
 
-#### lispindent2.lisp's command-line options
+#### lispindent2 Commandline Options
     +---------------------------------------------------------------------------+
     |   Usage:  lispindent2.lisp [[<file>] [--no-modify] [--no-output]]         |
     |           --no-output ;; Don't output the indented code, false by default |
