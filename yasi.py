@@ -427,7 +427,7 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
     if opts.indent_comments:
         # We are allowed to indent comment lines
         comment_line = False
-    if not opts.compact and zerolevel == 0 and bracket_list == [] and not in_comment:
+    if not opts.compact  and bracket_list == [] and not in_comment:
         # If nocompact mode is on and there are no unclosed blocks, try to
         # find the zero level by simply counting spaces before a line that
         # is not empty or has a comment
@@ -1046,10 +1046,10 @@ def _after_indentation(indentation_state, options=None, fpath=''):
         if opts.warning:
             if opts.files:
                 msg['fname'] = fname
-                sys.stderr.write('{fname}:{line}:{column}: {msg}'.format(**msg))
+                sys.stderr.write('\n{fname}:{line}:{column}: {msg}'.format(**msg))
             else:
                 # Input was passed through stdin
-                sys.stderr.write(':{line}:{column}: {msg}'.format(**msg))
+                sys.stderr.write('\n:{line}:{column}: {msg}'.format(**msg))
 
     if bracket_locations:
         # If the bracket_locations list is not empty it means that there are some

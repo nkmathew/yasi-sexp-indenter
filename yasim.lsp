@@ -713,7 +713,7 @@ optional arguments:
                          (regex "^[ \t]*;" line 0)))
          (leading-spaces (regex "^[ \t]+[^; )\n\r]" line))
          (zero-level
-          (if (and (not (opts [compact])) (zero? zero-level)
+          (if (and (not (opts [compact]))
                    (empty? bracket-list) (zero? in-comment?))
               (if leading-spaces (- (leading-spaces 2) 1) 0)
             zero-level)))
@@ -1009,7 +1009,7 @@ optional arguments:
          (fname (filename-from-path fpath)))
 
     (dolist (message message-stack)
-      (warning "%s:%d:%d: %s" (push fname message) opts))
+      (warning "\n%s:%d:%d: %s" (push fname message) opts))
 
     (when bracket-locations
       (dolist (bracket (reverse bracket-locations))

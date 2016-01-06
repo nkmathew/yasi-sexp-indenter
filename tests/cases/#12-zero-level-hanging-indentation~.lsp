@@ -9,8 +9,8 @@
                       (slice substr
                              (or ((regex "[ \t]*" substr) 1) -1)) " \n\r\t"))
              (macro-name (slice substr 0 (or (find " " substr) -1))))
-            (if (not (empty? macro-name))
-                (push (list macro-name KEYWORD1) keyword-lst))))
+        (if (not (empty? macro-name))
+            (push (list macro-name KEYWORD1) keyword-lst))))
 
               (when (find func-name '("define-macro" "defmacro"))
                 (letn ((end-of-space ((regex "^[ \t]*" substr) 2))
@@ -19,8 +19,8 @@
                                 (slice substr
                                        (or ((regex "[ \t]*" substr) 1) -1)) " \n\r\t"))
                        (macro-name (slice substr 0 (or (find " " substr) -1))))
-                      (if (not (empty? macro-name))
-                          (push (list macro-name KEYWORD1) keyword-lst))))
+                  (if (not (empty? macro-name))
+                      (push (list macro-name KEYWORD1) keyword-lst))))
 
 
                                     (exit)
