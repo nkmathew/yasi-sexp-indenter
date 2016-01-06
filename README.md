@@ -8,6 +8,7 @@
 - [Installation](#installation)
 - [Features](#features)
 - [Command Line Arguments](#command-line-arguments)
+- [Hanging Indentation](#hanging-indentation)
 - [Customization](#customization)
 - [About the default indent](#about-the-default-indent)
 - [What yasi does not handle](#what-yasi-does-not-handle)
@@ -135,8 +136,55 @@ over its counterpart *lispindent.lisp*. Its features include:
                             Dictates whether the if-clause and else-clause of an
                             if-likeblock should have the same indent level.
 
-**NB:** Pass **--no-compact** when running the script to get a hanging indent the
-same way lispindent does by default.
+### Hanging Indentation
+This is where the indented code block is not flush with the left margin. Lispindent
+does this by default although differently to the way it's implemented in yasi.
+The effect is obtained by passing **--no-compact** to the script.
+Here's how hanging indentation in lispindent and yasi differs:
+
+Initial code:
+
+```lisp
+                    (if (not (empty? macro-name))
+                    (push (list macro-name KEYWORD1) keyword-lst)
+                    nil)
+
+        (if (not (empty? macro-name))
+        (push (list macro-name KEYWORD1) keyword-lst)
+        nil)
+
+                (exit)
+```
+
+Calling yasi on the file with **--no-compact**:
+
+```lisp
+                    (if (not (empty? macro-name))
+                        (push (list macro-name KEYWORD1) keyword-lst)
+                      nil)
+
+        (if (not (empty? macro-name))
+            (push (list macro-name KEYWORD1) keyword-lst)
+          nil)
+
+                (exit)
+```
+
+How lispindent does it(the number of spaces at the start of first block defines
+where the rest of the blocks in the file will start):
+
+```lisp
+                    (if (not (empty? macro-name))
+                        (push (list macro-name KEYWORD1) keyword-lst)
+                      nil)
+                    
+                    (if (not (empty? macro-name))
+                        (push (list macro-name KEYWORD1) keyword-lst)
+                      nil)
+                    
+                    (exit)
+
+```
 
 ### Customization
 Customization is done similarly to the way it's done in lispindent - keywords are
