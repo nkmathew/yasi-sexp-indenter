@@ -368,10 +368,13 @@
      "--dialect=newlisp")
     ("tests/cases/#11-gradual-space-reduction-reindentation.lsp"
      "tests/cases/#11-gradual-space-reduction-reindentation~.lsp"
-     "--dialect=newlisp")))
+     "--dialect=newlisp")
+    ("tests/cases/#12-zero-level-hanging-indentation.lsp"
+     "tests/cases/#12-zero-level-hanging-indentation~.lsp"
+     "--dialect=newlisp --no-compact")))
 
 (define-test (test_system)
-  (for (case-number 0 11)
+  (for (case-number 0 12)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
