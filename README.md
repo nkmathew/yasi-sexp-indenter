@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/nkmathew/yasi-sexp-indenter.svg?branch=master)](https://travis-ci.org/nkmathew/yasi-sexp-indenter)
 [![Latest tag](https://img.shields.io/github/tag/nkmathew/yasi-sexp-indenter.svg)](https://github.com/nkmathew/yasi-sexp-indenter/releases)
-[![pypi version](https://img.shields.io/pypi/v/yasi.svg)](https://pypi.python.org/pypi/yasi)
 [![pypi downloads](https://img.shields.io/pypi/dm/yasi.svg)](https://pypi.python.org/pypi/yasi)
 
 ## yasi - yet another s-expression indenter
