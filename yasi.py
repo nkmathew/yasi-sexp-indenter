@@ -398,7 +398,7 @@ def pad_leading_whitespace(string, zero_level, blist, options=None):
         string = substr1 + substr2
     else:
         # if in nocompact mode, pad with zero_level spaces.
-        string = re.sub('^[ \t]+', '', string, count=0, flags=re.M)
+        string = re.sub('^[ \t]+', '', string, count=0)
         string = ' ' * zero_level + string
 
     if blist:
