@@ -437,6 +437,8 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
             # every time you indent the file because the character at the end of
             # the regex is part of the capture.
             zerolevel = leading_spaces.end() - 1
+        else:
+            zerolevel = 0
 
     if in_symbol_region:
         # No processing done in strings and comments

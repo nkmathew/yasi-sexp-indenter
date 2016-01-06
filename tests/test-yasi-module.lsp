@@ -371,10 +371,13 @@
      "--dialect=newlisp")
     ("tests/cases/#12-zero-level-hanging-indentation.lsp"
      "tests/cases/#12-zero-level-hanging-indentation~.lsp"
+     "--dialect=newlisp --no-compact")
+    ("tests/cases/#13-hanging-with-non-hanging.lsp"
+     "tests/cases/#13-hanging-with-non-hanging~.lsp"
      "--dialect=newlisp --no-compact")))
 
 (define-test (test_system)
-  (for (case-number 0 12)
+  (for (case-number 0 13)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))

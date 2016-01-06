@@ -282,9 +282,13 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#12-zero-level-hanging-indentation.lsp',
                 'after': 'tests/cases/#12-zero-level-hanging-indentation~.lsp',
                 'options': '--dialect=newlisp --no-compact'
+            }, {
+                'before': 'tests/cases/#13-hanging-with-non-hanging.lsp',
+                'after': 'tests/cases/#13-hanging-with-non-hanging~.lsp',
+                'options': '--dialect=newlisp --no-compact'
             }
         ]
-        for i in range(0, 12):
+        for i in range(0, 13):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])
