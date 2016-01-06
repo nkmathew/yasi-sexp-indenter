@@ -15,7 +15,7 @@
 - [Modifications to lispindent](#modifications-to-lispindent)
 - [Use within Vim](#use-within-vim)
 - [Lispindent2 Issues](#lispindent2-issues)
-- [lispindent2 Commandline Options](#lispindent2-command-line-options)
+- [lispindent2 Command Line Options](#lispindent2-command-line-options)
 
 ### Introduction
 yasi is a dialect-aware s-expression indenter that tries to improve on [Dorai's
@@ -325,7 +325,7 @@ code:
 *lispindent2.lisp* uses the `ignore-errors` macro as a workaround. Doing that means
 that it can't run in *GNU Common Lisp* because it doesn't have the macro.
 
-#### lispindent2 Commandline Options
+#### lispindent2 Command Line Options
     +---------------------------------------------------------------------------+
     |   Usage:  lispindent2.lisp [[<file>] [--no-modify] [--no-output]]         |
     |           --no-output ;; Don't output the indented code, false by default |
