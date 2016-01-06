@@ -17,9 +17,14 @@ README.rst: README.md
 rst: README.rst
 .PHONY : rst
 
-html: README.rst
-	rst2html.py -stg README.rst README.html
+htm: README.html
+.PHONY : htm
+
+html: README.html
 .PHONY : html
+
+README.html: README.rst
+	rst2html.py -stg README.rst README.html
 
 py-test:
 	@${PYTHON} tests/test_yasi.py
@@ -57,4 +62,7 @@ help:
 	@echo " > egg"
 	@echo " > dist"
 	@echo " > tags"
+	@echo " > deps"
+	@echo " > rst"
+	@echo " > htm(html)"
 .PHONY : help
