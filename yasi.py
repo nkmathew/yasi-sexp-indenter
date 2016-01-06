@@ -427,7 +427,7 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
     if opts.indent_comments:
         # We are allowed to indent comment lines
         comment_line = False
-    if not opts.compact  and bracket_list == [] and not in_comment:
+    if not opts.compact and bracket_list == [] and not in_comment:
         # If nocompact mode is on and there are no unclosed blocks, try to
         # find the zero level by simply counting spaces before a line that
         # is not empty or has a comment
@@ -1009,13 +1009,17 @@ def colour_diff(diff_lines):
     Print diff text to terminal in color
     """
     colorama.init()
+
     def p_green(text):
+        """ Print added line in green"""
         print(colorama.Fore.GREEN + text + colorama.Fore.WHITE, end='')
 
     def p_yellow(text):
+        """ Print diff section header in yellow"""
         print(colorama.Fore.YELLOW + text + colorama.Fore.WHITE, end='')
 
     def p_red(text):
+        """ Print removed line in red"""
         print(colorama.Fore.RED + text + colorama.Fore.WHITE, end='')
     section = re.compile('@@\s+-\d\d,\d\d\s\+\d\d,\d\d\s+@@')
     for line in diff_lines:
@@ -1027,6 +1031,7 @@ def colour_diff(diff_lines):
             p_yellow(line)
         else:
             print(line, end='')
+
 
 def _after_indentation(indentation_state, options=None, fpath=''):
     """ _after_indentation(indentation_state : lst):
