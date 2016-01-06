@@ -13,10 +13,11 @@ Freatures:
 
 Fixes:
 
-  - **yasi.lsp**
+  - **yasi.py**
     + Backup being ran on the already modified file
     + Newlisp comments starting with hash(`#`) being evaluated
     + Space before comment decreasing by a single character on re-indentation
+    + Error dues to unsupported keyword argument in python 2.6
 
   - **yasi.lsp**
     + Backup being ran on the already modified file
