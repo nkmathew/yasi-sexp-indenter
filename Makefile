@@ -17,6 +17,10 @@ README.rst: README.md
 rst: README.rst
 .PHONY : rst
 
+html: README.rst
+	rst2html.py -stg README.rst README.html
+.PHONY : html
+
 py-test:
 	@${PYTHON} tests/test_yasi.py
 .PHONY : py-test
