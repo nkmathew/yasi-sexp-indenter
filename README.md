@@ -145,6 +145,7 @@ Here's how hanging indentation in lispindent and yasi differs:
 Initial code:
 
 ```lisp
+;; Comment
                     (if (not (empty? macro-name))
                     (push (list macro-name KEYWORD1) keyword-lst)
                     nil)
@@ -159,6 +160,7 @@ Initial code:
 Calling yasi on the file with **--no-compact**:
 
 ```lisp
+;; Comment
                     (if (not (empty? macro-name))
                         (push (list macro-name KEYWORD1) keyword-lst)
                       nil)
@@ -174,6 +176,7 @@ How lispindent does it(the number of spaces at the start of first block defines
 where the rest of the blocks in the file will start):
 
 ```lisp
+;; Comment
                     (if (not (empty? macro-name))
                         (push (list macro-name KEYWORD1) keyword-lst)
                       nil)
