@@ -21,7 +21,7 @@ Fixes:
     + Backup being ran on the already modified file
     + Newlisp comments starting with hash(`#`) being evaluated
     + Space before comment decreasing by a single character on re-indentation
-    + Error dues to unsupported keyword argument in python 2.6
+    + Error due to unsupported keyword argument in python 2.6
 
   - **yasi.lsp**
     + Backup being ran on the already modified file
@@ -41,7 +41,7 @@ Fixes:
 
   - **yasi.py**
     + Coloured diff not showing context lines
-    + Syntax error due to ommitted comma in setup.py argument list
+    + Syntax error due to omitted comma in setup.py argument list
 
 ### v1.1.0 - 4th January 2016
 
