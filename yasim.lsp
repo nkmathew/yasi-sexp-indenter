@@ -21,6 +21,7 @@
 (define [indent-size] 12)
 (define [read-rc] 13)
 (define [backup-suffix] 14)
+(define [tab-width] 15)
 
 (define [message] 0)
 (define [line] 1)
@@ -45,6 +46,7 @@
          (option-arg?
           (lambda (arg)
             (or
+             (matches-opt? "-tab" arg)
              (matches-opt? "-suffix" arg)
              (matches-opt? "-no-rc" arg)
              (matches-opt? "-nr" arg)
@@ -71,7 +73,7 @@
          (option-list?
           (lambda (lst)
             (and
-             (> (length lst) 10) ;; There are at least 10 options right now
+             (>= (length lst) 15) ;; There are at least 15 options now
              (list? lst)
              (string? (lst [backup-dir]))
              (number? (lst [default-indent]))
@@ -98,6 +100,7 @@
                    2            ;; Indent size
                    true         ;; Read rc file
                    ".yasi.bak~" ;; Backup file suffix
+                   -1           ;; Tab width
                    ))
          (matches-opt? (lambda (opt var)
                          (regex (string "^[-]*" opt) var)))
@@ -185,6 +188,14 @@
                        (list curr "")
                      (if (matches-opt? "-suffix" prev)
                          (list prev curr)
+                       (list "" ""))))
+                  (tab-width-pair
+                   (if (and (not (matches-opt? "-tab" prev))
+                            (matches-opt? "-tab" curr))
+                       ;; The "-tab" string is at the end of the arg list
+                       (list curr "")
+                     (if (matches-opt? "-suffix" prev)
+                         (list prev curr)
                        (list "" "")))))
               (when (not (empty? (indent-size-pair 0)) (empty? (indent-size-pair 1)))
                 (let ((lst (parse (indent-size-pair 0) "=")))
@@ -193,6 +204,13 @@
                       (setq (options [indent-size]) (to-int (indent-pair 1) 2))
                     (setq (options [indent-size]) (to-int
                                                    (join (rest lst) "=") 2)))))
+              (when (not (empty? (tab-width-pair 0)) (empty? (tab-width-pair 1)))
+                (let ((lst (parse (tab-width-pair 0) "=")))
+                  (if (= 1 (length lst))
+                      ;; No characters after the equal sign
+                      (setq (options [tab-width]) (to-int (tab-width-pair 1) -1))
+                    (setq (options [tab-width]) (to-int
+                                                 (join (rest lst) "=") -1)))))
               (when (not (empty? (indent-pair 0)) (empty? (indent-pair 1)))
                 (let ((lst (parse (indent-pair 0) "=")))
                   (if (= 1 (length lst))
@@ -281,6 +299,7 @@
     (println "Indent Size     : "  (arg-list [indent-size]))
     (println "Read rc         : "  (arg-list [read-rc]))
     (println "Backup suffix   : "  (arg-list [backup-suffix]))
+    (println "Tab width       : "  (arg-list [tab-width]))
     (println "")))
 
 
@@ -681,6 +700,35 @@ optional arguments:
     limit))
 
 
+(define (expand-tabs text tab-width)
+  " Expands tabs. Doesn't work very well when the text has newlines "
+  (letn ((portions (or (parse text "\t") '("")))
+         (expanded-text "")
+         (stop (-- (length portions))))
+    (for (i 0 stop)
+      (letn ((piece (portions i))
+             (len (length piece))
+             (spaces (- tab-width (% len tab-width))))
+        (if (= i stop)
+            (extend expanded-text piece)
+          (extend expanded-text (string piece (dup " " spaces))))))))
+
+
+
+(define (detabify text options)
+  (letn ((opts (parse-args options)))
+  (if (< (opts [tab-width]) 1)
+      (expand-tabs text 4)
+    (expand-tabs text (opts [tab-width])))))
+
+
+(define (tabify text options)
+  (letn ((opts (parse-args options)))
+    (if (< (opts [tab-width]) 1)
+        text
+      (replace (dup " " (opts [tab-width])) text "\t"))))
+
+
 (define (pad-leading-whitespace str zero-level blist options)
   " Indents the correct number of whitespace before the line using the current
   indent level and the zero level"
@@ -695,14 +743,12 @@ optional arguments:
                     (substr-2 (slice str trim-limit))
                     (substr-1 (string-trim! substr-1))) ;; strip the first portion
                (string substr-1 substr-2)) ;; join the portions
-           (let (str (replace "^[ \t]+" str "" 0)) ;; pad with zero-level spaces if in nocompact mode
-             (append (dup " " zero-level) str)))))
-    (if blist
-        (let (current-level ((first blist) 3))
-          ;; indent according to the current indentation level without including
-          ;; the zero-level whitespace added earlier.
-          (list (append (dup " " (- current-level zero-level)) str) current-level))
-      (list str 0))))
+           (replace "^[ \t]+" str "" 0))))
+    (letn ((indent-level (if blist
+                             ((first blist) [indent-level])
+                           zero-level))
+           (padding (dup " " indent-level)))
+      (list (append (tabify padding opts) str) indent-level))))
 
 
 (define (indent-line zero-level bracket-list line in-comment? in-symbol-region?
@@ -711,11 +757,14 @@ optional arguments:
          (comment-line (if (opts [indent-comments])
                            nil
                          (regex "^[ \t]*;" line 0)))
-         (leading-spaces (regex "^[ \t]+[^; )\n\r]" line))
+         (leading-spaces (letn ((_line (detabify line opts)))
+                           (regex "^[ \t]+[^; )\n\r]" _line)))
          (zero-level
           (if (and (not (opts [compact]))
                    (empty? bracket-list) (zero? in-comment?))
-              (if leading-spaces (- (leading-spaces 2) 1) 0)
+              (if leading-spaces
+                  (- (leading-spaces 2) 1)
+                0)
             zero-level)))
     (if in-symbol-region?
         (list zero-level line 0)
@@ -855,6 +904,10 @@ optional arguments:
         ;; supposed to be reset for every line.
         (setf zero-level (first indent-result))
         (set 'indented-code (append indented-code curr-line))
+        ;; Work with spaces instead of tabs as long as possible and then convert
+        ;; them later when indenting the line
+        (regex "^[ \t]*" curr-line 0)
+        (set 'new-str (replace "^[ \t]*" curr-line (detabify $0 opts) 0))
         (catch  ;; Closest thing to a break statement in case we encounter a semi colon
          (dostring (chr curr-line)
            (letn ((next-char (slice curr-line (+ 1 offset) 1))

@@ -286,9 +286,17 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#13-hanging-with-non-hanging.lsp',
                 'after': 'tests/cases/#13-hanging-with-non-hanging~.lsp',
                 'options': '--dialect=newlisp --no-compact'
+            }, {
+                'before': 'tests/cases/#14-tabbed-indentation.lsp',
+                'after': 'tests/cases/#14-tabbed-indentation~.lsp',
+                'options': '--dialect=newlisp --no-compact --tab=4'
+            }, {
+                'before': 'tests/cases/#15-input-space-output-tabs.lisp',
+                'after': 'tests/cases/#15-input-space-output-tabs~.lisp',
+                'options': '--dialect=lisp --no-compact --tab=4'
             }
         ]
-        for i in range(0, 13):
+        for i in range(0, 15):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])

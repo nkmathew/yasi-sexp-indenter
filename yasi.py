@@ -69,6 +69,11 @@ def create_args_parser():
         '-o', dest='output_file',
         help='Path/name of output file', type=str, default='')
     parser.add_argument(
+        '--tab', '-tab', dest='tab_size',
+        help='Indent with tabs using the specified tabwidth. A tab is assumed \
+        equal to 4 spaces by default when expanding the tabs in the input file',
+        type=int, default=-1)
+    parser.add_argument(
         '--dialect', '-dialect',
         help='Use Scheme keywords', type=str, default='all')
     parser.add_argument(
@@ -375,8 +380,37 @@ def all_whitespace(string):
     return re.search('^[ \t]*(\r|\n|$)', string)
 
 
+def detabify(text, options):
+    """ tabify(text : str, options : argparse.Namespace|str) -> str
+
+    Expands tabs
+    """
+    opts = parse_options(options)
+    if opts.tab_size < 1:
+        return text.expandtabs(4)
+    else:
+        return text.expandtabs(options.tab_size)
+
+
+def tabify(text, options):
+    """ tabify(text : str, options : argparse.Namespace|str) -> str
+
+    >>> tabify('        (println "hello world")', '--tab=3')
+     '\t\t  (println "hello world")'
+
+    Replace spaces with tabs
+    """
+    opts = parse_options(options)
+    if opts.tab_size < 1:
+        return text
+    else:
+        tab_equiv = ' ' * opts.tab_size
+        return text.replace(tab_equiv, '\t')
+
+
 def pad_leading_whitespace(string, zero_level, blist, options=None):
-    """ pad_leading_whitespace(string : str, current_level : int, zero_level : int) -> str
+    """ pad_leading_whitespace(string : str, current_level : int,
+                               zero_level : int) -> str
 
     >>> pad_leading_whitespace("(print 'Yello)")
     "         (print 'Yello)"
@@ -397,21 +431,16 @@ def pad_leading_whitespace(string, zero_level, blist, options=None):
         substr1 = trim(substr1)
         string = substr1 + substr2
     else:
-        # if in nocompact mode, pad with zero_level spaces.
+        # If in nocompact mode, remove leading spaces only
         string = re.sub('^[ \t]+', '', string, count=0)
-        string = ' ' * zero_level + string
 
+    indent_level = zero_level
     if blist:
-        # if there are unclosed blocks, you pad the line with the
-        # current indent level minus the zero level that was
-        # added earlier
-        current_level = blist[-1]['indent_level']
-        string = ' ' * (current_level - zero_level) + string
-        return string, current_level
-    else:
-        # Otherwise(all blocks finished), return the string as it is since
-        # it's the head of a new block
-        return string, 0
+        indent_level = blist[-1]['indent_level']
+
+    padding = ' ' * indent_level
+    padding = tabify(padding, opts)
+    return padding + string, indent_level
 
 
 def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
@@ -431,7 +460,8 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
         # If nocompact mode is on and there are no unclosed blocks, try to
         # find the zero level by simply counting spaces before a line that
         # is not empty or has a comment
-        leading_spaces = re.search('^[ \t]+[^; )\n\r]', line)
+        _line = detabify(line, opts)
+        leading_spaces = re.search('^[ \t]+[^; )\n\r]', _line)
         if leading_spaces:
             # NOTE: If you don't subtract one here, the zero level will increase
             # every time you indent the file because the character at the end of
@@ -820,6 +850,10 @@ def indent_code(original_code, options=None):
                                                           in_symbol_region, opts)
         # Build up the indented string.
         indented_code.append(curr_line)
+        regex = '^[ \t]*'
+        lead_spaces = re.findall(regex, curr_line)
+        if lead_spaces:
+            curr_line = re.sub(regex, detabify(lead_spaces[0], opts), curr_line)
         offset = 0
         for curr_char in curr_line:
             next_char = curr_line[offset + 1:offset + 2]

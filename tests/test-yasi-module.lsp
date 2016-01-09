@@ -313,20 +313,20 @@
 (define-test (test_parse_args)
   (assert= (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")
    '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true
-     ".yasi.bak~")))
+     ".yasi.bak~" -1)))
 
 (define-test (test_parse_args1)
  (assert= (parse-args
            (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic")))
    '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true
-     ".yasi.bak~")))
+     ".yasi.bak~" -1)))
 
 (define-test (test_parse_args2)
   (assert= (parse-args
             (parse-args "--dialect=newlisp -bd backups-folder --uniform -ic"))
    '("backups-folder" 1 "newlisp" () true nil true nil true true true "" 2 true
-     ".yasi.bak~")))
+     ".yasi.bak~" -1)))
 
 
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ System Tests ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -374,10 +374,16 @@
      "--dialect=newlisp --no-compact")
     ("tests/cases/#13-hanging-with-non-hanging.lsp"
      "tests/cases/#13-hanging-with-non-hanging~.lsp"
-     "--dialect=newlisp --no-compact")))
+     "--dialect=newlisp --no-compact")
+    ("tests/cases/#14-tabbed-indentation.lsp"
+     "tests/cases/#14-tabbed-indentation~.lsp"
+     "--dialect=newlisp --no-compact --tabs=4")
+    ("tests/cases/#15-input-space-output-tabs.lisp"
+     "tests/cases/#15-input-space-output-tabs~.lisp"
+     "--dialect=newlisp --no-compact --tabs=4")))
 
 (define-test (test_system)
-  (for (case-number 0 13)
+  (for (case-number 0 15)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
