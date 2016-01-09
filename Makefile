@@ -23,6 +23,7 @@ htm: README.html
 html: README.html
 .PHONY : html
 
+# pip install docutils pygments
 README.html: README.rst
 	rst2html.py -stg README.rst README.html
 
