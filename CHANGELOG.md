@@ -1,6 +1,6 @@
 ### Unreleased
 
-Freatures:
+Features:
   - **yasi.py**
     + **--suffix** option for specifying backup file suffix
     + The zero level of the first block doesn't define that of the rest of the code.
