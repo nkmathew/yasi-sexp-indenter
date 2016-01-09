@@ -5,11 +5,15 @@ Freatures:
     + **--suffix** option for specifying backup file suffix
     + The zero level of the first block doesn't define that of the rest of the code.
       Other blocks can start at different columns
+    + Indentation with tabs now supported by specifying tab width using the **--tabs**
+      commandline argument
 
   - **yasi.lsp**
     + **--suffix** option for specifying backup file suffix
     + The zero level of the first block doesn't define that of the rest of the code.
       Other blocks can start at different columns
+    + Indentation with tabs now supported by specifying tab width using the **--tabs**
+      commandline argument
 
 Fixes:
 
