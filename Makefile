@@ -57,13 +57,13 @@ clean:
 
 help:
 	@echo "Targets:"
-	@echo " > test(new-test, py-test)"
-	@echo " > checks"
-	@echo " > clean"
-	@echo " > egg"
-	@echo " > dist"
-	@echo " > tags"
-	@echo " > deps"
-	@echo " > rst"
-	@echo " > htm(html)"
+	@echo " -> test(new-test, py-test)"
+	@echo " -> checks"
+	@echo " -> clean"
+	@echo " -> egg"
+	@echo " -> dist"
+	@echo " -> tags"
+	@echo " -> deps"
+	@echo " -> rst"
+	@echo " -> htm(html)"
 .PHONY : help
