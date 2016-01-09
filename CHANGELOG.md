@@ -1,4 +1,4 @@
-### Unreleased
+### v1.2.0 - 10th January 2016
 
 Features:
   - **yasi.py**
