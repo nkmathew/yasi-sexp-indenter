@@ -86,7 +86,7 @@ over its counterpart *lispindent.lisp*. Its features include:
 ### Command Line Arguments
 
     usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [--no-output] [-c]
-                [-ne] [-o OUTPUT_FILE] [--dialect DIALECT] [-v]
+                [-ne] [-o OUTPUT_FILE] [--tab TAB_SIZE] [--dialect DIALECT] [-v]
                 [-suffix BACKUP_SUFFIX] [-bd BACKUP_DIR] [-is INDENT_SIZE]
                 [-di DEFAULT_INDENT] [-ic] [-uni]
                 [files [files ...]]
@@ -116,6 +116,10 @@ over its counterpart *lispindent.lisp*. Its features include:
       -ne, --no-exit, --ne  Instructs the program not to exit when a warning is
                             raised.
       -o OUTPUT_FILE        Path/name of output file
+      --tab TAB_SIZE, -tab TAB_SIZE
+                            Indent with tabs using the specified tabwidth. A tab
+                            is assumed equal to 4 spaces by default when expanding
+                            the tabs in the input file
       --dialect DIALECT, -dialect DIALECT
                             Use Scheme keywords
       -v, --version         Prints script version
