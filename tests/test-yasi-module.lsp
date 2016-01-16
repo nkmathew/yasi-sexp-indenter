@@ -380,7 +380,7 @@
      "--dialect=newlisp --no-compact --tabs=4")
     ("tests/cases/#15-input-space-output-tabs.lisp"
      "tests/cases/#15-input-space-output-tabs~.lisp"
-     "--dialect=newlisp --no-compact --tabs=4")))
+     "--dialect=lisp --no-compact --tabs=4")))
 
 (define-test (test_system)
   (for (case-number 0 15)
