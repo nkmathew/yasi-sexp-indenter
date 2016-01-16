@@ -1031,9 +1031,9 @@ def indent_code(original_code, options=None):
 
             offset += 1
         line_number += 1
-    return [message_stack, first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations,
-            newlisp_brace_locations, in_string, in_comment,
-            in_symbol_with_space, bracket_locations,
+    return [message_stack, first_tag_string, in_newlisp_tag_string,
+            last_symbol_location, comment_locations, newlisp_brace_locations,
+            in_string, in_comment, in_symbol_with_space, bracket_locations,
             last_quote_location, code_lines, indented_code]
 
 
