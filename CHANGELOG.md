@@ -1,3 +1,12 @@
+### Unreleased
+
+Fixes:
+  - **yasi.py**
+    + Defaults to plain diff output when colorama is not installed. Prevents import
+      errors when used as a module in Sublime text plugin where non-standard
+      packages through pip are not supported
+
+
 ### v1.2.0 - 10th January 2016
 
 Features:
