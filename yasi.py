@@ -21,7 +21,6 @@ import time
 import collections
 import json
 import difflib
-import colorama
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -1042,6 +1041,14 @@ def colour_diff(diff_lines):
 
     Print diff text to terminal in color
     """
+
+    try:
+        import colorama
+    except ImportError:
+        # colorama is not available, print plain diff
+        print(''.join(list(diff_lines)))
+        return
+
     colorama.init()
 
     def p_green(text):
