@@ -5,7 +5,7 @@ tags
 __pycache__/
 *.egg-info/
 dist/
-README.html
 README.rst
 build/
 .tox/
+*.html
