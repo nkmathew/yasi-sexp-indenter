@@ -1171,7 +1171,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
                 indented_file.write(indent_result.encode('utf8'))
 
 
-def indent_files(arguments=sys.argv[1:]):
+def indent_files(arguments):
     """ indent_files(fname : str)
 
     1. Creates a backup of the source file(backup_source_file())
