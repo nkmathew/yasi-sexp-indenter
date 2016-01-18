@@ -1210,7 +1210,7 @@ def indent_files(arguments):
 
 def main():
     """ Entry point """
-    indent_files()
+    indent_files(sys.argv[1:])
 
 if __name__ == '__main__':
     main()
