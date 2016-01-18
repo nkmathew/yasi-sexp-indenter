@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/nkmathew/yasi-sexp-indenter.svg?branch=master)](https://travis-ci.org/nkmathew/yasi-sexp-indenter)
-[![Latest tag](https://img.shields.io/github/tag/nkmathew/yasi-sexp-indenter.svg)](https://github.com/nkmathew/yasi-sexp-indenter/releases)
-[![pypi downloads](https://img.shields.io/pypi/dm/yasi.svg)](https://pypi.python.org/pypi/yasi)
+[![Build Status][2]][3]
+[![Latest tag][4]][5]
+[![pypi downloads][6]][7]
 
 ## yasi - yet another s-expression indenter
 
@@ -388,3 +388,9 @@ that it can't run in *GNU Common Lisp* because it doesn't have the macro.
 
 [0]: https://github.com/ds26gte/scmindent
 [1]: https://github.com/ds26gte/scmindent/blob/master/lispindent.lisp
+[2]: https://travis-ci.org/nkmathew/yasi-sexp-indenter.svg?branch=master
+[3]: https://travis-ci.org/nkmathew/yasi-sexp-indenter
+[4]: https://img.shields.io/github/tag/nkmathew/yasi-sexp-indenter.svg
+[5]: https://github.com/nkmathew/yasi-sexp-indenter/releases
+[6]: https://img.shields.io/pypi/dm/yasi.svg
+[7]: https://pypi.python.org/pypi/yasi
