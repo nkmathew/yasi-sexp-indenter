@@ -13,7 +13,7 @@
 - [About the default indent](#about-the-default-indent)
 - [What yasi does not handle](#what-yasi-does-not-handle)
 - [Modifications to lispindent](#modifications-to-lispindent)
-- [Use within Vim](#use-within-vim)
+- [Editor Integration](#editor-integration)
 - [Lispindent2 Issues](#lispindent2-issues)
 - [lispindent2 Command Line Options](#lispindent2-command-line-options)
 
@@ -323,7 +323,7 @@ I made a couple of modifications to *lispindent.lisp* and renamed it to
 + *lispindent2.lisp* writes files using *LF* line endings be default. It's less
   irritating than *CRLF* endings which usually light up in an annoying way in *Vim*.
 
-#### Use within Vim
+#### Editor Integration
 yasi's ability to format code from standard input makes it a suitable candidate for
 the `equalprg` setting in Vim. Add this in your **.vimrc** and you're good to go.
 
@@ -333,6 +333,12 @@ au filetype clojure,lisp,scheme,newlisp setlocal equalprg=yasi.py\ --indent-comm
 
 You can then indent a function/block by providing the motion after the `=` sign
 e.g `=%`
+
+You can also checkout these other projects for proper integration without invoking
+it externally as a filter script for example:
+
+  + Vim plugin: https://github.com/nkmathew/vim-newlisp-yasi
+  + Sublime Text 2/3 plugin: https://github.com/nkmathew/sublime-yasi
 
 #### lispindent2 Issues
 
