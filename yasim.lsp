@@ -1149,7 +1149,7 @@ optional arguments:
                  ((regex ".clj[sc]{0,1}$" fname) (setq (opts [dialect]) "clojure"))
                  ((regex ".ss$" fname) (setq (opts [dialect]) "scheme"))
                  ((regex ".scm$" fname) (setq (opts [dialect]) "scheme"))
-                 (t (setq (opts [dialect]) "all"))))
+                 (true (setq (opts [dialect]) "all"))))
                (indent-result (indent-code code opts)))
           (when (and (opts [backup]) (real-path backup-dir))
             (backup-source-file! fname opts))
