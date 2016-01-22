@@ -278,9 +278,9 @@ The numbers are described below(assuming standard indentation size of 2 spaces):
 
 ```lisp
 (letfn [(six-times [y]
-                    (* (twice y) 3))
+                   (* (twice y) 3))
         (twice [x]
-                (* x 2))]
+               (* x 2))]
   (println "Twice 15 =" (twice 15))
   (println "Six times 15 =" (six-times 15)))
 ```
