@@ -1,4 +1,4 @@
-### Unreleased
+### v1.2.1 - 22nd January 2016
 
 Fixes:
   - **yasi.lsp**
