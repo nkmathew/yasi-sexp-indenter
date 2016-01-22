@@ -492,7 +492,7 @@ CRLF = CR + LF
 KEYWORD0 = 0  # Non-keyword
 KEYWORD1 = 1  # Indents uniformly by 1 unit
 KEYWORD2 = 2  # Distinguishes subforms
-KEYWORD3 = 3  # Indens uniformly by 2 units
+KEYWORD3 = 3  # Indents uniformly by 2 units
 
 # Keywords that indent by two spaces
 SCHEME_KEYWORDS = \
@@ -531,7 +531,7 @@ LISP_KEYWORDS = \
      'macrolet', 'defparameter', 'with-slots', 'typecase', 'loop', 'when', 'prog1',
      'unless', 'with-open-file', 'with-output-to-string', 'with-input-from-string',
      'block', 'handler-case', 'defstruct', 'eval-when', 'tagbody', 'ignore-errors',
-     'labels', 'multiple-value-bind'
+     'labels', 'multiple-value-bind', 'progn'
      ]
 
 NEWLISP_KEYWORDS = \
