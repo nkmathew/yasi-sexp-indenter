@@ -311,7 +311,9 @@ This is *Vim's* default style of indentation.
 That option enables you to specify the amount you want, for example to achieve the
 style above, you pass the parameter like so:
 
+```shell
     yasi.py test.lisp --lisp --default-indent 2
+```
 
 ----------
 
