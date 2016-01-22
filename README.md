@@ -203,6 +203,7 @@ directories the one in the current working directory will be preferred.
 
 A typical config file looks like this:
 
+```javascript
     {
       "scheme": {
         "do": 2,
@@ -221,6 +222,7 @@ A typical config file looks like this:
         "if": 2
       }
     }
+```
 
 
 The numbers are described below(assuming standard indentation size of 2 spaces):
@@ -228,31 +230,61 @@ The numbers are described below(assuming standard indentation size of 2 spaces):
   + **0** - Associating a keyword with zero turns it into a normal function i.e
     removes keywordness
 
+```lisp
         (do-the-boogie (= 12 44)
                        (print "if clause")
                        (print "else clause"))
-
+```
 
   + **1** - Causes the subforms of the function to be indented uniformly by a unit
     indentation size(which can be changed)
 
+```lisp
         (do-the-boogie (= 12 44)
           (print "if clause")
           (print "else clause"))
+```
 
   + **2** - Distinguishes the first subform by giving it a greater indentation than
     the rest of the subforms the same way the standard if expression is indented.
     The first subform has twice the indentation size as the rest.
 
+```lisp
         (do-the-boogie (= 12 44)
             (print "if clause")
           (print "else clause"))
+```
 
   + **3** - Subforms will be indented uniformly by twice the indentation size
 
+```lisp
         (do-the-boogie (= 12 44)
             (print "if clause")
             (print "else clause"))
+```
+
+  + **4** - Indents by a unit like a 1-keyword but also its local functions
+
+```lisp
+        (letfn [(six-times [y]
+                  (* (twice y) 3))
+                (twice [x]
+                  (* x 2))]
+          (println "Twice 15 =" (twice 15))
+          (println "Six times 15 =" (six-times 15)))
+```
+
+    The standard indentation(assuming `letfn` is just another function) would be:
+
+```lisp
+        (letfn [(six-times [y]
+                           (* (twice y) 3))
+                (twice [x]
+                       (* x 2))]
+          (println "Twice 15 =" (twice 15))
+          (println "Six times 15 =" (six-times 15)))
+```
+
 
 #### About the default indent
 
