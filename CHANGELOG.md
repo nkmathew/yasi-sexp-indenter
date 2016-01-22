@@ -3,6 +3,7 @@
 Fixes:
   - **yasi.lsp**
     + Local functions in Clojure `letfn` construct not being indented the right way
+    + Dialect detection by file extension not working properly
 
   - **yasi.py**
     + Defaults to plain diff output when colorama is not installed. Prevents import
@@ -11,6 +12,7 @@ Fixes:
     + Made runnable in embedded interpreters where sys.argv doesn't exist e.g. as a
       sublime text plugin
     + Local functions in Clojure `letfn` construct not being indented the right way
+    + Dialect detection by file extension not working properly
 
 
 ### v1.2.0 - 10th January 2016

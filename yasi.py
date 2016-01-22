@@ -74,7 +74,7 @@ def create_args_parser():
         type=int, default=-1)
     parser.add_argument(
         '--dialect', '-dialect',
-        help='Use Scheme keywords', type=str, default='all')
+        help='Use Scheme keywords', type=str, default='')
     parser.add_argument(
         '-v', '--version', action='version',
         help='Prints script version', version='yasi v%s' % __version__)
@@ -1202,10 +1202,12 @@ def indent_files(arguments):
                 opts.dialect = 'lisp'
             elif fname.endswith('.lsp'):
                 opts.dialect = 'newlisp'
-            elif fname.endswith('.clj'):
+            elif re.search(".clj[sc]{0,1}$", fname):
                 opts.dialect = 'clojure'
             elif fname.endswith('.ss') or fname.endswith('.scm'):
                 opts.dialect = 'scheme'
+            else:
+                opts.dialect = 'all'
         indent_result = indent_code(code, opts)
 
         if opts.backup:

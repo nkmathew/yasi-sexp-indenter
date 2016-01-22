@@ -87,7 +87,7 @@
          (options (list
                    (real-path)  ;; Backup directory
                    1            ;; Default indent
-                   "all"        ;; Dialect
+                   ""           ;; Dialect
                    '()          ;; Input files
                    nil          ;; Indent comments
                    true         ;; Backup
@@ -1146,9 +1146,10 @@ optional arguments:
                 (cond
                  ((regex ".lisp$" fname) (setq (opts [dialect]) "lisp"))
                  ((regex ".lsp$" fname) (setq (opts [dialect]) "newlisp"))
-                 ((regex ".clj$" fname) (setq (opts [dialect]) "clojure"))
+                 ((regex ".clj[sc]{0,1}$" fname) (setq (opts [dialect]) "clojure"))
                  ((regex ".ss$" fname) (setq (opts [dialect]) "scheme"))
-                 ((regex ".scm$" fname) (setq (opts [dialect]) "scheme"))))
+                 ((regex ".scm$" fname) (setq (opts [dialect]) "scheme"))
+                 (t (setq (opts [dialect]) "all"))))
                (indent-result (indent-code code opts)))
           (when (and (opts [backup]) (real-path backup-dir))
             (backup-source-file! fname opts))
