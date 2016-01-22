@@ -294,9 +294,17 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#15-input-space-output-tabs.lisp',
                 'after': 'tests/cases/#15-input-space-output-tabs~.lisp',
                 'options': '--dialect=lisp --no-compact --tab=4'
+            }, {
+                'before': 'tests/cases/#16-lisp-flets-and-labels.lisp',
+                'after': 'tests/cases/#16-lisp-flets-and-labels~.lisp',
+                'options': '--dialect=lisp'
+            }, {
+                'before': 'tests/cases/#17-clojure-letfn.clj',
+                'after': 'tests/cases/#17-clojure-letfn~.clj',
+                'options': '--dialect=clojure'
             }
         ]
-        for i in range(0, 15):
+        for i in range(0, 17):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])

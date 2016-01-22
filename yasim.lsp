@@ -310,6 +310,7 @@
 (define KEYWORD1 1)
 (define KEYWORD2 2)
 (define KEYWORD3 3)
+(define KEYWORD4 4)
 
 (define (lookup0 keyword lst)
   (letn ((keyword (or keyword ""))
@@ -321,13 +322,17 @@
   (= KEYWORD0 (lookup0 keyword assoc-lst)))
 
 (define (keyword1? keyword assoc-lst)
-  (= KEYWORD1 (lookup0 keyword assoc-lst)))
+  (or (= KEYWORD1 (lookup0 keyword assoc-lst))
+      (= KEYWORD4 (lookup0 keyword assoc-lst))))
 
 (define (keyword2? keyword assoc-lst)
   (= KEYWORD2 (lookup0 keyword assoc-lst)))
 
 (define (keyword3? keyword assoc-lst)
   (= KEYWORD3 (lookup0 keyword assoc-lst)))
+
+(define (keyword4? keyword assoc-lst)
+  (= KEYWORD4 (lookup0 keyword assoc-lst)))
 
 ;; ****************************************************************************************
 (define *help* (string [text]
@@ -481,6 +486,7 @@ optional arguments:
 (define (add-keywords opts)
   (set 'dialect (opts [dialect]))
   (set 'two-spacers '())
+  (set 'local-binders '())
   (set 'two-armed *if-like*)
   (set 'keyword-list '())
   (cond
@@ -488,16 +494,20 @@ optional arguments:
     (set 'two-armed
          (append *if-like*
                  '("multiple-value-bind" "destructuring-bind" "do" "do*")))
+    (extend local-binders '("flet" "labels" "macrolet"))
     (set 'two-spacers *lisp-keywords*))
    ((= dialect "scheme")
     (set 'scheme-if-like (append '("with-slots" "do" "do*")  *if-like*))
     (set 'two-spacers *scheme-keywords*)
+    (extend local-binders '())
     (set 'two-armed *scheme-if-like*))
    ((= dialect "clojure")
     (set 'two-spacers *clojure-keywords*)
+    (extend local-binders '("letfn"))
     (set 'two-armed (append *if-like*)))
    ((= dialect "newlisp")
     (set 'two-spacers *newlisp-keywords*)
+    (extend local-binders '())
     (set 'two-armed (append *if-like*)))
    ((= dialect "all")
     (set 'two-spacers
@@ -505,6 +515,7 @@ optional arguments:
                  *clojure-keywords* *newlisp-keywords*))))
   (set 'keyword-list (assign-indent-numbers two-spacers keyword-list KEYWORD1))
   (set 'keyword-list (assign-indent-numbers two-armed keyword-list KEYWORD2))
+  (set 'keyword-list (assign-indent-numbers local-binders keyword-list KEYWORD4))
   (when (opts [read-rc])
    (set 'keyword-list (assign-indent-numbers
                        (lookup dialect (parse-rc-json)) keyword-list nil)))
@@ -867,7 +878,7 @@ optional arguments:
     (push position-list lst)
     (when (>= (length lst) 3)
       (let (parent-func ((lst 2) [func-name]))
-        (when (find parent-func '("flet" "labels" "macrolet"))
+        (when (keyword4? parent-func keyword-lst)
           (setf ((first lst) [indent-level]) (+ (opts [indent-size]) offset)))))
     lst))
 

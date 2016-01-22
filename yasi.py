@@ -493,6 +493,7 @@ KEYWORD0 = 0  # Non-keyword
 KEYWORD1 = 1  # Indents uniformly by 1 unit
 KEYWORD2 = 2  # Distinguishes subforms
 KEYWORD3 = 3  # Indents uniformly by 2 units
+KEYWORD4 = 4  # A 1-keyword used mostly for defining local functions e.g flets
 
 # Keywords that indent by two spaces
 SCHEME_KEYWORDS = \
@@ -585,23 +586,29 @@ def add_keywords(opts):
     keywords = collections.defaultdict(int)
     two_spacers = []
     two_armed = IF_LIKE
+    local_binders = []
     if dialect == 'lisp':  # Lisp
         two_spacers = LISP_KEYWORDS
         two_armed += ['multiple-value-bind', 'destructuring-bind', 'do', 'do*']
+        local_binders += ['flet', 'macrolet', 'labels']
     elif dialect == 'scheme':  # Scheme
         two_spacers = SCHEME_KEYWORDS
         two_armed += ['with-slots', 'do', 'do*']
+        local_binders += []
     elif dialect == 'clojure':  # Clojure
         two_spacers = CLOJURE_KEYWORDS
         two_armed += []
+        local_binders += ['letfn']
     elif dialect == 'newlisp':  # newLISP
         two_spacers = NEWLISP_KEYWORDS
         two_armed += []
+        local_binders += []
     elif dialect == 'all':
         two_spacers = LISP_KEYWORDS + SCHEME_KEYWORDS + CLOJURE_KEYWORDS + \
             NEWLISP_KEYWORDS
     keywords = assign_indent_numbers(two_spacers, KEYWORD1, keywords)
     keywords = assign_indent_numbers(two_armed, KEYWORD2, keywords)
+    keywords = assign_indent_numbers(local_binders, KEYWORD4, keywords)
     if opts.read_rc:
         rc_keywords = parse_rc_json()
         keywords.update(rc_keywords[dialect])
@@ -737,7 +744,7 @@ def _push_to_list(lst, func_name, char, line, offset,
                 'spaces': 0}
 
     is_macro = is_macro_name(func_name, opts.dialect)
-    two_spacer = is_macro or keywords[func_name] == KEYWORD1
+    two_spacer = is_macro or keywords[func_name] in [KEYWORD1, KEYWORD4]
 
     if in_list_literal or char == '{' or (char == '[' and opts.dialect == 'clojure'):
         # found quoted list or clojure hashmap/vector
@@ -761,7 +768,7 @@ def _push_to_list(lst, func_name, char, line, offset,
         # functions. The 'labels' indentation may not be exactly
         # perfect.
         parent_func = lst[-3]['func_name']
-        if parent_func in ['flet', 'labels', 'macrolet']:
+        if keywords[parent_func] == KEYWORD4:
             lst[-1]['indent_level'] = offset + opts.indent_size
     except IndexError:
         pass

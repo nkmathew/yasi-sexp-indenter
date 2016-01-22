@@ -380,10 +380,16 @@
      "--dialect=newlisp --no-compact --tabs=4")
     ("tests/cases/#15-input-space-output-tabs.lisp"
      "tests/cases/#15-input-space-output-tabs~.lisp"
-     "--dialect=lisp --no-compact --tabs=4")))
+     "--dialect=lisp --no-compact --tabs=4")
+    ("tests/cases/#16-lisp-flets-and-labels.lisp"
+     "tests/cases/#16-lisp-flets-and-labels~.lisp"
+     "--dialect=lisp")
+    ("tests/cases/#17-clojure-letfn.clj"
+     "tests/cases/#17-clojure-letfn~.clj"
+     "--dialect=clojure")))
 
 (define-test (test_system)
-  (for (case-number 0 15)
+  (for (case-number 0 17)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))
