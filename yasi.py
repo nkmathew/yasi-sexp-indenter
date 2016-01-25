@@ -782,19 +782,20 @@ def indent_code(original_code, options=None):
     fpath: Simply used in formatting the warning messages
 
     >>> indent_code("(print\n'Hello)")
-    [(),
-     False,
-     (),
-     [],
-     [],
-     False,
-     0,
-     False,
-     [],
-     (),
-     '',
-     "(print\n'Hello)",
-     "(print\n 'Hello)"]
+    {'bracket_locations': [],
+     'comment_locations': [],
+     'in_comment': 0,
+     'in_newlisp_tag_string': False,
+     'in_string': False,
+     'in_symbol_with_space': False,
+     'indented_code': ['(print\n', " 'Hello)"],
+     'last_quote_location': (),
+     'last_symbol_location': (),
+     'message_stack': [],
+     'newlisp_brace_locations': [],
+     'original_code': ['(print\n', "'Hello)"],
+     'first_tag_string': ()}
+
 
     The last entry in the list is the indented string.
     """
@@ -1039,7 +1040,7 @@ def indent_code(original_code, options=None):
         line_number += 1
     res = {
         'message_stack': message_stack,
-        'wirst_tag_string': first_tag_string,
+        'first_tag_string': first_tag_string,
         'in_newlisp_tag_string': in_newlisp_tag_string,
         'last_symbol_location': last_symbol_location,
         'comment_locations': comment_locations,
@@ -1071,15 +1072,15 @@ def colour_diff(diff_lines):
     colorama.init()
 
     def p_green(text):
-        """ Print added line in green"""
+        """ Print added line in green """
         print(colorama.Fore.GREEN + text + colorama.Fore.WHITE, end='')
 
     def p_yellow(text):
-        """ Print diff section header in yellow"""
+        """ Print diff section header in yellow """
         print(colorama.Fore.YELLOW + text + colorama.Fore.WHITE, end='')
 
     def p_red(text):
-        """ Print removed line in red"""
+        """ Print removed line in red """
         print(colorama.Fore.RED + text + colorama.Fore.WHITE, end='')
     section = re.compile('@@\s+-\d\d,\d\d\s\+\d\d,\d\d\s+@@')
     for line in diff_lines:
