@@ -1,3 +1,9 @@
+### Unreleased
+
+Fixes:
+  - Indent function specially only in binding vector in Clojure `letfn`
+
+
 ### v2.0.0 - 25th January 2016
 
 Features:
