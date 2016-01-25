@@ -768,7 +768,10 @@ def _push_to_list(lst, func_name, char, line, offset,
         # functions. The 'labels' indentation may not be exactly
         # perfect.
         parent_func = lst[-3]['func_name']
-        if keywords[parent_func] == KEYWORD4:
+        # Make 'special' indentation occur only in a Clojure binding block([]) for
+        # letfns
+        non_bind_block = opts.dialect == 'clojure' and lst[-2]['character'] != '['
+        if keywords[parent_func] == KEYWORD4 and not non_bind_block:
             lst[-1]['indent_level'] = offset + opts.indent_size
     except IndexError:
         pass

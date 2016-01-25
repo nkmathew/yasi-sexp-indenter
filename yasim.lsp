@@ -877,8 +877,11 @@ optional arguments:
                                                 leading-spaces offset))))))
     (push position-list lst)
     (when (>= (length lst) 3)
-      (let (parent-func ((lst 2) [func-name]))
-        (when (keyword4? parent-func keyword-lst)
+      (letn ((parent-func ((lst 2) [func-name]))
+             (enclosing-bracket ((lst 1) [character]))
+             (non-binding-block (and (!= enclosing-bracket "[")
+                                     (= (opts [dialect]) "clojure"))))
+        (when (and (not non-binding-block) (keyword4? parent-func keyword-lst))
           (setf ((first lst) [indent-level]) (+ (opts [indent-size]) offset)))))
     lst))
 
