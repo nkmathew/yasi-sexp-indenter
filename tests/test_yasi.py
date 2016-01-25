@@ -2,7 +2,7 @@
 # coding: utf-8
 
 # Disable pylint warnings on methods without docstrings and too many public methods
-# pylint: disable=C0111,R0904
+# pylint: disable=C0111,R0904,C0413
 
 """ Test suite for yasi
 """
@@ -14,7 +14,7 @@ import unittest
 PROJECT_DIR = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 sys.path.insert(0, PROJECT_DIR)
 
-import yasi
+import yasi  # noqa
 
 
 class UnitTests(unittest.TestCase):
