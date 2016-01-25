@@ -232,8 +232,8 @@ The numbers are described below(assuming standard indentation size of 2 spaces):
 
 ```lisp
 (do-the-boogie (= 12 44)
-                (print "if clause")
-                (print "else clause"))
+               (print "if clause")
+               (print "else clause"))
 ```
 
   + **1** - Causes the subforms of the function to be indented uniformly by a unit
