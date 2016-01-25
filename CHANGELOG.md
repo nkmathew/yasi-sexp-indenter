@@ -1,3 +1,9 @@
+### v2.0.0 - 25th January 2016
+
+Features:
+  - Indentation state is now returned in a dictionary instead of list which breaks
+    any existing scripts that use the `indent_code` function
+
 ### v1.2.1 - 22nd January 2016
 
 Fixes:
