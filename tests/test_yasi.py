@@ -311,7 +311,8 @@ class SystemTests(unittest.TestCase):
             before = yasi.read_file(before_path)
             after = yasi.read_file(after_path)
             options = '--no-rc ' + case['options']
-            indented_code = ''.join(yasi.indent_code(before, options=options)[-1])
+            result = yasi.indent_code(before, options=options)
+            indented_code = ''.join(result['indented_code'])
             try:
                 self.assertEqual(indented_code, after)
             except AssertionError as exception:

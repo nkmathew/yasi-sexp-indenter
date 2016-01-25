@@ -1037,10 +1037,22 @@ def indent_code(original_code, options=None):
 
             offset += 1
         line_number += 1
-    return [message_stack, first_tag_string, in_newlisp_tag_string,
-            last_symbol_location, comment_locations, newlisp_brace_locations,
-            in_string, in_comment, in_symbol_with_space, bracket_locations,
-            last_quote_location, code_lines, indented_code]
+    res = {
+        'message_stack': message_stack,
+        'wirst_tag_string': first_tag_string,
+        'in_newlisp_tag_string': in_newlisp_tag_string,
+        'last_symbol_location': last_symbol_location,
+        'comment_locations': comment_locations,
+        'newlisp_brace_locations': newlisp_brace_locations,
+        'in_string': in_string,
+        'in_comment': in_comment,
+        'in_symbol_with_space': in_symbol_with_space,
+        'bracket_locations': bracket_locations,
+        'last_quote_location': last_quote_location,
+        'original_code': code_lines,
+        'indented_code': indented_code
+    }
+    return res
 
 
 def colour_diff(diff_lines):
@@ -1081,23 +1093,17 @@ def colour_diff(diff_lines):
             print(line, end='')
 
 
-def _after_indentation(indentation_state, options=None, fpath=''):
-    """ _after_indentation(indentation_state : lst):
+def _after_indentation(res, options=None, fpath=''):
+    """ _after_indentation(res : dict):
 
     Called after the string has been indented appropriately.
     It takes care of writing the file and checking for unclosed strings
     or comments.
     """
-    # Receive all the state variables. *This is the price you for modularity*
-    message_stack, first_tag_string, in_newlisp_tag_string, last_symbol_location, comment_locations, \
-        newlisp_brace_locations, in_string, _, _, \
-        bracket_locations, last_quote_location, original_code, indented_code \
-        = indentation_state
-
     fname = os.path.basename(fpath)
     opts = parse_options(options)
 
-    for msg in message_stack:
+    for msg in res['message_stack']:
         if opts.warning:
             if opts.files:
                 msg['fname'] = fname
@@ -1106,10 +1112,10 @@ def _after_indentation(indentation_state, options=None, fpath=''):
                 # Input was passed through stdin
                 sys.stderr.write('\n:{line}:{column}: {msg}'.format(**msg))
 
-    if bracket_locations:
+    if res['bracket_locations']:
         # If the bracket_locations list is not empty it means that there are some
         # brackets(opening) that haven't been closed.
-        for bracket in bracket_locations:
+        for bracket in res['bracket_locations']:
             line = bracket['line_number']
             column = bracket['bracket_pos']
             character = bracket['character']
@@ -1120,34 +1126,34 @@ def _after_indentation(indentation_state, options=None, fpath=''):
             if opts.warning:
                 sys.stderr.write(message % (fname, line, column, character))
 
-    if newlisp_brace_locations:
-        for brace in newlisp_brace_locations:
+    if res['newlisp_brace_locations']:
+        for brace in res['newlisp_brace_locations']:
             message = "\n%s:%d:%d: Unclosed newLISP brace string"
             if opts.warning:
                 sys.stderr.write(message % (fname, brace[0], brace[1]))
 
-    if comment_locations:
-        for comment in comment_locations:
+    if res['comment_locations']:
+        for comment in res['comment_locations']:
             message = "\n%s:%d:%d: Unclosed multiline comment"
             tpl = (fname,) + comment
             if opts.warning:
                 sys.stderr.write(message % tpl)
 
-    if last_symbol_location:
+    if res['last_symbol_location']:
         message = "\n%s:%d:%d: Unclosed symbol"
-        tpl = (fname,) + last_symbol_location
+        tpl = (fname,) + res['last_symbol_location']
         if opts.warning:
             sys.stderr.write(message % tpl)
 
-    if in_string:
+    if res['in_string']:
         message = "\n%s:%d:%d: String extends to end-of-file"
-        tpl = (fname,) + last_quote_location
+        tpl = (fname,) + res['last_quote_location']
         if opts.warning:
             sys.stderr.write(message % tpl)
 
-    if in_newlisp_tag_string:
+    if res['in_newlisp_tag_string']:
         message = "\n%s:%d:%d: Tag string extends to end-of-file"
-        tpl = (fname,) + first_tag_string
+        tpl = (fname,) + res['first_tag_string']
         if opts.warning:
             sys.stderr.write(message % tpl)
 
@@ -1155,8 +1161,9 @@ def _after_indentation(indentation_state, options=None, fpath=''):
     if not output_file:
         output_file = fpath
 
+    indented_code = res['indented_code']
     indent_result = ''.join(indented_code)
-    if indented_code == original_code and opts.files:
+    if indented_code == res['original_code'] and opts.files:
         message = "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
         sys.stderr.write(message % fname)
         if output_file != fpath:
@@ -1164,7 +1171,7 @@ def _after_indentation(indentation_state, options=None, fpath=''):
                 indented_file.write(indent_result.encode('utf8'))
     else:
         if opts.output_diff:
-            diff = difflib.unified_diff(original_code, indented_code, n=5)
+            diff = difflib.unified_diff(res['original_code'], indented_code, n=5)
             if opts.colour_diff:
                 colour_diff(diff)
             else:
