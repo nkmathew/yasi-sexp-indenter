@@ -1,4 +1,4 @@
-### Unreleased
+### v2.0.1 - 25th January 2016
 
 Fixes:
   - Indent function specially only in binding vector in Clojure `letfn`
