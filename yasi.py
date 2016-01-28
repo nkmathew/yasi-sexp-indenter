@@ -532,7 +532,7 @@ LISP_KEYWORDS = \
      'macrolet', 'defparameter', 'with-slots', 'typecase', 'loop', 'when', 'prog1',
      'unless', 'with-open-file', 'with-output-to-string', 'with-input-from-string',
      'block', 'handler-case', 'defstruct', 'eval-when', 'tagbody', 'ignore-errors',
-     'labels', 'multiple-value-bind', 'progn', 'unwind-protect'
+     'labels', 'multiple-value-bind', 'progn', 'unwind-protect', 'collect'
      ]
 
 NEWLISP_KEYWORDS = \
