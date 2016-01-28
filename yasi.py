@@ -532,7 +532,7 @@ LISP_KEYWORDS = \
      'macrolet', 'defparameter', 'with-slots', 'typecase', 'loop', 'when', 'prog1',
      'unless', 'with-open-file', 'with-output-to-string', 'with-input-from-string',
      'block', 'handler-case', 'defstruct', 'eval-when', 'tagbody', 'ignore-errors',
-     'labels', 'multiple-value-bind', 'progn'
+     'labels', 'multiple-value-bind', 'progn', 'unwind-protect'
      ]
 
 NEWLISP_KEYWORDS = \
@@ -971,12 +971,13 @@ def indent_code(original_code, options=None):
                     find_first_arg_pos(offset, curr_line, opts)
                 func_name = substr[0:first_arg_pos - 1].strip(')]\t\n\r ').lower()
                 in_list_literal = False
-                if re.search("('|`|#)([ \t]*\(|\[)($|\r)", curr_line[0:offset + 1]):
+                if re.search("[^#]('|`|#)([ \t]*\(|\[)($|\r)", curr_line[0:offset + 1]):
                     in_list_literal = True
 
                 if re.search('^[^ \t]+[ \t]*($|\r)', substr):
                     # The function is the last symbol/form in the line
                     func_name = substr.strip(')]\t\n\r ').lower()
+
                 if in_list_literal:
                     # an empty string is always in a non-empty string, we don't want
                     # this. We set False as the func_name because it's not a string

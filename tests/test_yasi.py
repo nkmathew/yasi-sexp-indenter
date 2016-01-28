@@ -306,9 +306,13 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#18-letfn-binding-block-indentation-only.clj',
                 'after': 'tests/cases/#18-letfn-binding-block-indentation-only~.clj',
                 'options': '--dialect=clojure'
+            }, {
+                'before': 'tests/cases/#19-hash-quoted-expressions.lisp',
+                'after': 'tests/cases/#19-hash-quoted-expressions~.lisp',
+                'options': '--dialect=lisp'
             }
         ]
-        for i in range(0, 18):
+        for i in range(0, 19):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])

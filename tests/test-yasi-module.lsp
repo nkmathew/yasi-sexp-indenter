@@ -389,10 +389,13 @@
      "--dialect=clojure")
     ("tests/cases/#18-letfn-binding-block-indentation-only.clj"
      "tests/cases/#18-letfn-binding-block-indentation-only~.clj"
-     "--dialect=clojure")))
+     "--dialect=clojure")
+    ("tests/cases/#19-hash-quoted-expressions.lisp"
+     "tests/cases/#19-hash-quoted-expressions~.lisp"
+     "--dialect=lisp")))
 
 (define-test (test_system)
-  (for (case-number 0 18)
+  (for (case-number 0 19)
     (letn ((test-case (system-tests case-number))
            (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
            (before-path (string project-dir *os-sep* (test-case [before])))

@@ -1010,7 +1010,7 @@ optional arguments:
                               (func-name
                                (lower-case (strip (slice substr 0 (- first-arg-pos 1)) ")]\t\n\r ")))
                               (in-list-literal? nil))
-                         (when (regex "('|`|#)([ \t]*\\(|\\[)($|\r)" (slice curr-line 0 (+ offset 1)))
+                         (when (regex "[^#]('|`|#)([ \t]*\\(|\\[)($|\r)" (slice curr-line 0 (+ offset 1)))
                            (set 'in-list-literal? true))
                          (when (regex "^[^ \t]+[ \t]*($|\r)" substr)
                            (set 'func-name (lower-case (strip substr ")]\t\n\r "))))
