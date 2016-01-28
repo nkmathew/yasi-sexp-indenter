@@ -1,3 +1,8 @@
+### Unreleased
+
+Fixes:
+  - Hash quoted expressions being indented like literal lists
+
 ### v2.0.1 - 25th January 2016
 
 Fixes:
