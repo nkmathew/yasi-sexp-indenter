@@ -21,6 +21,7 @@ import time
 import collections
 import json
 import difflib
+from functools import lru_cache
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -28,6 +29,7 @@ from pprint import pprint
 __version__ = '2.0.1'
 
 
+@lru_cache(maxsize=None)
 def create_args_parser():
     """ Return command line parser """
     parser = argparse.ArgumentParser(
@@ -103,6 +105,12 @@ def create_args_parser():
         help='Dictates whether the if-clause and else-clause of an if-like' +
         'block should have the same indent level.',
         action='store_true')
+
+    parser.add_argument(
+        '-parallel', '--parallel',
+        help='Process the given files in parallel',
+        action='store_true')
+
     return parser
 
 
@@ -225,6 +233,7 @@ def find_line_ending(string):
         return LF
 
 
+@lru_cache(maxsize=None)
 def trim(string):
     """ trim(string : str) -> str
 
@@ -311,6 +320,7 @@ def find_trim_limit(string, options=None):
     return limit
 
 
+@lru_cache(maxsize=None)
 def is_macro_name(func_name, dialect):
     """ is_macro_name(func_name : str, dialect : str) -> bool
 
@@ -336,6 +346,7 @@ def is_macro_name(func_name, dialect):
         return False
 
 
+@lru_cache(maxsize=None)
 def split_preserve(string, sep):
     """ split_preserve(string : str, sep : str)  -> [str]
 
@@ -368,6 +379,7 @@ def split_preserve(string, sep):
     return str_list
 
 
+@lru_cache(maxsize=None)
 def all_whitespace(string):
     """ all_whitespace(string : str) -> bool
 
@@ -485,6 +497,7 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
 # ---------------------------------------------------------------------------------
 # GLOBAL CONSTANTS::
 
+
 CR   = '\r'
 LF   = '\n'
 CRLF = CR + LF
@@ -548,6 +561,7 @@ NEWLISP_KEYWORDS = \
 IF_LIKE = ['if']
 
 
+@lru_cache(maxsize=None)
 def parse_rc_json():
     """ Reads the json configuration file(.yasirc.json), parses it and returns the
     dictionary
@@ -579,7 +593,7 @@ def assign_indent_numbers(lst, inum, dic=collections.defaultdict(int)):
 def add_keywords(opts):
     """ add_keywords(dialect : str) -> [str, str]
 
-    Takens a lisp dialect name and returns a list of keywords that increase
+    Takes a lisp dialect name and returns a list of keywords that increase
     indentation by two spaces and those that can be one-armed like 'if'
     """
     dialect = opts.dialect
@@ -1169,7 +1183,7 @@ def _after_indentation(res, options=None, fpath=''):
     indented_code = res['indented_code']
     indent_result = ''.join(indented_code)
     if indented_code == res['original_code'] and opts.files:
-        message = "\nFile `%s' has already been formatted. Leaving it unchanged. . .\n"
+        message = "File '%s' has already been formatted. Leaving it unchanged. . .\n"
         sys.stderr.write(message % fname)
         if output_file != fpath:
             with open(output_file, 'wb') as indented_file:
@@ -1191,12 +1205,14 @@ def _after_indentation(res, options=None, fpath=''):
 
 
 def indent_files(arguments):
-    """ indent_files(fname : str)
+    """ indent_files(arguments)
 
     1. Creates a backup of the source file(backup_source_file())
     2. Reads the files contents(read_file())
     3. Indents the code(indent_code())
     4. Writes the file or print the indented code(_after_indentation())
+
+    Note: if the parallel option is provided, the files will be read and processed in parallel
     """
     opts = parse_options(arguments)
     if not opts.files:
@@ -1205,33 +1221,51 @@ def indent_files(arguments):
         indent_result = indent_code(code, opts)
         _after_indentation(indent_result)
 
-    for fname in opts.files:
-        code = read_file(fname)
-        if not opts.dialect:
-            # Guess dialect from the file extensions if none is specified in the
-            # command line
-            if fname.endswith('.lisp'):
-                opts.dialect = 'lisp'
-            elif fname.endswith('.lsp'):
-                opts.dialect = 'newlisp'
-            elif re.search(".clj[sc]{0,1}$", fname):
-                opts.dialect = 'clojure'
-            elif fname.endswith('.ss') or fname.endswith('.scm'):
-                opts.dialect = 'scheme'
-            else:
-                opts.dialect = 'all'
-        indent_result = indent_code(code, opts)
+    if opts.parallel:
+        import multiprocessing
+        pool = multiprocessing.Pool(multiprocessing.cpu_count())
+        pool.starmap(indent_file, [(opts, fname) for fname in opts.files])
+    else:
+        for fname in opts.files:
+            indent_file(opts, fname)
 
-        if opts.backup:
-            # Create a backup file in the directory specified
-            backup_source_file(fname, opts)
 
-        _after_indentation(indent_result, fpath=fname)
+def indent_file(opts, fname):
+    """
+    indent_files(opts, fname: string)
+
+    1. Creates a backup of the source file(backup_source_file())
+    2. Reads the files contents(read_file())
+    3. Indents the code(indent_code())
+    4. Writes the file or print the indented code(_after_indentation())
+    """
+    code = read_file(fname)
+    if not opts.dialect:
+        # Guess dialect from the file extensions if none is specified in the
+        # command line
+        if fname.endswith('.lisp'):
+            opts.dialect = 'lisp'
+        elif fname.endswith('.lsp'):
+            opts.dialect = 'newlisp'
+        elif re.search(".clj[sc]{0,1}$", fname):
+            opts.dialect = 'clojure'
+        elif fname.endswith('.ss') or fname.endswith('.scm'):
+            opts.dialect = 'scheme'
+        else:
+            opts.dialect = 'all'
+    indent_result = indent_code(code, opts)
+
+    if opts.backup:
+        # Create a backup file in the directory specified
+        backup_source_file(fname, opts)
+
+    _after_indentation(indent_result, fpath=fname)
 
 
 def main():
     """ Entry point """
     indent_files(sys.argv[1:])
+
 
 if __name__ == '__main__':
     main()
