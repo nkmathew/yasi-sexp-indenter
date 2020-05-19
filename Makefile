@@ -46,11 +46,11 @@ test: py-test new-test
 tags: yasi.py
 	ctags yasi.py
 
-checks:
+lint:
 	pep8 yasi.py tests/test_yasi.py
 	@printf "\n-------------------\n"
 	pylint yasi.py tests/test_yasi.py
-.PHONY : checks
+.PHONY : lint
 
 clean:
 	rm -rf __pycache__ tags *.pyc *.bak~ tests/cases/*.bak~
@@ -59,7 +59,7 @@ clean:
 help:
 	@echo "Targets:"
 	@echo " -> test(new-test, py-test)"
-	@echo " -> checks"
+	@echo " -> lint"
 	@echo " -> clean"
 	@echo " -> egg"
 	@echo " -> dist"
