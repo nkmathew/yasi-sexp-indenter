@@ -7,6 +7,7 @@ Date: 20th November 2013
 Author: nkmathew <kipkoechmathew@gmail.com>
 
 Dialect aware s-expression indenter
+
 """
 
 from __future__ import print_function
@@ -109,12 +110,10 @@ def create_args_parser():
         help='Dictates whether the if-clause and else-clause of an if-like' +
         'block should have the same indent level.',
         action='store_true')
-
     parser.add_argument(
         '-parallel', '--parallel',
         help='Process the given files in parallel',
         action='store_true')
-
     return parser
 
 
@@ -131,7 +130,6 @@ def parse_options(arguments=None):
         return arguments
     parser = create_args_parser()
     args = parser.parse_args(arguments)
-    # pprint(args.__dict__)
 
     args.dialect = args.dialect.lower()
     if args.dialect not in ['lisp', 'newlisp', 'clojure', 'scheme', 'all', '']:
@@ -152,7 +150,7 @@ def parse_options(arguments=None):
         args.warning = False
 
     if args.output_diff:
-        # If someone requests a diff we assume he/she doesn't want the file to be
+        # If someone requests a diff we assume they don't want the file to be
         # modified
         args.modify = False
 
@@ -1211,12 +1209,9 @@ def _after_indentation(res, options=None, fpath=''):
 def indent_files(arguments):
     """ indent_files(arguments)
 
-    1. Creates a backup of the source file(backup_source_file())
-    2. Reads the files contents(read_file())
-    3. Indents the code(indent_code())
-    4. Writes the file or print the indented code(_after_indentation())
+    Note: if the parallel option is provided, the files will be read and processed
+    in parallel
 
-    Note: if the parallel option is provided, the files will be read and processed in parallel
     """
     opts = parse_options(arguments)
     if not opts.files:
@@ -1238,17 +1233,18 @@ def indent_file(opts, fname):
     """
     indent_files(opts, fname: string)
 
-    1. Creates a backup of the source file(backup_source_file())
-    2. Reads the files contents(read_file())
-    3. Indents the code(indent_code())
-    4. Writes the file or print the indented code(_after_indentation())
+    1. Create a backup of the source file(backup_source_file())
+    2. Read the file contents(read_file())
+    3. Indent the code(indent_code())
+    4. Write to the file or print the indented code(_after_indentation())
+
     """
     opts = parse_options(opts)
     fname = os.path.expanduser(fname)
     code = read_file(fname)
     if not opts.dialect:
-        # Guess dialect from the file extensions if none is specified in the
-        # command line
+        # Guess dialect from the file extensions if none is specified in the command
+        # line
         if fname.endswith('.lisp'):
             opts.dialect = 'lisp'
         elif fname.endswith('.lsp'):
@@ -1262,7 +1258,7 @@ def indent_file(opts, fname):
     indent_result = indent_code(code, opts)
 
     if opts.backup:
-        # Create a backup file in the directory specified
+        # Create a backup file in the specified directory
         backup_source_file(fname, opts)
 
     _after_indentation(indent_result, fpath=fname)
