@@ -327,5 +327,6 @@ class SystemTests(unittest.TestCase):
                 print('??? Test failed: ' + case['before'] + '\n')
                 print(exception)
 
+
 if __name__ == '__main__':
     unittest.main()
