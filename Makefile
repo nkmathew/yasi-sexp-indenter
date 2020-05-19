@@ -32,7 +32,7 @@ py-test:
 .PHONY : py-test
 
 deps:
-	pip install colorama argparse
+	-pip install colorama argparse
 .PHONY : deps
 
 new-test:
