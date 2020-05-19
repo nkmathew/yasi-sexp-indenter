@@ -1,24 +1,36 @@
 ### Unreleased
 
+Features:
+
+ - Flag for processing files in parallel(`--parallel`), [#3][1]
+
 Fixes:
-  - Hash quoted expressions being indented like literal lists
+
+ - Hash quoted expressions being indented like literal lists
+
+Misc:
+
+ - Drop Python 2.6 support
 
 ### v2.0.1 - 25th January 2016
 
 Fixes:
-  - Indent function specially only in binding vector in Clojure `letfn`
+
+ - Indent function specially only in binding vector in Clojure `letfn`
 
 
 ### v2.0.0 - 25th January 2016
 
 Features:
-  - Indentation state is now returned in a dictionary instead of list which breaks
+
+ - Indentation state is now returned in a dictionary instead of list which breaks
     any existing scripts that use the `indent_code` function
 
 ### v1.2.1 - 22nd January 2016
 
 Fixes:
-  - **yasi.lsp**
+
+ - **yasi.lsp**
     + Local functions in Clojure `letfn` construct not being indented the right way
     + Dialect detection by file extension not working properly
 
@@ -35,7 +47,8 @@ Fixes:
 ### v1.2.0 - 10th January 2016
 
 Features:
-  - **yasi.py**
+
+ - **yasi.py**
     + **--suffix** option for specifying backup file suffix
     + The zero level of the first block doesn't define that of the rest of the code.
       Other blocks can start at different columns
@@ -150,3 +163,7 @@ Features:
     + Guesses dialect by file extension when the dialect flag is not supplied
     + Able to specify output filename
     + Tildes in backup folder path in Windows
+
+---
+
+[1]: https://github.com/nkmathew/yasi-sexp-indenter/issues/3
