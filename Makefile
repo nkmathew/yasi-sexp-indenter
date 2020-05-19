@@ -32,7 +32,7 @@ py-test:
 .PHONY : py-test
 
 deps:
-	-pip install colorama argparse
+	-pip install colorama argparse backports.functools_lru_cache
 .PHONY : deps
 
 new-test:

@@ -21,7 +21,11 @@ import time
 import collections
 import json
 import difflib
-from functools import lru_cache
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache
 
 # pylint: disable=unused-import
 from pprint import pprint
