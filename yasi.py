@@ -98,16 +98,16 @@ def create_args_parser():
         type=int, default=2)
     parser.add_argument(
         '-di', '--default-indent', '--di',
-        help='The indent level to be used in case a ' +
+        help='The indent level to be used in case a '
         "function's argument is in the next line. Vim uses 2, the most common being 1.",
         type=int, default=1)
     parser.add_argument(
         '-ic', '--indent-comments', '--ic',
-        help='If true, comment lines will be indented possibly ' +
+        help='If true, comment lines will be indented possibly '
         'messing with any deliberate comment layout', action='store_true')
     parser.add_argument(
         '-uni', '--uniform', '-uniform', '--uni',
-        help='Dictates whether the if-clause and else-clause of an if-like' +
+        help='Dictates whether the if-clause and else-clause of an if-like'
         'block should have the same indent level.',
         action='store_true')
     parser.add_argument(
