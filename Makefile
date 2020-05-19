@@ -66,14 +66,14 @@ clean:
 
 help:
 	@echo "Targets:"
-	@echo " -> test(new-test, py-test)"
-	@echo " -> lint"
 	@echo " -> clean"
-	@echo " -> egg"
-	@echo " -> dist"
-	@echo " -> tags"
 	@echo " -> deps"
+	@echo " -> dist"
+	@echo " -> egg"
 	@echo " -> fmt"
-	@echo " -> rst"
 	@echo " -> htm(html)"
+	@echo " -> lint"
+	@echo " -> rst"
+	@echo " -> tags"
+	@echo " -> test(new-test, py-test)"
 .PHONY : help
