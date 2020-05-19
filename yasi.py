@@ -21,7 +21,11 @@ import time
 import collections
 import json
 import difflib
-from functools import lru_cache
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache
 
 # pylint: disable=unused-import
 from pprint import pprint
@@ -166,7 +170,7 @@ def read_file(fname):
             CRLF            CRLF    LF
             CR              CR      LF
     """
-    assert os.path.exists(fname), "\n--%s-- Warning: File `%s' does not exist. . ." \
+    assert os.path.exists(fname), "\n--%s-- Warning: File `%s' does not exist..." \
         % (current_time(), fname)
     with open(fname, 'rb') as fp:
         return fp.read().decode('utf-8')
@@ -193,9 +197,9 @@ def backup_source_file(fname, options=None):
     opts = parse_options(options)
     backup_dir = opts.backup_dir
     assert os.path.exists(fname), \
-        ("\n--%s-- Warning: File `%s' does not exist. . ." % (current_time(), fname))
+        ("\n--%s-- Warning: File `%s' does not exist..." % (current_time(), fname))
     assert os.path.exists(os.path.abspath(backup_dir)), \
-        ("\n--%s-- Warning: Directory `%s' does not exist. . ." % (current_time(), fname))
+        ("\n--%s-- Warning: Directory `%s' does not exist..." % (current_time(), fname))
     backup_name = backup_dir + os.sep + os.path.split(fname)[1] + opts.backup_suffix
     try:
         shutil.copyfile(fname, backup_name)
@@ -1183,7 +1187,7 @@ def _after_indentation(res, options=None, fpath=''):
     indented_code = res['indented_code']
     indent_result = ''.join(indented_code)
     if indented_code == res['original_code'] and opts.files:
-        message = "File '%s' has already been formatted. Leaving it unchanged. . .\n"
+        message = "File '%s' has already been formatted. Leaving it unchanged...\n"
         sys.stderr.write(message % fname)
         if output_file != fpath:
             with open(output_file, 'wb') as indented_file:

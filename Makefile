@@ -1,5 +1,7 @@
 PYTHON?=python
 
+ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
 all: help
 .PHONY : all
 
@@ -23,7 +25,6 @@ htm: README.html
 html: README.html
 .PHONY : html
 
-# pip install docutils pygments
 README.html: README.rst
 	rst2html.py -stg README.rst README.html
 
@@ -32,7 +33,7 @@ py-test:
 .PHONY : py-test
 
 deps:
-	pip install colorama argparse
+	-pip install -r $(ROOT_DIR)/requirements.txt
 .PHONY : deps
 
 new-test:
@@ -45,11 +46,11 @@ test: py-test new-test
 tags: yasi.py
 	ctags yasi.py
 
-checks:
+lint:
 	pep8 yasi.py tests/test_yasi.py
 	@printf "\n-------------------\n"
 	pylint yasi.py tests/test_yasi.py
-.PHONY : checks
+.PHONY : lint
 
 clean:
 	rm -rf __pycache__ tags *.pyc *.bak~ tests/cases/*.bak~
@@ -58,7 +59,7 @@ clean:
 help:
 	@echo "Targets:"
 	@echo " -> test(new-test, py-test)"
-	@echo " -> checks"
+	@echo " -> lint"
 	@echo " -> clean"
 	@echo " -> egg"
 	@echo " -> dist"
