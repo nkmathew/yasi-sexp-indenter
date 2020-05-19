@@ -1243,6 +1243,8 @@ def indent_file(opts, fname):
     3. Indents the code(indent_code())
     4. Writes the file or print the indented code(_after_indentation())
     """
+    opts = parse_options(opts)
+    fname = os.path.expanduser(fname)
     code = read_file(fname)
     if not opts.dialect:
         # Guess dialect from the file extensions if none is specified in the

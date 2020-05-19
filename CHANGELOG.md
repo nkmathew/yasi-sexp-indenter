@@ -11,6 +11,7 @@ Fixes:
 Misc:
 
  - Drop Python 2.6 support
+ - Support tilded paths in Windows
 
 ### v2.0.1 - 25th January 2016
 
