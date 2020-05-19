@@ -1,5 +1,7 @@
 PYTHON?=python
 
+ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
 all: help
 .PHONY : all
 
@@ -31,7 +33,7 @@ py-test:
 .PHONY : py-test
 
 deps:
-	-pip install -r .\requirements.txt
+	-pip install -r $(ROOT_DIR)/requirements.txt
 .PHONY : deps
 
 new-test:
