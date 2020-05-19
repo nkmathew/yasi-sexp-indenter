@@ -229,10 +229,9 @@ def find_line_ending(string):
     """
     if CRLF in string:
         return CRLF
-    elif CR in string:
+    if CR in string:
         return CR
-    else:
-        return LF
+    return LF
 
 
 @lru_cache(maxsize=None)
@@ -344,8 +343,7 @@ def is_macro_name(func_name, dialect):
         return re.search('^(def|with)', func_name)
     if dialect == 'newlisp':
         return re.search('^(macro|def)', func_name)
-    else:
-        return False
+    return False
 
 
 @lru_cache(maxsize=None)
@@ -401,8 +399,7 @@ def detabify(text, options):
     opts = parse_options(options)
     if opts.tab_size < 1:
         return text.expandtabs(4)
-    else:
-        return text.expandtabs(options.tab_size)
+    return text.expandtabs(options.tab_size)
 
 
 def tabify(text, options):
@@ -416,9 +413,8 @@ def tabify(text, options):
     opts = parse_options(options)
     if opts.tab_size < 1:
         return text
-    else:
-        tab_equiv = ' ' * opts.tab_size
-        return text.replace(tab_equiv, '\t')
+    tab_equiv = ' ' * opts.tab_size
+    return text.replace(tab_equiv, '\t')
 
 
 def pad_leading_whitespace(string, zero_level, blist, options=None):
@@ -486,15 +482,14 @@ def indent_line(zerolevel, bracket_list, line, in_comment, in_symbol_region,
     if in_symbol_region:
         # No processing done in strings and comments
         return zerolevel, line, 0
-    elif not comment_line and not all_whitespace(line):
+    if not comment_line and not all_whitespace(line):
         # If this is not a comment line indent the line.
         # If the list is empty, then the current_level defaults
         # to zero
         curr_line, current_level = pad_leading_whitespace(line, zerolevel,
                                                           bracket_list, opts)
         return zerolevel, curr_line, current_level
-    else:
-        return zerolevel, line, 0
+    return zerolevel, line, 0
 
 # ---------------------------------------------------------------------------------
 # GLOBAL CONSTANTS::
