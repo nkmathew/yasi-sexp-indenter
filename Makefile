@@ -46,9 +46,17 @@ test: py-test new-test
 tags: yasi.py
 	ctags yasi.py
 
+fmt: yasi.py tests/test_yasi.py
+	autopep8 $^ \
+		--indent-size=4 \
+		--in-place \
+		--ignore=E221 \
+		--max-line-length 130
+.PHONY : fmt
+
 lint:
 	pep8 yasi.py tests/test_yasi.py
-	@printf "\n-------------------\n"
+	@printf "\033[01;36m\n\n-------------------\n\n\033[0m"
 	pylint yasi.py tests/test_yasi.py
 .PHONY : lint
 
@@ -65,6 +73,7 @@ help:
 	@echo " -> dist"
 	@echo " -> tags"
 	@echo " -> deps"
+	@echo " -> fmt"
 	@echo " -> rst"
 	@echo " -> htm(html)"
 .PHONY : help
