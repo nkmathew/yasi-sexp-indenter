@@ -23,7 +23,6 @@ htm: README.html
 html: README.html
 .PHONY : html
 
-# pip install docutils pygments
 README.html: README.rst
 	rst2html.py -stg README.rst README.html
 
@@ -32,7 +31,7 @@ py-test:
 .PHONY : py-test
 
 deps:
-	-pip install colorama argparse backports.functools_lru_cache
+	-pip install -r .\requirements.txt
 .PHONY : deps
 
 new-test:
