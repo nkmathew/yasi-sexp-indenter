@@ -13,7 +13,12 @@ import sys
 import traceback
 import unittest
 
-from colorama import Fore, init
+try:
+    import colorama
+    colorama.init()
+except ImportError:
+    pass
+
 
 PROJECT_DIR = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 sys.path.insert(0, PROJECT_DIR)
@@ -22,6 +27,7 @@ import yasi  # noqa
 
 
 def addcolour(message):
+    Fore = colorama.Fore
     message = message.split('\n')
     nmessage = ''
     for line in message:
@@ -52,7 +58,10 @@ class UnitTests(unittest.TestCase):
         except AssertionError as ex:
             testname = traceback.format_stack()[-2].split('\n')[0]
             testname = '\n\n%s\n\n%s' % (testname, str(ex))
-            print(addcolour(testname))
+            try:
+                print(addcolour(testname))
+            except NameError:
+                print(testname)
 
     def test_find_line_ending_only_lf(self):
         source = 'First Line\n Second Line\n'
@@ -372,9 +381,11 @@ class SystemTests(unittest.TestCase):
                 self.assertEqual(indented_code, after)
             except AssertionError as exception:
                 message = '\nFAIL: %s\n\n%s' % (case['before'], exception)
-                print(addcolour(message))
+                try:
+                    print(addcolour(message))
+                except NameError:
+                    print(message)
 
 
 if __name__ == '__main__':
-    init()
     unittest.main()
