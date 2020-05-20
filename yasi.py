@@ -29,7 +29,7 @@ except ImportError:
     from backports.functools_lru_cache import lru_cache
 
 # pylint: disable=unused-import
-from pprint import pprint # noqa
+from pprint import pprint  # noqa
 
 __version__ = '2.0.1'
 
@@ -1218,15 +1218,15 @@ def indent_files(arguments):
     if opts.parallel:
         import multiprocessing
         pool = multiprocessing.Pool(multiprocessing.cpu_count())
-        pool.starmap(indent_file, [(opts, fname) for fname in opts.files])
+        pool.starmap(indent_file, [(fname, opts) for fname in opts.files])
     else:
         for fname in opts.files:
-            indent_file(opts, fname)
+            indent_file(fname, opts)
 
 
-def indent_file(opts, fname):
+def indent_file(fname, opts):
     """
-    indent_files(opts, fname: string)
+    indent_file(fname: string, opts)
 
     1. Create a backup of the source file(backup_source_file())
     2. Read the file contents(read_file())
