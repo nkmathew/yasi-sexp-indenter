@@ -281,91 +281,95 @@ class SystemTests(unittest.TestCase):
             {
                 'before': 'tests/cases/#1-if-expression.lisp',
                 'after': 'tests/cases/#1-if-expression~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#2-multiple-value-bind.lisp',
                 'after': 'tests/cases/#2-multiple-value-bind~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#3-multiple-value-bind.lisp',
                 'after': 'tests/cases/#3-multiple-value-bind~.lisp',
-                'options': '--uniform --dialect=lisp'
+                'args': '--uniform --dialect=lisp'
             }, {
                 'before': 'tests/cases/#4-flet-indentation.lisp',
                 'after': 'tests/cases/#4-flet-indentation~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#5-looks-like-a-macro.lisp',
                 'after': 'tests/cases/#5-looks-like-a-macro~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#6-default-indent.lisp',
                 'after': 'tests/cases/#6-default-indent~.lisp',
-                'options': '--dialect=lisp --default-indent 2'
+                'args': '--dialect=lisp --default-indent 2'
             }, {
                 'before': 'tests/cases/#7-uniform-if-expression.lisp',
                 'after': 'tests/cases/#7-uniform-if-expression~.lisp',
-                'options': '--dialect=lisp --uniform'
+                'args': '--dialect=lisp --uniform'
             }, {
                 'before': 'tests/cases/#8-macrolet-special-operator.lisp',
                 'after': 'tests/cases/#8-macrolet-special-operator~.lisp',
-                'options': '--dialect=lisp --indent-comments'
+                'args': '--dialect=lisp --indent-comments'
             }, {
                 'before': 'tests/cases/#9-standard-emacs-form-indentation.lisp',
                 'after': 'tests/cases/#9-standard-emacs-form-indentation~.lisp',
-                'options': '--dialect=all'
+                'args': '--dialect=all'
             }, {
                 'before': 'tests/cases/#10-newlisp-hash-comment.lsp',
                 'after': 'tests/cases/#10-newlisp-hash-comment~.lsp',
-                'options': '--dialect=newlisp'
+                'args': '--dialect=newlisp'
             }, {
                 'before': 'tests/cases/#11-gradual-space-reduction-reindentation.lsp',
                 'after': 'tests/cases/#11-gradual-space-reduction-reindentation~.lsp',
-                'options': '--dialect=newlisp'
+                'args': '--dialect=newlisp'
             }, {
                 'before': 'tests/cases/#12-zero-level-hanging-indentation.lsp',
                 'after': 'tests/cases/#12-zero-level-hanging-indentation~.lsp',
-                'options': '--dialect=newlisp --no-compact'
+                'args': '--dialect=newlisp --no-compact'
             }, {
                 'before': 'tests/cases/#13-hanging-with-non-hanging.lsp',
                 'after': 'tests/cases/#13-hanging-with-non-hanging~.lsp',
-                'options': '--dialect=newlisp --no-compact'
+                'args': '--dialect=newlisp --no-compact'
             }, {
                 'before': 'tests/cases/#14-tabbed-indentation.lsp',
                 'after': 'tests/cases/#14-tabbed-indentation~.lsp',
-                'options': '--dialect=newlisp --no-compact --tab=4'
+                'args': '--dialect=newlisp --no-compact --tab=4'
             }, {
                 'before': 'tests/cases/#15-input-space-output-tabs.lisp',
                 'after': 'tests/cases/#15-input-space-output-tabs~.lisp',
-                'options': '--dialect=lisp --no-compact --tab=4'
+                'args': '--dialect=lisp --no-compact --tab=4'
             }, {
                 'before': 'tests/cases/#16-lisp-flets-and-labels.lisp',
                 'after': 'tests/cases/#16-lisp-flets-and-labels~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#17-clojure-letfn.clj',
                 'after': 'tests/cases/#17-clojure-letfn~.clj',
-                'options': '--dialect=clojure'
+                'args': '--dialect=clojure'
             }, {
                 'before': 'tests/cases/#18-letfn-binding-block-indentation-only.clj',
                 'after': 'tests/cases/#18-letfn-binding-block-indentation-only~.clj',
-                'options': '--dialect=clojure'
+                'args': '--dialect=clojure'
             }, {
                 'before': 'tests/cases/#19-hash-quoted-expressions.lisp',
                 'after': 'tests/cases/#19-hash-quoted-expressions~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#20-unclosed-string.lisp',
                 'after': 'tests/cases/#20-unclosed-string~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': 'tests/cases/#21-closing-brackets-separate-lines.lisp',
                 'after': 'tests/cases/#21-closing-brackets-separate-lines~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
             }, {
                 'before': './tests/cases/#22-defmacro-example.lisp',
                 'after': './tests/cases/#22-defmacro-example~.lisp',
-                'options': '--dialect=lisp'
+                'args': '--dialect=lisp'
+            }, {
+                'before': './tests/cases/#23-newlisp-long-string-tag-spacing.lsp',
+                'after': './tests/cases/#23-newlisp-long-string-tag-spacing~.lsp',
+                'args': '--dialect=newlisp'
             }
         ]
         for i in range(0, 22):
@@ -374,8 +378,8 @@ class SystemTests(unittest.TestCase):
             after_path = os.path.join(PROJECT_DIR, case['after'])
             before = yasi.read_file(before_path)
             after = yasi.read_file(after_path)
-            options = '--no-rc ' + case['options']
-            result = yasi.indent_code(before, options=options)
+            args = '--no-rc ' + case['args']
+            result = yasi.indent_code(before, args=args)
             indented_code = ''.join(result['indented_code'])
             try:
                 self.assertEqual(indented_code, after)
