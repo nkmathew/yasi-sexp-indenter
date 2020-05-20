@@ -12,7 +12,13 @@ README = ''
 with io.open('README.rst') as f:
     README = f.read()
 
-DEPS = ['colorama'] + (['argparse'] if sys.version_info < (2, 7) else [])
+DEPS = []
+
+if sys.version_info[:2] != (3, 4):
+    DEPS += ['colorama']
+
+if sys.version_info < (2, 7):
+    DEPS += ['argparse']
 
 def version():
     """Return version string."""
