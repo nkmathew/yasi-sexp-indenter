@@ -29,7 +29,7 @@ except ImportError:
     from backports.functools_lru_cache import lru_cache
 
 # pylint: disable=unused-import
-from pprint import pprint
+from pprint import pprint # noqa
 
 __version__ = '2.0.1'
 
