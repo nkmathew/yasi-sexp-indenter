@@ -310,9 +310,21 @@ class SystemTests(unittest.TestCase):
                 'before': 'tests/cases/#19-hash-quoted-expressions.lisp',
                 'after': 'tests/cases/#19-hash-quoted-expressions~.lisp',
                 'options': '--dialect=lisp'
+            }, {
+                'before': 'tests/cases/#20-unclosed-string.lisp',
+                'after': 'tests/cases/#20-unclosed-string~.lisp',
+                'options': '--dialect=lisp'
+            }, {
+                'before': 'tests/cases/#21-closing-brackets-separate-lines.lisp',
+                'after': 'tests/cases/#21-closing-brackets-separate-lines~.lisp',
+                'options': '--dialect=lisp'
+            }, {
+                'before': './tests/cases/#22-defmacro-example.lisp',
+                'after': './tests/cases/#22-defmacro-example~.lisp',
+                'options': '--dialect=lisp'
             }
         ]
-        for i in range(0, 19):
+        for i in range(0, 22):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])
