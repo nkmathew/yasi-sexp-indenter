@@ -579,7 +579,7 @@ def parse_rc_json():
     return collections.defaultdict(dict, ret)
 
 
-def assign_indent_numbers(lst, inum, dic=collections.defaultdict(int)):
+def assign_indent_numbers(lst, inum, dic):
     """ Associate keywords with their respective indentation numbers
     """
     for i in lst:
