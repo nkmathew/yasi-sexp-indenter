@@ -921,11 +921,11 @@ def indent_code(original_code, options=None):
 
             # ----------------------------------------------------------
 
-            # Strings are dealt with here only if we are not comment
+            # Strings are dealt with here only if we are not in a comment
             if not (in_symbol_with_space or in_comment or in_newlisp_tag_string):
                 if curr_char == '"':
                     last_quote_location = (line_number, offset)
-                    in_string = True if not in_string else False
+                    in_string = not bool(in_string)
                 if opts.dialect == 'newlisp' and not in_string:
                     # We handle newLISP's multiline(brace) string here. Brace
                     # strings can nest
