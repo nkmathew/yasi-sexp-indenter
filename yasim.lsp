@@ -692,8 +692,14 @@ optional arguments:
       ;; Include all whitespace before the semi colon as part of the comment
       (set 'comment-start ((regex "[ \t]*;" str) 1)))
     (when (= (opts [dialect]) "newlisp")
-      (letn ((brace-start (find "{" str))
-             (tag-start (find "[text]" str))
+      (letn ((brace-start (regex "{" str 0))
+             (tag-start (regex "\\[text\\]" str 0))
+             (brace-start (if brace-start
+                           (+ (brace-start 2) (brace-start 1))
+                           -1))
+             (tag-start (if tag-start
+                           (+ (tag-start 2) (tag-start 1))
+                           -1))
              (str-positions (list limit (or brace-start -1) (or tag-start -1)))
              (pos-lst '()))
         (dolist (arg str-positions)
@@ -753,7 +759,7 @@ optional arguments:
              (letn ((comment-start (regex "^[ \t]*;" str 0))
                     (trim-limit (if (and comment-start (opts [indent-comments]))
                                     (comment-start 2)
-                                  (find-trim-limit str)))
+                                  (find-trim-limit str opts)))
                     (substr-1 (slice str 0 trim-limit)) ;; split into two portions
                     (substr-2 (slice str trim-limit))
                     (substr-1 (string-trim! substr-1))) ;; strip the first portion

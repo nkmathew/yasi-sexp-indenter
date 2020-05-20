@@ -15,6 +15,11 @@
 
 (set 'path "C:/MyDir/example.lsp")
 
+(string            {   Hello world                }    " message")
+
+(println {            QWERTY  DVORAK               }) ;; jjj' [text]
+
+
 ; inner braces are balanced
 (regex {abc{1,2}} line) 
 

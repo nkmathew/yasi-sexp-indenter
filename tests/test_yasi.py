@@ -205,7 +205,7 @@ class UnitTests(unittest.TestCase):
 
     def test_find_trim_limit_newlisp_brace_string_before_comment(self):
         source = '(println {            Hello     World                   }) ;; jjj'
-        self.assertEq(9, yasi.find_trim_limit(source, '--dialect=newlisp'))
+        self.assertEq(10, yasi.find_trim_limit(source, '--dialect=newlisp'))
 
     def test_find_trim_limit_comment_alone_in_newlisp(self):
         source = 'thhjh h               jgjh             ;;            hjbjh'
@@ -213,7 +213,7 @@ class UnitTests(unittest.TestCase):
 
     def test_find_trim_limit_newlisp_brace_string(self):
         source = '(string         {   Hello world                }    " message"))'
-        self.assertEq(16, yasi.find_trim_limit(source, '--dialect=newlisp'))
+        self.assertEq(17, yasi.find_trim_limit(source, '--dialect=newlisp'))
 
     def test_split_preserve_empty_lines_at_EOF(self):
         source = "Tengo una pregunta\nSobre todo \n en este mundo\n\n\n\n\n"
@@ -363,16 +363,16 @@ class SystemTests(unittest.TestCase):
                 'after': 'tests/cases/#21-closing-brackets-separate-lines~.lisp',
                 'args': '--dialect=lisp'
             }, {
-                'before': './tests/cases/#22-defmacro-example.lisp',
-                'after': './tests/cases/#22-defmacro-example~.lisp',
+                'before': 'tests/cases/#22-defmacro-example.lisp',
+                'after': 'tests/cases/#22-defmacro-example~.lisp',
                 'args': '--dialect=lisp'
             }, {
-                'before': './tests/cases/#23-newlisp-long-string-tag-spacing.lsp',
-                'after': './tests/cases/#23-newlisp-long-string-tag-spacing~.lsp',
+                'before': 'tests/cases/#23-newlisp-long-string-tag-spacing.lsp',
+                'after': 'tests/cases/#23-newlisp-long-string-tag-spacing~.lsp',
                 'args': '--dialect=newlisp'
             }
         ]
-        for i in range(0, 22):
+        for i in range(0, 23):
             case = cases[i]
             before_path = os.path.join(PROJECT_DIR, case['before'])
             after_path = os.path.join(PROJECT_DIR, case['after'])

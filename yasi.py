@@ -298,8 +298,10 @@ def find_trim_limit(string, args=None):
 
     if args.dialect == 'newlisp':
         # Find out which string type comes first(normal, tag or brace strings)
-        brace_string_start = string.find('{')
-        tag_string_start = string.find('[text]')
+        brace_string_start = re.search('{', string)
+        tag_string_start = re.search('\[text\]', string)
+        brace_string_start = brace_string_start.end() if brace_string_start else -1
+        tag_string_start = tag_string_start.end() if tag_string_start else -1
         pos_lst = [limit, brace_string_start, tag_string_start]
         pos_lst = [x for x in pos_lst if x != -1]
         if pos_lst:

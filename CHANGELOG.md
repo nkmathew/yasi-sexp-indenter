@@ -7,6 +7,8 @@ Features:
 Fixes:
 
  - Hash quoted expressions being indented like literal lists
+ - Conjoining of *newLISP* tag and brace strings with function when compacted, e.g
+   `(regex {abc{1,2}} line)` becomes `(regex{abc{1,2}} line)`
 
 Misc:
 
@@ -67,13 +69,13 @@ Fixes:
 
   - **yasi.py**
     + Backup being ran on the already modified file
-    + Newlisp comments starting with hash(`#`) being evaluated
+    + *newLISP* comments starting with hash(`#`) being evaluated
     + Space before comment decreasing by a single character on re-indentation
     + Error due to unsupported keyword argument in python 2.6
 
   - **yasi.lsp**
     + Backup being ran on the already modified file
-    + Newlisp comments starting with hash(`#`) being evaluated
+    + *newLISP* comments starting with hash(`#`) being evaluated
     + Space before comment decreasing by a single character on re-indentation
     + **--no-output** option not being parsed properly, affecting compact setting
 
@@ -108,7 +110,7 @@ Fixes:
 Fixes:
 
   - Add License file
-  - Include testcases and newlisp scripts in pypi source distribution
+  - Include testcases and *newLISP* scripts in pypi source distribution
   - README.rst generated from README.md for pypi documentation using pandoc
   - Long description for pypi
 
@@ -140,14 +142,14 @@ Fixes:
 Fixes:
 
   - **yasi.py**
-    + Newlisp brace strings being trimmed
+    + *newLISP* brace strings being trimmed
     + **--indent-comments** now indents comments without trimming whitespace
-    + Newlisp tag strings being trimmed
+    + *newLISP* tag strings being trimmed
 
   - **yasi.lsp**
-    + Newlisp brace strings being trimmed
+    + *newLISP* brace strings being trimmed
     + **--indent-comments** now indents comments without trimming whitespace
-    + Newlisp tag strings being trimmed
+    + *newLISP* tag strings being trimmed
 
 Features:
 

@@ -7,20 +7,40 @@
   (letn ((sep (if (= ostype "Win32")
                   "\\"
                 "/"))
-         (new-path (if (= (path -1) sep) (replace "\\\\$" path "" 0) path))
+         (new-path (if (= (path -1) sep)
+                       (replace "/$" (replace "\\\\$" path "" 0) "" 0)
+                     path))
          (splits (slice (parse new-path sep) 0 -1)))
     (join splits sep)))
 
 ;; Returns the directory of the currently running script
 (define (script-dir script-name)
-  (let (script-path (real-path (main-args 1)))
+  (let (script-path (real-path script-name))
     (replace (string script-name "\$") script-path "" 0)))
 
-;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(define (folder-name path)
+  (letn ((path (replace "\\\\" (real-path path) "/" 0))
+         (path (parse path "/")))
+    (nth -1 path)))
+
+(define (in-test-folder)
+ (and (= (folder-name ".") "tests") (real-path "nl-unittest.lsp")))
+
+; }}=============================================================================={{
 
 ;; Imports
-(load (string (get-parent-path (script-dir "test-yasi-module.lsp")) "\\yasim.lsp"))
-(load (string (script-dir "test-yasi-module.lsp") "nl-unittest.lsp"))
+
+(if (and (!= (folder-name ".") "tests") (real-path "yasim.lsp"))
+ (load "yasim.lsp"))
+
+(if (and (= (folder-name ".") "tests") (real-path "../yasim.lsp"))
+ (load "../yasim.lsp"))
+
+(if (and (!= (folder-name ".") "tests") (real-path "tests/nl-unittest.lsp"))
+ (load "tests/nl-unittest.lsp"))
+
+(if (and (= (folder-name ".") "tests") (real-path "nl-unittest.lsp"))
+ (load "nl-unittest.lsp"))
 
 ;; Unit test library settings
 (setq UnitTest:*enable-term-color*       true) ;; use colors in console?
@@ -244,14 +264,14 @@
    (find-trim-limit
     [text](string         {   Hello world                }    " message"))[/text]
     "--dialect=newlisp")
-   16))
+   17))
 
 (define-test (test_find_trim_limit_newlisp_brace_string_before_comment)
   (assert=
    (find-trim-limit
     [text](println {            Hello     World                   }) ;; jjj[/text]
     "--dialect=newlisp")
-   9))
+   10))
 
 (define-test (test_split_preserve_empty_lines_at_EOF)
   (assert=
@@ -392,26 +412,36 @@
      "--dialect=clojure")
     ("tests/cases/#19-hash-quoted-expressions.lisp"
      "tests/cases/#19-hash-quoted-expressions~.lisp"
-     "--dialect=lisp")))
+     "--dialect=lisp")
+    ("tests/cases/#20-unclosed-string.lisp"
+     "tests/cases/#20-unclosed-string~.lisp"
+     "--dialect=lisp")
+    ("tests/cases/#21-closing-brackets-separate-lines.lisp"
+     "tests/cases/#21-closing-brackets-separate-lines~.lisp"
+     "--dialect=lisp")
+    ("tests/cases/#22-defmacro-example.lisp"
+     "tests/cases/#22-defmacro-example~.lisp"
+     "--dialect=lisp")
+    ("tests/cases/#23-newlisp-long-string-tag-spacing.lsp"
+     "tests/cases/#23-newlisp-long-string-tag-spacing~.lsp"
+     "--dialect=newlisp")
+    ))
 
 (define-test (test_system)
-  (for (case-number 0 19)
+  (for (case-number 0 (- (length system-tests) 0))
     (letn ((test-case (system-tests case-number))
-           (project-dir (get-parent-path (script-dir "test-yasi-module.lsp")))
-           (before-path (string project-dir *os-sep* (test-case [before])))
-           (after-path (string project-dir *os-sep* (test-case [after])))
+           (before-path (test-case [before]))
+           (after-path (test-case [after]))
            (options (string "--no-rc " (test-case [options]))))
+      (println "Running Test: " before-path)
       (set 'before (read-file! before-path))
       (set 'after (read-file! after-path))
       (set 'indent-result (indent-code before options))
       (set 'indented-code (indent-result 7))
       (assert= after indented-code)
-      ;; (unless (= indented-code after)
-      ;;   (println "\n>>> Test Failed: " (first test-case) "\n")
-      ;;   (println "Returned: \n" indented-code)
-      ;;   (println "Expected: \n" after))
+      (unless (= indented-code after)
+        (println "\n>>> Test Failed: " before-path "\n"))
       )))
 
 (UnitTest:run-all 'MAIN)
-;; (test_system)
 (exit)
