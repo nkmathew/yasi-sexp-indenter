@@ -58,6 +58,8 @@ lint:
 	-pycodestyle yasi.py tests/test_yasi.py
 	@printf "\033[01;36m\n\n-------------------\n\n\033[0m"
 	pylint yasi.py tests/test_yasi.py
+	@printf "\033[01;36m\n\n-------------------\n\n\033[0m"
+	flake8 yasi.py tests/test_yasi.py
 .PHONY : lint
 
 clean:
