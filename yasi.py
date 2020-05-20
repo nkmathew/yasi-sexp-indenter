@@ -1109,8 +1109,8 @@ def colour_diff(diff_lines):
             print(line, end='')
 
 
-def _after_indentation(res, args=None, fpath=''):
-    """ _after_indentation(res : dict):
+def _post_indentation(res, args=None, fpath=''):
+    """ _post_indentation(res : dict):
 
     Called after the string has been indented appropriately.
     It takes care of writing the file and checking for unclosed strings
@@ -1213,7 +1213,7 @@ def indent_files(arguments):
         # Indent from stdin
         code = sys.stdin.read()
         indent_result = indent_code(code, args)
-        _after_indentation(indent_result)
+        _post_indentation(indent_result)
 
     if args.parallel:
         import multiprocessing
@@ -1231,7 +1231,7 @@ def indent_file(fname, args):
     1. Create a backup of the source file(backup_source_file())
     2. Read the file contents(read_file())
     3. Indent the code(indent_code())
-    4. Write to the file or print the indented code(_after_indentation())
+    4. Write to the file or print the indented code(_post_indentation())
 
     """
     args = parse_args(args)
@@ -1256,7 +1256,7 @@ def indent_file(fname, args):
         # Create a backup file in the specified directory
         backup_source_file(fname, args)
 
-    _after_indentation(indent_result, fpath=fname)
+    _post_indentation(indent_result, fpath=fname)
 
 
 def main():
