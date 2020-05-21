@@ -31,7 +31,7 @@ except ImportError:
 # pylint: disable=unused-import
 from pprint import pprint  # noqa
 
-__version__ = '2.0.1'
+__version__ = '2.1.0'
 
 
 @lru_cache(maxsize=None)

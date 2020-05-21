@@ -1,4 +1,4 @@
-### Unreleased
+### v2.1.0 - 21st May 2020
 
 Features:
 
