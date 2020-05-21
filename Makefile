@@ -87,7 +87,11 @@ clean-dist:
 
 upload-test: clean-dist egg
 	twine upload --repository testpypi dist/*
-.PHONY : install
+.PHONY : upload-test
+
+upload: clean-dist egg
+	twine upload dist/*
+.PHONY : upload
 
 help:
 	@echo "Targets:"
@@ -103,5 +107,6 @@ help:
 	@echo " -> rst"
 	@echo " -> tags"
 	@echo " -> test(new-test, py-test)"
+	@echo " -> upload"
 	@echo " -> upload-test"
 .PHONY : help
