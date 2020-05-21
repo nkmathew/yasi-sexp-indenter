@@ -2,3 +2,10 @@ argparse==1.4.0
 backports.functools-lru-cache==1.6.1
 colorama==0.4.3
 docutils==0.16
+
+autopep8
+flake8
+pycodestyle
+pylint
+tox
+virtualenv
