@@ -67,7 +67,13 @@ lint:
 .PHONY : lint
 
 clean:
-	rm -rf __pycache__ tags *.pyc *.bak~ tests/cases/*.bak~
+	rm -rf README.html \
+		__pycache__ tags \
+		README.html \
+		README.rst \
+		*.pyc \
+		*.bak~ \
+		tests/cases/*.bak~
 .PHONY : clean
 
 help:
