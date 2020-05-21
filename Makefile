@@ -9,7 +9,7 @@ ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 all: help
 .PHONY : all
 
-egg: rst
+egg:
 	${PYTHON} setup.py sdist
 .PHONY : egg
 
@@ -92,6 +92,7 @@ upload-test: clean-dist egg
 help:
 	@echo "Targets:"
 	@echo " -> clean"
+	@echo " -> clean-dist"
 	@echo " -> deps"
 	@echo " -> dist"
 	@echo " -> egg"

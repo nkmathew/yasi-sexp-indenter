@@ -9,7 +9,7 @@ import ast
 import setuptools
 
 README = ''
-with io.open('README.rst') as f:
+with io.open('README.md') as f:
     README = f.read()
 
 DEPS = []
@@ -33,6 +33,7 @@ setuptools.setup(
     version=version(),
     description='A dialect aware s-expression indenter',
     long_description=README,
+    long_description_content_type='text/markdown',
     author="Mathew Ng'etich",
     author_email='kipkoechmathew@gmail.com',
     download_url="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master",
