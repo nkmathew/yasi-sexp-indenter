@@ -463,7 +463,7 @@ optional arguments:
          (path (or (real-path fname)
                    (real-path (string home *os-sep* fname))""))
          (contents (or (read-file path) "")))
-  (or (json-parse contents) '())))
+    (or (json-parse contents) '())))
 
 (define (assign-indent-numbers lst assoc-list inum)
   " Builds an associative list with keys as keywords and values as their indentation
@@ -517,8 +517,8 @@ optional arguments:
   (set 'keyword-list (assign-indent-numbers two-armed keyword-list KEYWORD2))
   (set 'keyword-list (assign-indent-numbers local-binders keyword-list KEYWORD4))
   (when (opts [read-rc])
-   (set 'keyword-list (assign-indent-numbers
-                       (lookup dialect (parse-rc-json)) keyword-list nil)))
+    (set 'keyword-list (assign-indent-numbers
+                        (lookup dialect (parse-rc-json)) keyword-list nil)))
   keyword-list)
 
 ;; ---------------------------------------------------------------------------------
@@ -695,11 +695,11 @@ optional arguments:
       (letn ((brace-start (regex "{" str 0))
              (tag-start (regex "\\[text\\]" str 0))
              (brace-start (if brace-start
-                           (+ (brace-start 2) (brace-start 1))
-                           -1))
+                              (+ (brace-start 2) (brace-start 1))
+                            -1))
              (tag-start (if tag-start
-                           (+ (tag-start 2) (tag-start 1))
-                           -1))
+                            (+ (tag-start 2) (tag-start 1))
+                          -1))
              (str-positions (list limit (or brace-start -1) (or tag-start -1)))
              (pos-lst '()))
         (dolist (arg str-positions)
@@ -738,9 +738,9 @@ optional arguments:
 
 (define (detabify text options)
   (letn ((opts (parse-args options)))
-  (if (< (opts [tab-width]) 1)
-      (expand-tabs text 4)
-    (expand-tabs text (opts [tab-width])))))
+    (if (< (opts [tab-width]) 1)
+        (expand-tabs text 4)
+      (expand-tabs text (opts [tab-width])))))
 
 
 (define (tabify text options)
