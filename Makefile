@@ -73,11 +73,16 @@ clean:
 		README.rst \
 		*.pyc \
 		*.bak~ \
+		dist/* \
 		tests/cases/*.bak~
 .PHONY : clean
 
 install: html
 	${PYTHON} setup.py install
+.PHONY : install
+
+upload-test: egg
+	twine upload --repository testpypi dist/*
 .PHONY : install
 
 help:
@@ -93,4 +98,5 @@ help:
 	@echo " -> rst"
 	@echo " -> tags"
 	@echo " -> test(new-test, py-test)"
+	@echo " -> upload-test"
 .PHONY : help
