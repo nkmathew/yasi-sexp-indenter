@@ -81,7 +81,11 @@ install: html
 	${PYTHON} setup.py install
 .PHONY : install
 
-upload-test: egg
+clean-dist:
+	rm -rf dist/*
+.PHONY : clean-dist
+
+upload-test: clean-dist egg
 	twine upload --repository testpypi dist/*
 .PHONY : install
 
