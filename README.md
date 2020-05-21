@@ -1,6 +1,8 @@
 [![Build Status][2]][3]
 [![Latest tag][4]][5]
 [![pypi downloads][6]][7]
+[![Supported versions][8]][5]
+[![Supported implementations][9]][5]
 
 ## yasi - yet another s-expression indenter
 
@@ -451,3 +453,5 @@ that it can't run in *GNU Common Lisp* because it doesn't have the macro.
 [5]: https://github.com/nkmathew/yasi-sexp-indenter/releases
 [6]: https://img.shields.io/pypi/dm/yasi.svg
 [7]: https://pypi.python.org/pypi/yasi
+[8]: https://img.shields.io/pypi/pyversions/yasi
+[9]: https://img.shields.io/pypi/implementation/yasi
