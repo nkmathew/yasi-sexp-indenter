@@ -1,4 +1,8 @@
-PYTHON?=python
+ifeq ($(OS),Windows_NT)
+	PYTHON?=python
+else
+	PYTHON?=python3
+endif
 
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -33,7 +37,7 @@ py-test:
 .PHONY : py-test
 
 deps:
-	-pip install -r $(ROOT_DIR)/requirements.txt
+	-${PYTHON} -m pip install -r $(ROOT_DIR)/requirements.txt
 .PHONY : deps
 
 new-test:
