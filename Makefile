@@ -30,7 +30,7 @@ html: README.html
 .PHONY : html
 
 README.html: README.rst
-	rst2html.py -stg README.rst README.html
+	${PYTHON} rst2html.py -stg README.rst README.html
 
 py-test:
 	@${PYTHON} tests/test_yasi.py
