@@ -76,6 +76,10 @@ clean:
 		tests/cases/*.bak~
 .PHONY : clean
 
+install: html
+	${PYTHON} setup.py install
+.PHONY : install
+
 help:
 	@echo "Targets:"
 	@echo " -> clean"
@@ -84,6 +88,7 @@ help:
 	@echo " -> egg"
 	@echo " -> fmt"
 	@echo " -> htm(html)"
+	@echo " -> install"
 	@echo " -> lint"
 	@echo " -> rst"
 	@echo " -> tags"
