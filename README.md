@@ -42,6 +42,12 @@ From pypi:
 
     pip install --upgrade yasi
 
+Locally(latest changes):
+
+    git clone https://github.com/nkmathew/yasi-sexp-indenter.git
+    cd yasi-sexp-indenter
+    make install
+
 ### Features
 
 *yasi's* indentation relies heavily on regular expressions that give it an edge
