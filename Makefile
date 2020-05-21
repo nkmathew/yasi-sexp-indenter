@@ -46,10 +46,20 @@ test: py-test new-test
 tags: yasi.py
 	ctags yasi.py
 
+fmt: yasi.py tests/test_yasi.py
+	autopep8 $^ \
+		--indent-size=4 \
+		--in-place \
+		--ignore=E221 \
+		--max-line-length 130
+.PHONY : fmt
+
 lint:
-	pep8 yasi.py tests/test_yasi.py
-	@printf "\n-------------------\n"
-	pylint yasi.py tests/test_yasi.py
+	-pycodestyle yasi.py tests/test_yasi.py
+	@printf "\033[01;36m\n-------------------\n\n\033[0m"
+	-pylint yasi.py tests/test_yasi.py
+	@printf "\033[01;36m\n-------------------\n\n\033[0m"
+	flake8 yasi.py tests/test_yasi.py
 .PHONY : lint
 
 clean:
@@ -58,13 +68,14 @@ clean:
 
 help:
 	@echo "Targets:"
-	@echo " -> test(new-test, py-test)"
-	@echo " -> lint"
 	@echo " -> clean"
-	@echo " -> egg"
-	@echo " -> dist"
-	@echo " -> tags"
 	@echo " -> deps"
-	@echo " -> rst"
+	@echo " -> dist"
+	@echo " -> egg"
+	@echo " -> fmt"
 	@echo " -> htm(html)"
+	@echo " -> lint"
+	@echo " -> rst"
+	@echo " -> tags"
+	@echo " -> test(new-test, py-test)"
 .PHONY : help

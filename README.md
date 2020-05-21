@@ -18,6 +18,7 @@
 - [lispindent2 Command Line Options](#lispindent2-command-line-options)
 
 ### Introduction
+
 yasi is a dialect-aware s-expression indenter that tries to improve on [Dorai's
 indenter][0] and *Vim's* built in indenter. It can handle *Common Lisp*, *Clojure*,
 *Scheme* and *newLISP* code and their unique syntaxes.
@@ -36,11 +37,13 @@ I made this because there weren't any good enough tools out there that could ind
 the code I would copy/paste and run from tutorials when I was starting out with Lisp.
 
 ### Installation
+
 From pypi:
 
     pip install --upgrade yasi
 
 ### Features
+
 *yasi's* indentation relies heavily on regular expressions that give it an edge
 over its counterpart *lispindent.lisp*. Its features include:
 
@@ -88,7 +91,7 @@ over its counterpart *lispindent.lisp*. Its features include:
     usage: yasi [-h] [-nc] [-nb] [-nm] [--diff] [-nw] [-nr] [--no-output] [-c]
                 [-ne] [-o OUTPUT_FILE] [--tab TAB_SIZE] [--dialect DIALECT] [-v]
                 [-suffix BACKUP_SUFFIX] [-bd BACKUP_DIR] [-is INDENT_SIZE]
-                [-di DEFAULT_INDENT] [-ic] [-uni]
+                [-di DEFAULT_INDENT] [-ic] [-uni] [-parallel]
                 [files [files ...]]
 
     Dialect-aware s-expression indenter
@@ -139,12 +142,15 @@ over its counterpart *lispindent.lisp*. Its features include:
       -uni, --uniform, -uniform, --uni
                             Dictates whether the if-clause and else-clause of an
                             if-likeblock should have the same indent level.
+      -parallel, --parallel
+                            Process the given files in parallel
+
 
 ### Hanging Indentation
 This is where the indented code block is not flush with the left margin. Lispindent
 does this by default although differently to the way it's implemented in yasi.
 The effect is obtained by passing **--no-compact** to the script.
-Here's how hanging indentation in lispindent and yasi differs:
+Here's how hanging indentation in *lispindent* and yasi differs:
 
 Initial code:
 
@@ -176,7 +182,7 @@ Calling yasi on the file with **--no-compact**:
                 (exit)
 ```
 
-How lispindent does it(the number of spaces at the start of first block defines
+How *lispindent* does it(the number of spaces at the start of first block defines
 where the rest of the blocks in the file will start):
 
 ```lisp
@@ -194,7 +200,8 @@ where the rest of the blocks in the file will start):
 ```
 
 ### Customization
-Customization is done similarly to the way it's done in lispindent - keywords are
+
+Customization is done similarly to the way it's done in *lispindent* - keywords are
 associated with numbers that determine the next line's indentation level.
 
 The additional keywords are defined in a **.yasirc.json** file placed in the current
@@ -318,11 +325,13 @@ style above, you pass the parameter like so:
 ----------
 
 ### What yasi does not handle
+
 There are some syntaxes used in some dialects of Scheme that didn't seem worth the
 effort implementing. An example is *MzScheme* and *Gauche's* use of `#//` or `#[]`
 for regular expressions.
 
 #### Modifications to lispindent
+
 I made a couple of modifications to *lispindent.lisp* and renamed it to
 *lispindent2.lisp*. The changes include:
 
@@ -358,8 +367,9 @@ I made a couple of modifications to *lispindent.lisp* and renamed it to
   irritating than *CRLF* endings which usually light up in an annoying way in *Vim*.
 
 #### Editor Integration
+
 yasi's ability to format code from standard input makes it a suitable candidate for
-the `equalprg` setting in Vim. Add this in your **.vimrc** and you're good to go.
+the `equalprg` setting in *Vim*. Add this in your **.vimrc** and you're good to go.
 
 ```vim
 au filetype clojure,lisp,scheme,newlisp setlocal equalprg=yasi.py\ --indent-comments
@@ -371,7 +381,7 @@ e.g `=%`
 You can also checkout these other projects for proper integration without invoking
 it externally as a filter script for example:
 
-  + Vim plugin: https://github.com/nkmathew/vim-newlisp-yasi
+  + *Vim* plugin: https://github.com/nkmathew/vim-newlisp-yasi
   + Sublime Text 2/3 plugin: https://github.com/nkmathew/sublime-yasi
 
 #### lispindent2 Issues
@@ -420,6 +430,7 @@ code:
 that it can't run in *GNU Common Lisp* because it doesn't have the macro.
 
 #### lispindent2 Command Line Options
+
     +---------------------------------------------------------------------------+
     |   Usage:  lispindent2.lisp [[<file>] [--no-modify] [--no-output]]         |
     |           --no-output ;; Don't output the indented code, false by default |

@@ -1,11 +1,69 @@
 [REPORTS]
-# Tells whether to display a full report or only the messages
-reports=no
+reports = no
 
 [FORMAT]
-# Maximum number of characters on a single line.
-max-line-length=130
+max-line-length = 130
 
 [MESSAGES CONTROL]
-
-disable=R0101,C0302,I0011,W1401,C0103,R0915,R0913,R0914,C0326,C0330,R0912,W1622,I0021,W1620,W1634,W1601,E1603,W1602,W1628,W1632,E1607,W1608,E1606,W1623,W1614,W1637,W1615,W1616,W1629,W1613,W1618,W1603,W1627,W1607,W1630,W1625,W1606,E1608,W1636,E1601,E1602,W1640,W1617,W1626,W1609,W1635,W1619,W1633,W1610,W1639,W1638,W1612,W1621,W1605,I0020,W1624,W0704,W1611,E1605,W1604,E1604
+disable = C0103,
+    C0302,
+    C0326,
+    C0330,
+    I0011,
+    I0020,
+    I0021,
+    R0101,
+    R0912,
+    R0913,
+    R0914,
+    R0915,
+    W0704,
+    W1401,
+    apply-builtin,
+    backtick,
+    basestring-builtin,
+    buffer-builtin,
+    cmp-builtin,
+    cmp-method,
+    coerce-builtin,
+    coerce-method,
+    delslice-method,
+    dict-iter-method,
+    dict-view-method,
+    execfile-builtin,
+    file-builtin,
+    filter-builtin-not-iterating,
+    getslice-method,
+    hex-method,
+    indexing-exception,
+    input-builtin,
+    intern-builtin,
+    long-builtin,
+    long-suffix,
+    map-builtin-not-iterating,
+    metaclass-assignment,
+    next-method-called,
+    no-absolute-import,
+    nonzero-method,
+    oct-method,
+    old-division,
+    old-ne-operator,
+    old-octal-literal,
+    old-raise-syntax,
+    parameter-unpacking,
+    print-statement,
+    raising-string,
+    range-builtin-not-iterating,
+    raw_input-builtin,
+    reduce-builtin,
+    reload-builtin,
+    round-builtin,
+    setslice-method,
+    standarderror-builtin,
+    unichr-builtin,
+    unicode-builtin,
+    unpacking-in-except,
+    using-cmp-argument,
+    xrange-builtin,
+    import-outside-toplevel,
+    zip-builtin-not-iterating
