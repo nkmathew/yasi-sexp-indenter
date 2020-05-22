@@ -29,15 +29,20 @@ def version():
 
 
 setuptools.setup(
-    name='yasi',
-    version=version(),
-    description='A dialect aware s-expression indenter',
-    long_description=README,
-    long_description_content_type='text/markdown',
     author="Mathew Ng'etich",
     author_email='kipkoechmathew@gmail.com',
+    description='A dialect aware s-expression indenter',
     download_url="https://github.com/nkmathew/yasi-sexp-indenter/zipball/master",
+    entry_points={'console_scripts': ['yasi = yasi:main']},
+    install_requires=DEPS,
+    keywords='scheme, formatter, newlisp, beautifier, clojure, lisp, indenter',
+    long_description=README,
+    long_description_content_type='text/markdown',
+    name='yasi',
+    py_modules=['yasi'],
+    test_suite='test.test_yasi',
     url='https://github.com/nkmathew/yasi-sexp-indenter',
+    version=version(),
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -56,10 +61,5 @@ setuptools.setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Quality Assurance',
-    ],
-    keywords='scheme, formatter, newlisp, beautifier, clojure, lisp, indenter',
-    test_suite='test.test_yasi',
-    py_modules=['yasi'],
-    install_requires=DEPS,
-    entry_points={'console_scripts': ['yasi = yasi:main']}
+    ]
 )
