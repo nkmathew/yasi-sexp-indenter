@@ -1,0 +1,6 @@
+---
+- id: yasi
+  name: yasi
+  entry: yasi
+  language: python
+  args: [--no-backup, --no-output, --parallel]
