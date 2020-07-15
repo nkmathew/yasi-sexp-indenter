@@ -4,3 +4,5 @@
   entry: yasi
   language: python
   args: [--no-backup, --no-output, --parallel]
+  types: [file]
+  files: \.(clj|cljc|cljs|lsp|lisp|ss|scm|rkt)$
